@@ -118,9 +118,11 @@ input.mini,input.mini2{text-align:right}
 .subnav{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .subnav button{border:1.5px solid var(--line);background:#fff;border-radius:9px;padding:8px 18px;font-weight:700;color:var(--gray)}
 .subnav button.on{border-color:var(--red);color:#fff;background:var(--red)}
-.thumb{font-size:17px;padding:4px 10px;border-radius:8px;border:1px solid var(--line);background:#fff;line-height:1}
-.thumb:hover{border-color:var(--red)}
-.thumb.down{filter:grayscale(.2)}
+.thumb{font-size:17px;padding:4px 9px;border-radius:8px;border:1.5px solid var(--line);background:#fff;line-height:1;opacity:.4;filter:grayscale(1)}
+.thumb:hover{border-color:var(--red);opacity:.85;filter:none}
+.thumb.active{opacity:1;filter:none}
+.thumb.active.up{border-color:var(--ok);background:var(--okBg)}
+.thumb.active.down{border-color:var(--red);background:#FDECEF}
 .catRow{cursor:pointer}
 .catRow:hover td{background:var(--surface)}
 .catRow .arr{display:inline-block;transition:transform .15s;color:var(--red);font-weight:700;margin-right:6px}
@@ -253,6 +255,23 @@ let S = { token:null, refresh:null, uid:null, role:null, nome:null, unidade:null
 
 document.querySelectorAll('.logoImg').forEach(i=>i.src=LOGO);
 
+/* ---- sessão persistente ---- */
+function saveSess(){ try{ localStorage.setItem('fin_sess', JSON.stringify({refresh:S.refresh})); }catch(e){} }
+function clearSess(){ try{ localStorage.removeItem('fin_sess'); localStorage.removeItem('fin_unidade'); }catch(e){} }
+(async function boot(){
+  let sess=null; try{ sess=JSON.parse(localStorage.getItem('fin_sess')||'null'); }catch(e){}
+  if(!sess||!sess.refresh) return;
+  try{
+    const r=await fetch(SUPA+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{'apikey':ANON,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:sess.refresh})});
+    if(!r.ok){ clearSess(); return; }
+    const d=await r.json();
+    S.token=d.access_token; S.refresh=d.refresh_token; S.uid=d.user.id; saveSess();
+    await afterLogin();
+    const u=localStorage.getItem('fin_unidade');
+    if(u) loadUnidade(u).catch(()=>{});
+  }catch(e){}
+})();
+
 function curComp(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 function compLabel(c){ const [y,m]=c.split('-'); return MESES[+m-1]+' '+y; }
@@ -291,7 +310,7 @@ async function refreshToken(){
   try{
     const r = await fetch(SUPA+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{'apikey':ANON,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:S.refresh})});
     if(!r.ok) return false;
-    const d = await r.json(); S.token=d.access_token; S.refresh=d.refresh_token; return true;
+    const d = await r.json(); S.token=d.access_token; S.refresh=d.refresh_token; saveSess(); return true;
   }catch{ return false; }
 }
 
@@ -307,7 +326,7 @@ async function doLogin(){
     const r = await fetch(SUPA+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'apikey':ANON,'Content-Type':'application/json'},body:JSON.stringify({email:loEmail.value.trim(),password:loPass.value})});
     const d = await r.json();
     if(!r.ok) throw new Error(d.error_description||d.msg||'E-mail ou senha incorretos');
-    S.token=d.access_token; S.refresh=d.refresh_token; S.uid=d.user.id;
+    S.token=d.access_token; S.refresh=d.refresh_token; S.uid=d.user.id; saveSess();
     await afterLogin();
   }catch(e){ authMsg(e.message); }
 }
@@ -319,7 +338,7 @@ async function doSignup(){
     const d = await r.json();
     if(!r.ok) throw new Error(d.error_description||d.msg||'Não foi possível criar a conta');
     if(d.access_token){
-      S.token=d.access_token; S.refresh=d.refresh_token; S.uid=d.user.id;
+      S.token=d.access_token; S.refresh=d.refresh_token; S.uid=d.user.id; saveSess();
       const rr = await db.rpc('fin_ativar_com_convite',{codigo_convite:suCode.value.trim()});
       if(!rr.ok){ showInvite(); return authMsg(rr.erro); }
       if(suNome.value.trim()) await db.upd('fin_usuarios','id=eq.'+S.uid,{nome:suNome.value.trim()}).catch(()=>{});
@@ -358,6 +377,7 @@ async function loadUnidade(id){
   S.unidade=id; S.cfg={};
   const cfgRows = await db.get('fin_config',`unidade=eq.${id}&select=chave,valor`);
   cfgRows.forEach(r=>S.cfg[r.chave]=r.valor);
+  try{ localStorage.setItem('fin_unidade', id); }catch(e){}
   const u=UNIDADES.find(x=>x.id===id);
   document.getElementById('unitSel').innerHTML=UNIDADES.map(x=>`<option value="${x.id}" ${x.id===id?'selected':''}>${x.nome}</option>`).join('');
   document.getElementById('sideUnit').textContent='Financeiro · '+u.nome.replace('CNA ','');
@@ -367,7 +387,7 @@ async function loadUnidade(id){
   go('resumo');
 }
 function switchUnidade(id){ loadUnidade(id).then(()=>toast('Você está em '+UNIDADES.find(x=>x.id===id).nome)).catch(e=>toast(e.message)); }
-function logout(){ S={token:null,refresh:null,uid:null,role:null,nome:null,unidade:null,comp:curComp(),view:'resumo',cfg:{}}; document.getElementById('app').style.display='none'; document.getElementById('auth').style.display='flex'; showLogin(); }
+function logout(){ clearSess(); S={token:null,refresh:null,uid:null,role:null,nome:null,unidade:null,comp:curComp(),view:'resumo',cfg:{}}; document.getElementById('app').style.display='none'; document.getElementById('auth').style.display='flex'; showLogin(); }
 
 /* ================= ROUTER ================= */
 const TITLES={resumo:'Resumo do mês',contas:'Contas a pagar',folha:'Folha de pagamento',receitas:'Receitas',dre:'DRE',projecao:'Projeção e sugestões',df:'DF · Relatório de franquia',cadastros:'Cadastros'};
@@ -444,7 +464,7 @@ async function vResumo(el){
 function miniList(items){
   return `<table><thead><tr><th>Conta</th><th>Vence</th><th>Responsável</th><th class="num">Valor</th><th></th></tr></thead><tbody>`+
   items.map(l=>`<tr><td>${esc(l.nome)}</td><td>${dBR(l.vencimento)}</td><td>${esc(l.responsavel||'—')}</td><td class="num">${fmt(l.valor_cents)}</td>
-  <td style="text-align:right"><button class="thumb" title="Marcar como paga" onclick="marcarPago(${l.id})">👍</button></td></tr>`).join('')+`</tbody></table>`;
+  <td style="text-align:right"><button class="thumb up" style="opacity:.9;filter:none" title="Marcar como paga" onclick="marcarPago(${l.id})">👍</button></td></tr>`).join('')+`</tbody></table>`;
 }
 async function marcarPago(id){ await db.upd('fin_lancamentos','id=eq.'+id,{status:'pago',pago_em:todayISO()}); toast('Conta marcada como paga'); render(); }
 
@@ -518,9 +538,8 @@ async function vContas(el){
       <td>${dBR(l.vencimento)}</td><td>${esc(l.responsavel||'—')}</td>
       <td class="num"><input class="mini" inputmode="decimal" value="${(l.valor_cents/100).toFixed(2).replace('.',',')}" onchange="mudaValor(${l.id},this.value)"></td>
       <td style="text-align:right;white-space:nowrap">
-        ${l.status==='pendente'
-          ?`<button class="thumb" title="Marcar como paga" onclick="marcarPago(${l.id})">👍</button>`
-          :`<button class="thumb down" title="Desfazer pagamento" onclick="desmarcar(${l.id})">👎</button>`}
+        <button class="thumb up ${l.status==='pago'?'active':''}" title="Marcar como paga" onclick="marcarPago(${l.id})">👍</button>
+        <button class="thumb down ${l.status!=='pago'?'active':''}" title="Marcar como não paga" onclick="desmarcar(${l.id})">👎</button>
         <button class="btn sm ghost" onclick="delLanc(${l.id})">✕</button>
       </td></tr>`;}).join('')}</tbody></table>`
     :`<div class="empty">Nenhum lançamento ${contasFiltro!=='todas'?'nesse filtro':'neste mês ainda'}.</div>`}
