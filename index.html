@@ -63,7 +63,7 @@ aside .brand small{display:block;color:#999;font-weight:400;font-size:11px;margi
 nav a{display:block;padding:9px 20px;color:#ccc;text-decoration:none;font-weight:500;font-size:13.5px;border-left:3px solid transparent;cursor:pointer}
 nav a:hover{color:#fff}
 nav a.on{color:#fff;border-left-color:var(--red);background:rgba(230,20,60,.12)}
-aside .foot{margin-top:auto;padding:14px 20px;font-size:12px;color:#888}
+aside .foot{margin-top:auto;padding:14px 20px;font-size:12px;color:#888;display:flex;flex-direction:column;gap:4px}
 aside .foot b{color:#ccc;display:block}
 aside .foot button{color:#999;font-size:12px;padding:0;margin-top:6px;text-decoration:underline}
 main{flex:1;padding:22px 26px 60px;max-width:1180px}
@@ -146,7 +146,9 @@ input.mini,input.mini2{text-align:right}
   nav{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 6px}
   nav a{border-left:none;border-bottom:3px solid transparent;padding:10px 12px;white-space:nowrap;font-size:13px}
   nav a.on{border-bottom-color:var(--red);border-left:none;background:none}
-  aside .foot{display:none}
+  aside .foot{display:flex;flex-direction:row;align-items:center;justify-content:space-between;padding:7px 14px;margin:0;border-top:1px solid #2a2a2a;font-size:11.5px}
+  aside .foot .who b{display:inline;margin-right:6px}
+  aside .foot button{margin:0}
   main{padding:16px 12px 70px;max-width:100%}
   .topbar{gap:10px}
   .topbar h1{width:100%;font-size:17px}
@@ -218,7 +220,7 @@ input.mini,input.mini2{text-align:right}
     <div class="brand"><span class="logoChip"><img class="logoImg side" alt="CNA idiomas"></span><small id="sideUnit">Financeiro</small></div>
     <nav id="nav">
       <a data-v="resumo" class="on" onclick="go('resumo')">Resumo</a>
-      <a data-v="contas" onclick="go('contas')">Contas a pagar</a>
+      <a data-v="contas" onclick="go('contas')">Contas</a>
       <a data-v="folha" data-admin onclick="go('folha')">Folha</a>
       <a data-v="receitas" onclick="go('receitas')">Receitas</a>
       <a data-v="dre" onclick="go('dre')">DRE</a>
@@ -226,7 +228,7 @@ input.mini,input.mini2{text-align:right}
       <a data-v="df" onclick="go('df')">DF · Franquia</a>
       <a data-v="cadastros" onclick="go('cadastros')">Cadastros</a>
     </nav>
-    <div class="foot"><b id="whoName"></b><span id="whoRole"></span><br><button onclick="logout()">Sair</button></div>
+    <div class="foot"><div class="who"><b id="whoName"></b><span id="whoRole"></span></div><button onclick="logout()">Sair</button></div>
   </aside>
   <main>
     <div class="topbar">
@@ -390,7 +392,7 @@ function switchUnidade(id){ loadUnidade(id).then(()=>toast('Você está em '+UNI
 function logout(){ clearSess(); S={token:null,refresh:null,uid:null,role:null,nome:null,unidade:null,comp:curComp(),view:'resumo',cfg:{}}; document.getElementById('app').style.display='none'; document.getElementById('auth').style.display='flex'; showLogin(); }
 
 /* ================= ROUTER ================= */
-const TITLES={resumo:'Resumo do mês',contas:'Contas a pagar',folha:'Folha de pagamento',receitas:'Receitas',dre:'DRE',projecao:'Projeção e sugestões',df:'DF · Relatório de franquia',cadastros:'Cadastros'};
+const TITLES={resumo:'Resumo do mês',contas:'Contas a pagar e a receber',folha:'Folha de pagamento',receitas:'Receitas',dre:'DRE',projecao:'Projeção e sugestões',df:'DF · Relatório de franquia',cadastros:'Cadastros'};
 function go(v){
   if(v==='folha'&&S.role!=='admin') return;
   S.view=v;
@@ -470,9 +472,16 @@ async function marcarPago(id){ await db.upd('fin_lancamentos','id=eq.'+id,{statu
 
 /* ================= CONTAS ================= */
 let contasTab='fixa', contasFiltro='todas';
-function setTab(t){ contasTab=t; render(); }
+function subnavHTML(){ return `<div class="subnav">
+    <button class="${contasTab==='fixa'?'on':''}" onclick="setTab('fixa')">A pagar · fixas</button>
+    <button class="${contasTab==='variavel'?'on':''}" onclick="setTab('variavel')">A pagar · variáveis</button>
+    <button class="${contasTab==='receber'?'on':''}" onclick="setTab('receber')">A receber</button>
+  </div>`; }
+function prependSubnav(el){ el.insertAdjacentHTML('afterbegin', subnavHTML()); }
+function setTab(t){ contasTab=t; contasFiltro='todas'; render(); }
 function setFiltro(f){ contasFiltro=f; render(); }
 async function vContas(el){
+  if(contasTab==='receber') return vReceber(el).then(()=>{ prependSubnav(el); });
   const c=S.comp;
   const [lanc,recs] = await Promise.all([
     db.get('fin_lancamentos',`unidade=eq.${S.unidade}&competencia=eq.${c}&select=*&order=vencimento.asc.nullslast,id.asc`),
@@ -512,10 +521,7 @@ async function vContas(el){
   </div>` : '';
 
   el.innerHTML=`
-  <div class="subnav">
-    <button class="${contasTab==='fixa'?'on':''}" onclick="setTab('fixa')">Despesas fixas</button>
-    <button class="${contasTab==='variavel'?'on':''}" onclick="setTab('variavel')">Despesas variáveis</button>
-  </div>
+  ${subnavHTML()}
   <div class="cards">
     <div class="card"><small>Fixas do mês</small><div class="v">${fmt(totFix)}</div></div>
     <div class="card"><small>Variáveis do mês</small><div class="v">${fmt(totVar)}</div></div>
@@ -574,6 +580,72 @@ async function addAvulsa(){
   const dia=+avDia.value, ld=lastDay(S.comp);
   await db.ins('fin_lancamentos',[{unidade:S.unidade,competencia:S.comp,tipo:'despesa',origem:'avulsa',tipo_despesa:contasTab,nome,categoria:avCat.value,valor_cents:parseBRL(avValor.value),vencimento:dia?`${S.comp}-${String(Math.min(dia,ld)).padStart(2,'0')}`:null,responsavel:avResp.value.trim()||null}]);
   toast('Despesa adicionada'); render();
+}
+
+async function vReceber(el){
+  const c=S.comp, hoje=todayISO();
+  const [recb,recAgg]=await Promise.all([
+    db.get('fin_recebiveis',`unidade=eq.${S.unidade}&competencia=eq.${c}&select=*&order=vencimento.asc.nullslast,id.asc`),
+    db.get('fin_receitas',`unidade=eq.${S.unidade}&competencia=eq.${c}&select=faturado_cents,recebido_cents`)
+  ]);
+  const fat=recAgg.reduce((a,r)=>a+r.faturado_cents,0), rebAgg=recAgg.reduce((a,r)=>a+r.recebido_cents,0);
+  const pend=recb.filter(r=>r.status==='pendente');
+  const pendTot=pend.reduce((a,r)=>a+r.valor_cents,0);
+  const atras=pend.filter(r=>r.vencimento&&r.vencimento<hoje);
+  const atrasTot=atras.reduce((a,r)=>a+r.valor_cents,0);
+  const rebTot=recb.filter(r=>r.status==='recebido').reduce((a,r)=>a+r.valor_cents,0);
+  const shown=recb.filter(r=>contasFiltro==='todas'||(contasFiltro==='pend'&&r.status==='pendente')||(contasFiltro==='pago'&&r.status==='recebido'));
+  const diasAtraso=v=>{ if(!v||v>=hoje) return 0; return Math.round((new Date(hoje)-new Date(v))/86400000); };
+
+  el.innerHTML=`
+  <div class="cards">
+    <div class="card"><small>A receber (lista)</small><div class="v">${fmt(pendTot)}</div><div class="d">${pend.length} título${pend.length===1?'':'s'} em aberto</div></div>
+    <div class="card"><small>Em atraso</small><div class="v red">${fmt(atrasTot)}</div><div class="d">${atras.length?atras.length+' vencido'+(atras.length>1?'s':''):'nada vencido'}</div></div>
+    <div class="card"><small>Recebido (desta lista)</small><div class="v ok">${fmt(rebTot)}</div></div>
+    <div class="card"><small>A receber no mês (geral)</small><div class="v">${fmt(Math.max(0,fat-rebAgg))}</div><div class="d">das Receitas: faturado − recebido</div></div>
+  </div>
+  <div class="panel">
+    <div class="panelHead">
+      <h2>Títulos a receber · ${compLabel(c)}</h2>
+      <button class="pill ${contasFiltro==='todas'?'on':''}" onclick="setFiltro('todas')">Todos</button>
+      <button class="pill ${contasFiltro==='pend'?'on':''}" onclick="setFiltro('pend')">Em aberto</button>
+      <button class="pill ${contasFiltro==='pago'?'on':''}" onclick="setFiltro('pago')">Recebidos</button>
+    </div>
+    ${shown.length?`<table><thead><tr><th></th><th>Descrição</th><th>Vence</th><th class="num">Valor</th><th style="text-align:right">Recebido?</th></tr></thead><tbody>${shown.map(r=>{
+      const dd=diasAtraso(r.vencimento), late=r.status==='pendente'&&dd>0;
+      return `<tr class="${r.status==='recebido'?'paid':''}">
+      <td><span class="badge ${late?'late':r.status==='recebido'?'pago':'pend'}">${late?dd+'d atraso':r.status==='recebido'?'Recebido':'Em dia'}</span></td>
+      <td><span class="name">${esc(r.descricao)}</span>${r.obs?`<div class="hint">${esc(r.obs)}</div>`:''}</td>
+      <td>${dBR(r.vencimento)}</td>
+      <td class="num"><input class="mini" inputmode="decimal" value="${(r.valor_cents/100).toFixed(2).replace('.',',')}" onchange="mudaValorReceb(${r.id},this.value)"></td>
+      <td style="text-align:right;white-space:nowrap">
+        <button class="thumb up ${r.status==='recebido'?'active':''}" title="Marcar como recebido" onclick="marcarRecebido(${r.id})">👍</button>
+        <button class="thumb down ${r.status!=='recebido'?'active':''}" title="Marcar como não recebido" onclick="desmarcarReceb(${r.id})">👎</button>
+        <button class="btn sm ghost" onclick="delReceb(${r.id})">✕</button>
+      </td></tr>`;}).join('')}</tbody></table>`
+    :`<div class="empty">Nenhum título ${contasFiltro!=='todas'?'nesse filtro':'lançado neste mês'}. Registre aqui mensalidades em aberto, acordos e outros valores a receber.</div>`}
+  </div>
+  <div class="panel">
+    <h2>Adicionar valor a receber</h2>
+    <div class="formRow">
+      <div class="field"><label>Descrição (aluno/origem)</label><input id="rbDesc"></div>
+      <div class="field"><label>Valor</label><input id="rbValor" inputmode="decimal" placeholder="0,00"></div>
+      <div class="field"><label>Vencimento (dia)</label><input id="rbDia" type="number" min="1" max="31"></div>
+      <div class="field" style="grid-column:span 2"><label>Observação</label><input id="rbObs" placeholder="opcional"></div>
+      <button class="btn" onclick="addReceb()">Adicionar</button>
+    </div>
+    <p class="hint" style="margin-top:6px">Esta lista é o controle título a título (quem deve, quanto e desde quando) e alimenta a Projeção. A aba Receitas continua sendo a visão macro do mês (faturado × recebido total, do CNA Box).</p>
+  </div>`;
+}
+async function marcarRecebido(id){ await db.upd('fin_recebiveis','id=eq.'+id,{status:'recebido',recebido_em:todayISO()}); toast('Recebido registrado'); render(); }
+async function desmarcarReceb(id){ await db.upd('fin_recebiveis','id=eq.'+id,{status:'pendente',recebido_em:null}); render(); }
+async function delReceb(id){ if(!confirm('Excluir esse título?'))return; await db.del('fin_recebiveis','id=eq.'+id); render(); }
+async function mudaValorReceb(id,v){ await db.upd('fin_recebiveis','id=eq.'+id,{valor_cents:parseBRL(v)}); toast('Valor atualizado'); render(); }
+async function addReceb(){
+  const d=rbDesc.value.trim(); if(!d) return toast('Descreva o título (ex: mensalidade do aluno X)');
+  const dia=+rbDia.value, ld=lastDay(S.comp);
+  await db.ins('fin_recebiveis',[{unidade:S.unidade,competencia:S.comp,descricao:d,valor_cents:parseBRL(rbValor.value),vencimento:dia?`${S.comp}-${String(Math.min(dia,ld)).padStart(2,'0')}`:null,obs:rbObs.value.trim()||null}]);
+  toast('Título adicionado'); render();
 }
 
 /* ================= FOLHA ================= */
@@ -789,11 +861,12 @@ async function vProjecao(el){
   const c=S.comp;
   const meses6=[]; for(let i=5;i>=0;i--) meses6.push(nextComp(c,-i));
   const inList=meses6.map(x=>'"'+x+'"').join(',');
-  const [lanc,recAll,recs,folhaLanc]=await Promise.all([
+  const [lanc,recAll,recs,folhaLanc,recbv]=await Promise.all([
     db.get('fin_lancamentos',`unidade=eq.${S.unidade}&competencia=eq.${c}&select=*`),
     db.get('fin_receitas',`unidade=eq.${S.unidade}&competencia=in.(${inList})&select=competencia,faturado_cents,recebido_cents`),
     db.get('fin_despesas_recorrentes',`unidade=eq.${S.unidade}&ativo=eq.true&select=valor_cents,nome`),
-    db.get('fin_lancamentos',`unidade=eq.${S.unidade}&origem=eq.folha&select=competencia,valor_cents&order=competencia.desc&limit=9`)
+    db.get('fin_lancamentos',`unidade=eq.${S.unidade}&origem=eq.folha&select=competencia,valor_cents&order=competencia.desc&limit=9`),
+    db.get('fin_recebiveis',`unidade=eq.${S.unidade}&competencia=eq.${c}&status=eq.pendente&select=valor_cents,vencimento`)
   ]);
   const hoje=todayISO(), ld=lastDay(c);
   const diaHoje = c===curComp() ? (new Date()).getDate() : ld;
@@ -811,10 +884,16 @@ async function vProjecao(el){
   const semanas=[[1,7],[8,14],[15,21],[22,ld]];
   const diasRestantes=Math.max(1, ld-diaHoje+1);
   const entradaDia=aReceber/diasRestantes;
+  const usaTitulos=recbv.length>0;
   const linhas=semanas.map(([d1,d2],i)=>{
     const sai=pend.filter(l=>{ if(!l.vencimento) return i===3; const d=+l.vencimento.slice(8); return d>=d1&&d<=d2; }).reduce((a,l)=>a+l.valor_cents,0);
-    const diasSem=Math.max(0, Math.min(d2,ld)-Math.max(d1,diaHoje)+1);
-    const entra=Math.round(entradaDia*diasSem);
+    let entra;
+    if(usaTitulos){
+      entra=recbv.filter(r=>{ if(!r.vencimento) return i===3; const d=+r.vencimento.slice(8); return d>=d1&&d<=d2; }).reduce((a,r)=>a+r.valor_cents,0);
+    } else {
+      const diasSem=Math.max(0, Math.min(d2,ld)-Math.max(d1,diaHoje)+1);
+      entra=Math.round(entradaDia*diasSem);
+    }
     return {rot:`${String(d1).padStart(2,'0')} a ${String(Math.min(d2,ld)).padStart(2,'0')}`, sai, entra, passada:d2<diaHoje};
   });
   let acum=0;
@@ -846,6 +925,8 @@ async function vProjecao(el){
   const pctReceb=fat?receb/fat:0;
   if(fat&&diaHoje>=15&&pctReceb<0.6) sugs.push({n:'alerta',t:`Só ${Math.round(pctReceb*100)}% do faturado entrou no caixa até o dia ${diaHoje}`,d:`Há ${fmt(aReceber)} a receber. Rode a régua de cobrança (lembrete no vencimento, contato em 5 dias, renegociação em 15) antes de comprometer novos gastos.`});
   else if(fat&&pctReceb<0.85&&diaHoje>=25) sugs.push({n:'atencao',t:`Recebimento em ${Math.round(pctReceb*100)}% com o mês acabando`,d:'Revise a lista de mensalidades em aberto no CNA Box e priorize contato com responsáveis antes da virada do mês.'});
+  const titAtras=recbv.filter(r=>r.vencimento&&r.vencimento<hoje);
+  if(titAtras.length) sugs.push({n:'alerta',t:`${titAtras.length} título${titAtras.length>1?'s':''} a receber vencido${titAtras.length>1?'s':''}, somando ${fmt(titAtras.reduce((a,r)=>a+r.valor_cents,0))}`,d:'Lista pronta no Contas a receber. Contato hoje: quanto mais recente o atraso, maior a chance de recuperar.'});
   const semCritica=linhas.reduce((m,l)=>l.sai>m.sai?l:m,{sai:0});
   if(semCritica.sai>0&&pendTot>0&&semCritica.sai/pendTot>0.45) sugs.push({n:'atencao',t:`A semana de ${semCritica.rot} concentra ${fmt(semCritica.sai)} em vencimentos`,d:'Se o caixa estiver curto, antecipe recebíveis ou negocie um ou dois vencimentos dessa janela pra semana seguinte.'});
   const proLab=lanc.filter(l=>l.categoria==='Pró-labore').reduce((a,l)=>a+l.valor_cents,0);
@@ -869,7 +950,7 @@ async function vProjecao(el){
       <h2>Fluxo do mês, semana a semana</h2>
       <table><thead><tr><th>Semana</th><th class="num">Entrada estimada</th><th class="num">Contas a vencer</th><th class="num">Acumulado</th></tr></thead>
       <tbody>${linhasHTML}</tbody></table>
-      <p class="hint" style="margin-top:8px">Entrada estimada distribui o saldo a receber (${fmt(aReceber)}) de forma linear pelos dias restantes. As saídas são as contas pendentes reais por data de vencimento.</p>
+      <p class="hint" style="margin-top:8px">${usaTitulos?`Entradas vêm dos títulos em aberto no Contas a receber (${recbv.length} título${recbv.length>1?"s":""}), por data de vencimento.`:`Entrada estimada distribui o saldo a receber (${fmt(aReceber)}) de forma linear pelos dias restantes. Lance os títulos no Contas a receber pra esta projeção usar datas reais.`} As saídas são as contas pendentes reais.</p>
     </div>
     <div class="panel">
       <h2>Projeção dos próximos 3 meses</h2>
