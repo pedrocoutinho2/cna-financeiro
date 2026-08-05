@@ -16,9 +16,9 @@
 body{font-family:'Poppins',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface);color:var(--ink);font-size:14px;line-height:1.45}
 button{font:inherit;cursor:pointer;border:none;background:none}
 input,select,textarea{font:inherit;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:7px 9px;background:#fff;width:100%}
-input:focus,select:focus,textarea:focus{outline:2px solid var(--red);outline-offset:0;border-color:var(--red)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--blue);outline-offset:0;border-color:var(--blue)}
 h1{font-size:19px;font-weight:700;letter-spacing:-.3px}
-h2{font-size:15px;font-weight:700;color:var(--red);margin:0 0 10px}
+h2{font-size:15px;font-weight:700;color:var(--blue);margin:0 0 10px}
 .btn{background:var(--red);color:#fff;font-weight:600;padding:8px 16px;border-radius:7px;transition:background .15s}
 .btn:hover{background:var(--redDark)}
 .btn.sec{background:#fff;color:var(--blue);border:1px solid var(--line)}
@@ -44,7 +44,7 @@ aside::after{content:'';display:block;height:6px;background:var(--red);margin-to
 .field label{display:block;font-size:12px;font-weight:600;color:var(--gray);margin-bottom:4px}
 .authCard .btn{width:100%;margin-top:6px;padding:10px}
 .authSwitch{text-align:center;margin-top:16px;font-size:13px;color:var(--gray)}
-.authSwitch a{color:var(--redDark);font-weight:600;cursor:pointer;text-decoration:none}
+.authSwitch a{color:var(--blue);font-weight:600;cursor:pointer;text-decoration:none}
 .msg{border-radius:7px;padding:9px 12px;font-size:13px;margin-bottom:12px;display:none}
 .msg.err{display:block;background:#FDECEF;color:var(--redDark)}
 .msg.ok{display:block;background:var(--okBg);color:var(--ok)}
@@ -52,7 +52,7 @@ aside::after{content:'';display:block;height:6px;background:var(--red);margin-to
 .unitBtn:hover{border-color:var(--red);box-shadow:0 3px 12px rgba(230,20,60,.12)}
 .unitBtn b{display:block;font-size:15px;color:var(--ink)}
 .unitBtn span{font-size:12px;color:var(--gray)}
-.unitSel{width:auto;font-weight:700;color:var(--redDark);border-radius:8px;padding:8px 10px;background:#fff;cursor:pointer}
+.unitSel{width:auto;font-weight:700;color:var(--blue);border-radius:8px;padding:8px 10px;background:#fff;cursor:pointer}
 
 /* ---------- shell ---------- */
 #app{display:none;min-height:100vh}
@@ -63,22 +63,22 @@ aside .brand small{display:block;color:#999;font-weight:400;font-size:11px;margi
 nav a{display:block;padding:9px 20px;color:#ccc;text-decoration:none;font-weight:500;font-size:13.5px;border-left:3px solid transparent;cursor:pointer}
 nav a:hover{color:#fff}
 nav a.on{color:#fff;border-left-color:var(--red);background:rgba(230,20,60,.12)}
-aside .foot{margin-top:auto;padding:14px 20px;font-size:12px;color:#888;display:flex;flex-direction:column;gap:4px}
+aside .foot{margin-top:auto;padding:14px 20px;font-size:12px;color:#888}
 aside .foot b{color:#ccc;display:block}
 aside .foot button{color:#999;font-size:12px;padding:0;margin-top:6px;text-decoration:underline}
 main{flex:1;padding:22px 26px 60px;max-width:1180px}
 .topbar{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
 .topbar h1{margin-right:auto}
 .monthPick{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:4px 6px}
-.monthPick button{font-size:16px;color:var(--red);padding:2px 8px;font-weight:700}
-.monthPick b{min-width:120px;text-align:center;color:var(--redDark);text-transform:capitalize}
+.monthPick button{font-size:16px;color:var(--blue);padding:2px 8px;font-weight:700}
+.monthPick b{min-width:120px;text-align:center;color:var(--blue);text-transform:capitalize}
 
 /* ---------- components ---------- */
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:18px}
 .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px}
 .card small{display:block;color:var(--gray);font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;margin-bottom:5px}
 .card .v{font-size:20px;font-weight:700;color:var(--ink);letter-spacing:-.3px}
-.card .v.red{color:var(--redDark)} .card .v.blue{color:var(--redDark)} .card .v.ok{color:var(--ok)}
+.card .v.red{color:var(--redDark)} .card .v.blue{color:var(--blue)} .card .v.ok{color:var(--ok)}
 .card .d{font-size:11.5px;color:var(--gray);margin-top:3px}
 .panel{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:16px}
 .panelHead{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
@@ -96,7 +96,7 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:now
 .badge.late{background:#FDECEF;color:var(--redDark)}
 .badge.cat{background:var(--surface);color:var(--gray);font-weight:600}
 .pill{border:1px solid var(--line);background:#fff;border-radius:99px;padding:4px 12px;font-size:12.5px;font-weight:600;color:var(--gray)}
-.pill.on{border-color:var(--red);color:var(--redDark);background:#FDECEF}
+.pill.on{border-color:var(--blue);color:var(--blue);background:#EFF3FB}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .formRow{display:grid;grid-template-columns:2fr 1.4fr 1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:6px}
@@ -108,32 +108,13 @@ input.mini,input.mini2{text-align:right}
 .divider{border-top:1px solid var(--line);margin:14px 0}
 .bars{display:flex;align-items:flex-end;gap:6px;height:130px;padding-top:8px}
 .bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
-.bar .col{width:100%;max-width:38px;border-radius:4px 4px 0 0;background:var(--ok)}
+.bar .col{width:100%;max-width:38px;border-radius:4px 4px 0 0;background:var(--blue)}
 .bar .col.neg{background:var(--red)}
 .bar small{font-size:10px;color:var(--gray);white-space:nowrap;overflow:hidden;max-width:100%}
-.tag{font-size:10.5px;background:#FDECEF;color:var(--redDark);border-radius:4px;padding:1px 6px;font-weight:700;margin-left:6px}
+.tag{font-size:10.5px;background:#EFF3FB;color:var(--blue);border-radius:4px;padding:1px 6px;font-weight:700;margin-left:6px}
 .empty{padding:26px;text-align:center;color:var(--gray)}
 .toast{position:fixed;bottom:20px;right:20px;background:var(--ink);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:50}
 .toast.show{opacity:1}
-.subnav{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.subnav button{border:1.5px solid var(--line);background:#fff;border-radius:9px;padding:8px 18px;font-weight:700;color:var(--gray)}
-.subnav button.on{border-color:var(--red);color:#fff;background:var(--red)}
-.thumb{font-size:17px;padding:4px 9px;border-radius:8px;border:1.5px solid var(--line);background:#fff;line-height:1;opacity:.4;filter:grayscale(1)}
-.thumb:hover{border-color:var(--red);opacity:.85;filter:none}
-.thumb.active{opacity:1;filter:none}
-.thumb.active.up{border-color:var(--ok);background:var(--okBg)}
-.thumb.active.down{border-color:var(--red);background:#FDECEF}
-.catRow{cursor:pointer}
-.catRow:hover td{background:var(--surface)}
-.catRow .arr{display:inline-block;transition:transform .15s;color:var(--red);font-weight:700;margin-right:6px}
-.catRow.open .arr{transform:rotate(90deg)}
-.catDetail td{background:#FBFBFC;font-size:12.5px;color:var(--gray);padding-left:26px}
-.catDetail b{color:var(--ink);font-weight:600}
-.sug{border:1px solid var(--line);border-left:4px solid var(--gray);border-radius:10px;padding:11px 15px;background:#fff;margin-bottom:10px}
-.sug b{display:block;margin-bottom:3px}
-.sug.alerta{border-left-color:var(--red)} .sug.alerta b{color:var(--redDark)}
-.sug.atencao{border-left-color:var(--warn)} .sug.atencao b{color:var(--warn)}
-.sug.ok{border-left-color:var(--ok)} .sug.ok b{color:var(--ok)}
 @media(max-width:860px){
   body{font-size:14.5px}
   .shell{flex-direction:column}
@@ -146,9 +127,7 @@ input.mini,input.mini2{text-align:right}
   nav{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 6px}
   nav a{border-left:none;border-bottom:3px solid transparent;padding:10px 12px;white-space:nowrap;font-size:13px}
   nav a.on{border-bottom-color:var(--red);border-left:none;background:none}
-  aside .foot{display:flex;flex-direction:row;align-items:center;justify-content:space-between;padding:7px 14px;margin:0;border-top:1px solid #2a2a2a;font-size:11.5px}
-  aside .foot .who b{display:inline;margin-right:6px}
-  aside .foot button{margin:0}
+  aside .foot{display:none}
   main{padding:16px 12px 70px;max-width:100%}
   .topbar{gap:10px}
   .topbar h1{width:100%;font-size:17px}
@@ -164,11 +143,7 @@ input.mini,input.mini2{text-align:right}
   .panel table{min-width:640px}
   .btn{padding:10px 16px}
   .btn.sm{padding:7px 12px}
-  input,select{padding:9px 10px;font-size:16px}
-  .subnav{position:sticky;left:0}
-  .subnav button{flex:1;padding:10px 8px}
-  .thumb{font-size:19px;padding:8px 12px}
-  td{padding:9px 8px}
+  input,select{padding:9px 10px}
 }
 </style>
 </head>
@@ -220,15 +195,14 @@ input.mini,input.mini2{text-align:right}
     <div class="brand"><span class="logoChip"><img class="logoImg side" alt="CNA idiomas"></span><small id="sideUnit">Financeiro</small></div>
     <nav id="nav">
       <a data-v="resumo" class="on" onclick="go('resumo')">Resumo</a>
-      <a data-v="contas" onclick="go('contas')">Contas</a>
+      <a data-v="contas" onclick="go('contas')">Contas a pagar</a>
       <a data-v="folha" data-admin onclick="go('folha')">Folha</a>
       <a data-v="receitas" onclick="go('receitas')">Receitas</a>
       <a data-v="dre" onclick="go('dre')">DRE</a>
-      <a data-v="projecao" onclick="go('projecao')">Projeção</a>
       <a data-v="df" onclick="go('df')">DF · Franquia</a>
       <a data-v="cadastros" onclick="go('cadastros')">Cadastros</a>
     </nav>
-    <div class="foot"><div class="who"><b id="whoName"></b><span id="whoRole"></span></div><button onclick="logout()">Sair</button></div>
+    <div class="foot"><b id="whoName"></b><span id="whoRole"></span><br><button onclick="logout()">Sair</button></div>
   </aside>
   <main>
     <div class="topbar">
@@ -248,31 +222,14 @@ input.mini,input.mini2{text-align:right}
 
 <script>
 /* ================= CONFIG ================= */
-const SUPA = 'https://rfjtgdeavtegpzaercee.supabase.co';
-const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmanRnZGVhdnRlZ3B6YWVyY2VlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2ODYzMjIsImV4cCI6MjA5MzI2MjMyMn0.tokTWUx6zlWgCu0_Mijk8DPN_MGrYAtLr7PR-0dZadc';
+const SUPA = 'https://thelqaxsnuynevizhcla.supabase.co';
+const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoZWxxYXhzbnV5bmV2aXpoY2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU4NjA0MDUsImV4cCI6MjEwMTQzNjQwNX0.Xn52cJ74rnzmjcHcilbpqwy0BbmPF4fvb9bhoxEzzIw';
 const LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARgAAAB7CAMAAACYR2/+AAAA/1BMVEXnHkX+/v7pGjyUGjAbCA1hERr9/f1lCAgaRI+qMUhwDx4bNGkXO41SEhgqAwsSGWkUKFX8/PwXJksmRXf/AH//AAB2AXUAfQBtbG0JZGr/d3eBKjkAAP9oaLD/AP81AgipFxeoBFaxQ1UA//+qVVUA/wCBKTwwQ15MXHtlcYh4f/eUnq7/VaoRYJ56L0JDXZZgnp6MNESxsbHleqMAf/9QaIKxtcDUqqrFipt8L0RnQjxDXHt1h5b/f////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAS1lO0AAAAQHRSTlP+/v7yKKEUCP382e39YlUOop1k9wIBAgIECAKuAQMBhwMD9wEDAUNeoW4CTgME7+oEsAP+Aps9BvWyKsBmAgEAubgf1QAAEktJREFUeNrtnIl2o0YWhhmqoAQIRJDlSG6vbWfS6cxkkkyW2ev932rqLrWwSAIkd9qnxcnpyAIh+LjLf29VKdJ7NvVf/F+Z5EKIeOwmctk+jdQnbDIXURTHUVxqLcyLOBKi1GryeR43pYBPjr6YVH8VDVO5hssqk5+yLIsmbVmin/iukvc/lXCuuViUloJOSmDM//Hl1eQzbXVubiPRN6eCSYHKT4KZxJPICHtXCWDKy/n2stXqfRsMXEoyHcy1LuFWRKKvTwLzAk8bLQWQgCXDNg6LMfaKbYSeNqJ5mgnmX20weBETnrvjUmXtS5sFRqUWi4dynIw9wnz7A3uyYFsTiXljMwtMmQ1ZzHQwOT/kfKzJDIAxSEuHhYmMCLqBxSQ7opBbH8xM2APvnOkBIZhohispOA1doXiY60oKMkEWWgFiCSgdAROFruTezfLKnFv9IWAURiq+QiHngTGXngRpaHxoCYOvbMUYpmMC3+T8dB4wNxqSCD9c8+n7GWAUmUuMpwFbITpi0pbYs4moldTAn14+PZgXnaDBsNWPjL9tMMCFsDj/MDeaJ5UcZYDdo5KuwkF/+sRgzD1lUQDGxN/JFmOClIjcSQCQSEoDZTdThuQ9ATTRn7ZnAJPy52IXGHI5EYx9PjaugKk4Y1BqK80/w5tU0r6Af/aDgfwk9Y36dBazNTEzCJns0moKmK2uhJcuxlpIssrSFEt5NmHL94CJJ/vT6WD8GUxQsBcyxmQ8GEXqkENujKLMKJpcTK2VfLpO+qp4mj+dDkbJnH1A5Lnw1dxmNBio1zInYOMcncjp35a2HdK7/tZja6opggn2x8yc8tMnAaP8NeSVTKw7jXAmByZF1cxuSOaSUPrnzH1M4bUibAuMMb/AxfEf8Cd5r14bjKLPx1QlkeKk+HtUzFgwCmNUbLlAbPlnFkXx+M17i3seCXtmnrAVx7ETNaNCzemulFs7TvSTZEzmCrKjYobBPPrPxGQvFvVUMO2SgE5pOCekG1kxRra0TF8ZDBU3MVcCN94rRDXSYqRwQUCUX1/JpN2JGVFJOrFg+zEBGPUoZSJ8X4cIYT/iSr0amGufqU1di/LT3ebRMtuCSbIgdNKf8axCCQzOxnxvMRvs54mAMz3HI/npJDBqQ9UwabpU//CDiWvWu492ZhCM6yDSXfyF442XRFOKpdyVSh0wWld51tN75uhUvQ4Y97TRcUzBlGsseSyr4xZzYxUHmJhELrHnEhsFkFRmk6O24OTvXGcJuseSjCZslcbcqnlS5wez8dIuTlYo0sxT+FjZdleWjHAl13JGtqVv3lFdMK3PvxkCU77P8BERGheWMHUn1evEGEqzZBymkLSWY7OMqOTmMJjHMEjpjcqCeMsCeKNGb8MWk0T2GfGASGybGpyfBuunE8DcOBVFOKw/bHVug/9BMYMWI8Mq4jm3XRiQ0cZa5jRrB8GQ20CZkdn4y4aDoWagvzcfDBc4MauFkjtVmTlN6WRecqA9RMHXGh1cX5JZMCyA9dnAgNF4fwqbp7RDnQ8MSxZKzDdugMFbT3ykzYlgEhsPjRpVgpU7YVJnBBNUG1UiurUWhJpukTAbzLYVHeDb7dckNluSMx0GY+uJiA2GR0FyeRqXITBWvEiqEuJu1a3OAgYdiZWGuXmVBf3VyjlWfCgzAZgH+zkwrdypr5O59MDYjgyGmsCf7C7RrZ9mglHXUthvg1M67YLxwegRO8p0oMwGME52GbhIGsNiXulTtyFX4gxNzR7RbtT0pPBMMC9k99Zznc4jhzJfUTlrzfeVawBGuFgbxoLqVHvhiAtgvtGltws/OKmlu2arbDA/3ZwGRrGvcEaSIsTScqYDJtMCU+FJ6MHm8mSD6YHpNH+pSnAD5IxGQGmpTosxTg8EEsZ3yqgy4Gi8LzMBmNiDcSTjkeNSc8DYNJS7UNOuV70/zQJzT3aIlWKu2z1fbqugGcUufhwDk8sRJnYWMC5DY+rORRRy4dbn1UwwrtkQY+SVmSv6KzfJAO0odppPHgPjb+UsIcaDaffFqbfjBicJTXs39/dmgJGa7p9uQrovjt1jR2dKqcwmZxrqsQKYaABMrs9rMU7HCNcX5FBT4RBN7gS8HQFNfM82iseDUVYZ4KwL70goPnJbPybatyyHp5V0wNhPjhzHnAoGvF4EhUDkimtbdQeeBld/r95TXBgL5tqbBd5DHnRkME1zZpIpyeFon3d8QjCcJljYdYMt+VMcxmfwp8kWI53e5x4DuW0CLYat7fhTZgpK5+s/CIyvVnLXyHOD7A5N0BV2/uS6/OPApJCpY8pIiU6dnmHxsZF50Ay30KEyeBwRY14ZzBOZtJNcRCbn/NRqvsOOSWBcs4GFWN5pEyj6ZkK19QX4gJhhMCyPXc/h+PDCJDBfO4cWRh4pto7WOGWn6o46jfixrpRnbG2iumVHwk+wKLvHNlVbEw/bAadry7jMbGldfqPODIaejZ23VQVjcFErdUduQGsqmBQ63uyF5maqzBcB7mYo/sadzowJg2oIjA3VgSCcMZl2PBgY4ZNJMGZAX5pX7a7wRDDK61Ok7JJzrttTgLjoMcHYRbWeoKVayeohN58wGDV7HTChP3k0XgpHnSGtEWDUjc8zwso5237rDapQxJfu2XQH4GwRSfb07BXqkdGFk8FQbs2tYLcGQmjKXHTKhxFgXgJ5DZHXBhiRpOrm5uXx8fHGbI83duq9uZbU94mMyTwO9WM4ZdxWmS8KlDozmCjqGWKZhxOKw4b5VDBeJaPty3duMLabR5LYnSiVQWbadsFUrkinDHe47DwvGO30XuzHbaugwTcWjB9NhSN2geIXeQLbO7v5QT9RfR0I5aQ1rx97vsJXDRs3hzoSyScA4/NTMBEnCDXjY4wfqHayds/Yu5845jNT3K0MAIx0s46E3EkO1OcYJRhjMeoqbHG6lnXixrrjUWCuvfpHR0p6E9y6E8Eij9Bm+LDNiRbjs1yJqSIOhpmeXhkMsS9Fb0pwuyt8BAxIXlufx2F3as8cOae4S03rDMhQAzvwI5Hc6EsN7MDdpb6/kq+WlTwamQ+jYVWDd3AAzDVnJK6LZNaf1TMIxlfg3TIbwPwviLiU2/3KCrJppcaM03aHrkeDoRUvLkbE/aobx1b3g9n6Kpxa+u/3TabszSK1YwbdfNOe7UDqNxFBwyTLk4lL1DYzwHi9F4edYa4S4P3KP9k+mFRmlqnt1HXqjQOrztribROCuepIIzefys0QV9IAmzo9ZgqYVv3kjZ39KRegJPZaTMojaFa+51OmgMFEKdGfZ0WD+hvpm0e55uZWMFUjy7IpM6o24ZTJsWCgfgrQtKVwVen9YNykVXK/J+OV47ektOu8ODPd9+fgxbYeN08gbvcfJ66ivfZTzSaAwSAcjvaHVXfg7z2LCR+rVFvYy7Z7OG9InBJ19YR9Yls/8MUzGDbG2M4h6Ux8GjUr0Q+Z2TgzFQz5U6u0jO3sTqX2gUm1n2I6s40UzhNh7cZgaHqA7fGUNuK1o9fYCb/tVbSTwGhIf52lh7aLtQeM8mW0ibw7rZIy2P7stnLflpRStyqDlittrHKM/UQNMYnJngnQE8Ho4f4eFFDVIBjqZlpVIlOVRbwIJjq6lN4tl5HXvk3OlVB3LUFAJkwSk8KNSE4B4/0pmFcNQ3D5IJiXoA03OSNFQZnt4i89Vwdmw03F1pB72Zr4NNqVykEw8Z6SYE9gzMMxg85tXPUcyTpc2Zk+cdTKeaQlxVLITrpS7fVKD6Eq59+uMGjE7PVK704AE7hyvB+MCstok5GkUyRjF0DYyoA6M7FbBRyscFM6nDNID+AZchr9HMiEueF2KlZ+ApigfjoAZuOWl/Bjz8bo3SjqzuUymfi5FH7S+Ea1V9EGQS92LSNNsuDYVtnJ41WwJvIEi4GUn+TZYES4ajcbnGYvs2Chwng0rdmclJmuOuuuZaudhhLihAGm08CAn8hS9NfGOzAqqP9s+9EODCQJ6trDGwR0u7RLbrUdWQFMv7fAPGm3hDCIwyIp1fhiKaiX8nlZqWU0Mu+FGgfmJchB4uGXYDnbA5n50TjGgSWmCZycmShN7Vmp307SU2olWKl/cyYwqOlL609dMC/hymHfhcHpYBzlNoc3O03RTlm1rShU//3fdhBtVTe9WDqbxbj6KQujBoNRqQwcqbqxXSVqVelRbVkVTr/S18ItiDaY+r8GsmeUtKvy9v55mvIdMho7lNACQ8slWMKUbllJ7AXmGGf19YebTcQJvPf7MRs/YTCatTmB964/o2rWAKdqrwEjMMEKWRxulb7nKyeNiLXWqfug9TDwi0P4iMRw+bh33bXv3wwuFvVDVzMHHiphJ7qXEMO2Wv7gWiUHhkGOx/ckC6bw+h/IEP+I9lUrYSXXhrK/iIyjfnUdJzxJ8oRRPJef7E8xpa0Wkrwtg0GC6ylnvsc5v1EoZug8f4/2VP9YDhwcndnXRg2VL1fydpXl/OFNSAuEBlqE/OMnfr5UMuWHGzr9P+GdVLt1XsNgeFmVxGJg6jrapDuvwPXtu+OgU8ngnCsOYcF8VFxaODAEMtYYXcjNyuu0suJgDxhAg8EfSqVJtVIw6yKhd3BUq11Gzd5KLlMUTImwugkUjbDfpaYTT7wEe9Il38Y/oiNPqVMrVbKznLZypVJ/pADefcA7kQ/JQ1WdukBBdYRrhf9R/xa+ylCbtVKx4o3jK778Kjo6jHbazZxhtcaEy9mc/A02dB8D4wcZZ6yjxT83w+OUZ4HkTjrw5dPPpPxfv48D8+Vt6QXMBcwFzAXMlwdmtTqwb3exmIvFdDVhs+q3Z62krhr5ZYLZ6qYoilq35iPr2rzXGBUti/W6kF+mxciiWBTdmzdg1rX+q4G2WCzqLxPMqlguF0WlVy1Y5r1a/6jr9XKxKL5IMLeyWBgwUt/2wXzUFVnM8xcIZqV3NcST9oZWBC9MAKrl7RnSvv22N5Wug54OvnrW9WK5LLr7dh/JxtyxK0NiBRPftysM43BMGNY7sPBQ+ZbAuAFzd1vgXl0PutV7xmHhvduV3bsKbCM8/LZzwFtwpbomV3o2kgYSdS0JzC/Glcw+yTdawT5I7Vb+NOZz+GYNaOmj7rQSj669DKJzN4NkPksw364Lm3gaI1vWi8W6IDAryOVLcy/4tNcF7FoslgU9d9Q4Jq1j4moMB+N+C6d6YO8CTkasVhjHl3BopW/fChgKtLcmOeOlL/H2GcxyuazBx0DuwE7zD5DZ7VDjmHeW8I5RQusCX2KC2xoRsIaEBucxYD9K/S3stn/v3goYCLS3ulnTfZtrX2K6viMwJIERQkEwChjHx8P5LWJA/6sRIx1dsBbYUjiva/xbvy2LwcACF18XaDkExnhPYw6qkYcJOOgxS7Am4miiSAFmQzsXfN8S9pnIAw62wLhSoIrEE741MHijFCLApxyYRcOKr8Ds1QA1OKxx8aZGovhBFsoYeeWKaK8BzJo/39SVfmNg8OFWpkCidL20YJYN1w01dGd2RGalMcZAJIW4Ska0M/ePbFdO6YANrRuylAUkqTekfBsWc8bYMT5oiggcfAkMWEeBA3hG1AGkxoEBkUfmYF5tPZgGfJIyVWMQ1wuOSPUbAkPmj2DkMynfpQezsGBYz6w4bIRgCAcjkqRizOnWFM4dYvijGGpjfN5g0EpSVyvVDIGsw9zRCsxpt8Jg2weDr3aE6JYDeVFjYEYjgbCztjntTYFp8Gmn5uHesXwhMEuKneA+O4gjDWmRQ2DwnEsIthUHJyoQIKctuj2OzxsMZhkSczYrAYeGdAwGX8pAdKsGoG6WYYwxRwVgakxYsMuCkZSOOGjJzx/MnQWT0s3XUlY1xoZGc77xOqYx+1DBUncPWa1WhLRh21kSGPaYmsFgnxB+RNh8vGjegsXckWtAwGxIqJlbWFPI/EiCt7FRGPbRMaR8lzbkAqKqBQbcrGgaUso1Wwq8Yb+sDyb9vLa7lMCkdz9LuuslF0DFNk0xiDbp3R3XgFhJGQdKtz+mHJPu7lJK1/zKgEnThisjykT1zx/TeuHKhlr/+HPvOj7Dfgy6hH8JW1HYcAPljrRNc95Z88CK+5z0R0E1TjsLd6bigUQxb8O99c/OYtL0+/Vi/cG+/hUe69++/8+/1+vv4I1f1+v197Tvtw+wy4iT79znFmt+tbZn+LBe0Kvv1uZQc+x3az5T+oFs5sNvg1fxVfSnyza4XcBcwFzAXMBcwFzAXMBcwFzAXMBcwFzAXLb+9n98L7CEQ6YQOAAAAABJRU5ErkJggg==';
 
 const UNIDADES=[{id:'taquara',nome:'CNA Taquara',sub:'Estrada da Soca, 129'},{id:'queimados',nome:'CNA Queimados',sub:'Unidade Queimados'}];
 let S = { token:null, refresh:null, uid:null, role:null, nome:null, unidade:null, comp: curComp(), view:'resumo', cfg:{} };
 
 document.querySelectorAll('.logoImg').forEach(i=>i.src=LOGO);
-
-/* ---- sessão persistente ---- */
-function saveSess(){ try{ localStorage.setItem('fin_sess', JSON.stringify({refresh:S.refresh})); }catch(e){} }
-function clearSess(){ try{ localStorage.removeItem('fin_sess'); localStorage.removeItem('fin_unidade'); }catch(e){} }
-(async function boot(){
-  let sess=null; try{ sess=JSON.parse(localStorage.getItem('fin_sess')||'null'); }catch(e){}
-  if(!sess||!sess.refresh) return;
-  try{
-    const r=await fetch(SUPA+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{'apikey':ANON,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:sess.refresh})});
-    if(!r.ok){ clearSess(); return; }
-    const d=await r.json();
-    S.token=d.access_token; S.refresh=d.refresh_token; S.uid=d.user.id; saveSess();
-    await afterLogin();
-    const u=localStorage.getItem('fin_unidade');
-    if(u) loadUnidade(u).catch(()=>{});
-  }catch(e){}
-})();
 
 function curComp(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
@@ -281,7 +238,7 @@ function lastDay(c){ const [y,m]=c.split('-').map(Number); return new Date(y,m,0
 function nextComp(c,delta){ let [y,m]=c.split('-').map(Number); m+=delta; while(m>12){m-=12;y++} while(m<1){m+=12;y--} return y+'-'+String(m).padStart(2,'0'); }
 
 /* ================= HELPERS ================= */
-function fmt(c){ if(c==null||isNaN(c)) c=0; const v=(c/100).toFixed(2); const [i,d]=v.split('.'); const neg=c<0; const ii=Math.abs(+i).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.'); return (neg?'-':'')+'R$'+ii+','+d; }
+function fmt(c){ if(c==null||isNaN(c)) c=0; const v=(c/100).toFixed(2); const [i,d]=v.split('.'); const neg=c<0; const ii=Math.abs(+i).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.'); return (neg?'-':'')+'R$ '+ii+','+d; }
 function parseBRL(s){ if(s==null||s==='') return 0; s=String(s).replace(/[R$\s.]/g,'').replace(',','.'); const v=parseFloat(s); return isNaN(v)?0:Math.round(v*100); }
 function parseNum(s){ if(s==null||s==='') return 0; const v=parseFloat(String(s).replace(',','.')); return isNaN(v)?0:v; }
 function esc(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
@@ -312,7 +269,7 @@ async function refreshToken(){
   try{
     const r = await fetch(SUPA+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{'apikey':ANON,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:S.refresh})});
     if(!r.ok) return false;
-    const d = await r.json(); S.token=d.access_token; S.refresh=d.refresh_token; saveSess(); return true;
+    const d = await r.json(); S.token=d.access_token; S.refresh=d.refresh_token; return true;
   }catch{ return false; }
 }
 
@@ -328,7 +285,7 @@ async function doLogin(){
     const r = await fetch(SUPA+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'apikey':ANON,'Content-Type':'application/json'},body:JSON.stringify({email:loEmail.value.trim(),password:loPass.value})});
     const d = await r.json();
     if(!r.ok) throw new Error(d.error_description||d.msg||'E-mail ou senha incorretos');
-    S.token=d.access_token; S.refresh=d.refresh_token; S.uid=d.user.id; saveSess();
+    S.token=d.access_token; S.refresh=d.refresh_token; S.uid=d.user.id;
     await afterLogin();
   }catch(e){ authMsg(e.message); }
 }
@@ -340,7 +297,7 @@ async function doSignup(){
     const d = await r.json();
     if(!r.ok) throw new Error(d.error_description||d.msg||'Não foi possível criar a conta');
     if(d.access_token){
-      S.token=d.access_token; S.refresh=d.refresh_token; S.uid=d.user.id; saveSess();
+      S.token=d.access_token; S.refresh=d.refresh_token; S.uid=d.user.id;
       const rr = await db.rpc('fin_ativar_com_convite',{codigo_convite:suCode.value.trim()});
       if(!rr.ok){ showInvite(); return authMsg(rr.erro); }
       if(suNome.value.trim()) await db.upd('fin_usuarios','id=eq.'+S.uid,{nome:suNome.value.trim()}).catch(()=>{});
@@ -379,7 +336,6 @@ async function loadUnidade(id){
   S.unidade=id; S.cfg={};
   const cfgRows = await db.get('fin_config',`unidade=eq.${id}&select=chave,valor`);
   cfgRows.forEach(r=>S.cfg[r.chave]=r.valor);
-  try{ localStorage.setItem('fin_unidade', id); }catch(e){}
   const u=UNIDADES.find(x=>x.id===id);
   document.getElementById('unitSel').innerHTML=UNIDADES.map(x=>`<option value="${x.id}" ${x.id===id?'selected':''}>${x.nome}</option>`).join('');
   document.getElementById('sideUnit').textContent='Financeiro · '+u.nome.replace('CNA ','');
@@ -389,10 +345,10 @@ async function loadUnidade(id){
   go('resumo');
 }
 function switchUnidade(id){ loadUnidade(id).then(()=>toast('Você está em '+UNIDADES.find(x=>x.id===id).nome)).catch(e=>toast(e.message)); }
-function logout(){ clearSess(); S={token:null,refresh:null,uid:null,role:null,nome:null,unidade:null,comp:curComp(),view:'resumo',cfg:{}}; document.getElementById('app').style.display='none'; document.getElementById('auth').style.display='flex'; showLogin(); }
+function logout(){ S={token:null,refresh:null,uid:null,role:null,nome:null,unidade:null,comp:curComp(),view:'resumo',cfg:{}}; document.getElementById('app').style.display='none'; document.getElementById('auth').style.display='flex'; showLogin(); }
 
 /* ================= ROUTER ================= */
-const TITLES={resumo:'Resumo do mês',contas:'Contas a pagar e a receber',folha:'Folha de pagamento',receitas:'Receitas',dre:'DRE',projecao:'Projeção e sugestões',df:'DF · Relatório de franquia',cadastros:'Cadastros'};
+const TITLES={resumo:'Resumo do mês',contas:'Contas a pagar',folha:'Folha de pagamento',receitas:'Receitas',dre:'DRE',df:'DF · Relatório de franquia',cadastros:'Cadastros'};
 function go(v){
   if(v==='folha'&&S.role!=='admin') return;
   S.view=v;
@@ -405,7 +361,7 @@ function render(){
   document.getElementById('monthLabel').textContent=compLabel(S.comp);
   const el=document.getElementById('view');
   el.innerHTML='<div class="empty">Carregando…</div>';
-  ({resumo:vResumo,contas:vContas,folha:vFolha,receitas:vReceitas,dre:vDRE,projecao:vProjecao,df:vDF,cadastros:vCadastros})[S.view](el).catch(e=>{ el.innerHTML=`<div class="panel"><b style="color:var(--redDark)">Erro:</b> ${esc(e.message)}</div>`; });
+  ({resumo:vResumo,contas:vContas,folha:vFolha,receitas:vReceitas,dre:vDRE,df:vDF,cadastros:vCadastros})[S.view](el).catch(e=>{ el.innerHTML=`<div class="panel"><b style="color:var(--redDark)">Erro:</b> ${esc(e.message)}</div>`; });
 }
 
 /* ================= CÁLCULOS DA FOLHA ================= */
@@ -418,14 +374,14 @@ function calcINSS(brutoCents){
   return Math.round(inss);
 }
 function calcRow(f,r){
-  const comVal=(S.cfg.comissao_matricula&&S.cfg.comissao_matricula.valor)||5000;
-  const descanso=(typeof folhaData!=='undefined'&&folhaData.diasDescanso!=null)?folhaData.diasDescanso:(((S.cfg.dsr||{}).dias_descanso)||5);
-  const trab=r.dias_trabalhados||26;
+  const cfg=S.cfg, dsrCfg=cfg.dsr||{dias_uteis:25,dias_descanso:5};
+  const comKey=(cfg.comissao_valor_ativo||'comissao'), comVal=(cfg.comissao_matricula||{})[comKey]||5000;
+  const prov=cfg.provisoes||{ferias_divisor:36,decimo_divisor:12};
   let base=0, comissao=0, dsr=0;
   if(f.tipo==='mensalista'){
     base=f.salario_cents||0;
     comissao = r.comissao_manual_cents!=null && r.comissao_manual_cents!=='' ? +r.comissao_manual_cents : (f.comissionado?(r.matriculas||0)*comVal:0);
-    dsr = trab>0 ? Math.round(comissao/trab*descanso) : 0;
+    dsr = Math.round(comissao*(dsrCfg.dias_descanso/dsrCfg.dias_uteis));
   } else {
     base=Math.round((r.horas||0)*(f.valor_hora_cents||0));
     comissao = r.comissao_manual_cents!=null && r.comissao_manual_cents!=='' ? +r.comissao_manual_cents : 0;
@@ -434,7 +390,11 @@ function calcRow(f,r){
   const bruto=base+comissao+dsr+(r.ajuste_cents||0);
   const inss=calcINSS(bruto);
   const liquido=bruto-inss-(r.adiantamento_cents||0)-(r.desconto_vale_cents||0)-(f.plano_saude_cents||0);
-  return {salario_base_cents:base,comissao_cents:comissao,dsr_cents:dsr,bruto_cents:bruto,inss_cents:inss,liquido_cents:liquido,fgts_cents:0,ferias_prov_cents:0,decimo_prov_cents:0,custo_total_cents:liquido+(f.ifood_cents||0)+(f.vt_cents||0)};
+  const fgts=Math.round(bruto*(cfg.fgts_aliquota||0.08));
+  const ferias=Math.round(bruto/prov.ferias_divisor);
+  const decimo=Math.round(bruto/prov.decimo_divisor);
+  const custo=bruto+fgts+ferias+decimo+(f.ifood_cents||0)+(f.vt_cents||0);
+  return {salario_base_cents:base,comissao_cents:comissao,dsr_cents:dsr,bruto_cents:bruto,inss_cents:inss,liquido_cents:liquido,fgts_cents:fgts,ferias_prov_cents:ferias,decimo_prov_cents:decimo,custo_total_cents:custo};
 }
 
 /* ================= RESUMO ================= */
@@ -466,109 +426,66 @@ async function vResumo(el){
 function miniList(items){
   return `<table><thead><tr><th>Conta</th><th>Vence</th><th>Responsável</th><th class="num">Valor</th><th></th></tr></thead><tbody>`+
   items.map(l=>`<tr><td>${esc(l.nome)}</td><td>${dBR(l.vencimento)}</td><td>${esc(l.responsavel||'—')}</td><td class="num">${fmt(l.valor_cents)}</td>
-  <td style="text-align:right"><button class="thumb up" style="opacity:.9;filter:none" title="Marcar como paga" onclick="marcarPago(${l.id})">👍</button></td></tr>`).join('')+`</tbody></table>`;
+  <td style="text-align:right"><button class="btn sm sec" onclick="marcarPago(${l.id})">Marcar pago</button></td></tr>`).join('')+`</tbody></table>`;
 }
 async function marcarPago(id){ await db.upd('fin_lancamentos','id=eq.'+id,{status:'pago',pago_em:todayISO()}); toast('Conta marcada como paga'); render(); }
 
 /* ================= CONTAS ================= */
-let contasTab='fixa', contasFiltro='todas';
-function subnavHTML(){ return `<div class="subnav">
-    <button class="${contasTab==='fixa'?'on':''}" onclick="setTab('fixa')">A pagar · fixas</button>
-    <button class="${contasTab==='variavel'?'on':''}" onclick="setTab('variavel')">A pagar · variáveis</button>
-    <button class="${contasTab==='receber'?'on':''}" onclick="setTab('receber')">A receber</button>
-  </div>`; }
-function prependSubnav(el){ el.insertAdjacentHTML('afterbegin', subnavHTML()); }
-function setTab(t){ contasTab=t; contasFiltro='todas'; render(); }
+let contasFiltro='todas';
 function setFiltro(f){ contasFiltro=f; render(); }
 async function vContas(el){
-  if(contasTab==='receber') return vReceber(el).then(()=>{ prependSubnav(el); });
   const c=S.comp;
-  const [lanc,recs] = await Promise.all([
-    db.get('fin_lancamentos',`unidade=eq.${S.unidade}&competencia=eq.${c}&select=*&order=vencimento.asc.nullslast,id.asc`),
-    db.get('fin_despesas_recorrentes',`unidade=eq.${S.unidade}&select=*&order=dia_vencimento.asc.nullslast,nome.asc`)
-  ]);
+  const lanc = await db.get('fin_lancamentos',`unidade=eq.${S.unidade}&competencia=eq.${c}&select=*&order=vencimento.asc.nullslast,id.asc`);
   const cats=S.cfg.categorias_despesa||[];
   const hoje=todayISO();
-  const totFix=lanc.filter(l=>l.tipo_despesa!=='variavel').reduce((a,l)=>a+l.valor_cents,0);
-  const totVar=lanc.filter(l=>l.tipo_despesa==='variavel').reduce((a,l)=>a+l.valor_cents,0);
-  const pend=lanc.filter(l=>l.status==='pendente').reduce((a,l)=>a+l.valor_cents,0);
-  const doTab=lanc.filter(l=>(contasTab==='fixa'?l.tipo_despesa!=='variavel':l.tipo_despesa==='variavel'));
-  const shown=doTab.filter(l=>contasFiltro==='todas'||(contasFiltro==='pend'&&l.status==='pendente')||(contasFiltro==='pago'&&l.status==='pago'));
-  const semLancFixos=lanc.filter(l=>l.origem==='recorrente').length===0;
-
-  const painelRecorrentes = contasTab==='fixa' ? `
-  <div class="panel">
-    <div class="panelHead"><h2>Despesas fixas cadastradas (geram o mês automaticamente)</h2>
-      ${semLancFixos?`<button class="btn sm" onclick="gerarMes()">Gerar lançamentos de ${compLabel(c)}</button>`:''}
-    </div>
-    <table><thead><tr><th>Nome</th><th>Categoria</th><th class="num">Valor</th><th>Dia</th><th>Resp.</th><th></th></tr></thead><tbody>
-    ${recs.map(r=>`<tr style="${r.ativo?'':'opacity:.45'}">
-      <td><b>${esc(r.nome)}</b>${r.obs?`<div class="hint">${esc(r.obs)}</div>`:''}</td>
-      <td><span class="badge cat">${esc(r.categoria)}</span></td>
-      <td class="num">${r.valor_cents!=null?fmt(r.valor_cents):'variável'}</td>
-      <td>${r.dia_vencimento||'—'}</td><td>${esc(r.responsavel||'—')}</td>
-      <td style="text-align:right"><button class="btn sm ghost" onclick="toggleRec(${r.id},${!r.ativo})">${r.ativo?'Desativar':'Reativar'}</button></td></tr>`).join('')}
-    </tbody></table>
-    <div class="divider"></div>
-    <div class="formRow">
-      <div class="field"><label>Nome</label><input id="nrNome"></div>
-      <div class="field"><label>Categoria</label><select id="nrCat">${cats.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div>
-      <div class="field"><label>Valor</label><input id="nrValor" inputmode="decimal" placeholder="vazio = variável"></div>
-      <div class="field"><label>Dia venc.</label><input id="nrDia" type="number" min="1" max="31"></div>
-      <div class="field"><label>Responsável</label><input id="nrResp"></div>
-      <button class="btn" onclick="addRec()">Adicionar</button>
-    </div>
-  </div>` : '';
+  const tot=lanc.reduce((a,l)=>a+l.valor_cents,0), pg=lanc.filter(l=>l.status==='pago').reduce((a,l)=>a+l.valor_cents,0);
+  const shown=lanc.filter(l=>contasFiltro==='todas'||(contasFiltro==='pend'&&l.status==='pendente')||(contasFiltro==='pago'&&l.status==='pago'));
 
   el.innerHTML=`
-  ${subnavHTML()}
   <div class="cards">
-    <div class="card"><small>Fixas do mês</small><div class="v">${fmt(totFix)}</div></div>
-    <div class="card"><small>Variáveis do mês</small><div class="v">${fmt(totVar)}</div></div>
-    <div class="card"><small>Total geral</small><div class="v red">${fmt(totFix+totVar)}</div></div>
-    <div class="card"><small>Pendente</small><div class="v red">${fmt(pend)}</div></div>
+    <div class="card"><small>Total do mês</small><div class="v">${fmt(tot)}</div></div>
+    <div class="card"><small>Já pago</small><div class="v ok">${fmt(pg)}</div></div>
+    <div class="card"><small>Pendente</small><div class="v red">${fmt(tot-pg)}</div></div>
   </div>
   <div class="panel">
     <div class="panelHead">
-      <h2>${contasTab==='fixa'?'Lançamentos fixos':'Lançamentos variáveis'} · ${compLabel(c)}</h2>
+      <h2>Lançamentos · ${compLabel(c)}</h2>
       <button class="pill ${contasFiltro==='todas'?'on':''}" onclick="setFiltro('todas')">Todas</button>
       <button class="pill ${contasFiltro==='pend'?'on':''}" onclick="setFiltro('pend')">Pendentes</button>
       <button class="pill ${contasFiltro==='pago'?'on':''}" onclick="setFiltro('pago')">Pagas</button>
+      ${lanc.length===0?`<button class="btn sm" onclick="gerarMes()">Gerar lançamentos do mês</button>`:''}
     </div>
-    ${shown.length?`<table><thead><tr><th></th><th>Conta</th><th>Categoria</th><th>Vence</th><th>Resp.</th><th class="num">Valor</th><th style="text-align:right">Pagar?</th></tr></thead><tbody>${shown.map(l=>{
+    ${shown.length?`<table><thead><tr><th></th><th>Conta</th><th>Categoria</th><th>Vence</th><th>Resp.</th><th class="num">Valor</th><th></th></tr></thead><tbody>${shown.map(l=>{
       const late=l.status==='pendente'&&l.vencimento&&l.vencimento<hoje;
       return `<tr class="${l.status==='pago'?'paid':''}">
       <td><span class="badge ${late?'late':l.status==='pago'?'pago':'pend'}">${late?'Atrasada':l.status==='pago'?'Paga':'Pendente'}</span></td>
       <td><span class="name">${esc(l.nome)}</span>${l.origem==='folha'?'<span class="tag">FOLHA</span>':''}${l.obs?`<div class="hint">${esc(l.obs)}</div>`:''}</td>
       <td><span class="badge cat">${esc(l.categoria)}</span></td>
       <td>${dBR(l.vencimento)}</td><td>${esc(l.responsavel||'—')}</td>
-      <td class="num"><input class="mini" inputmode="decimal" value="${(l.valor_cents/100).toFixed(2).replace('.',',')}" onchange="mudaValor(${l.id},this.value)"></td>
+      <td class="num"><input class="mini" value="${(l.valor_cents/100).toFixed(2).replace('.',',')}" onchange="mudaValor(${l.id},this.value)"></td>
       <td style="text-align:right;white-space:nowrap">
-        <button class="thumb up ${l.status==='pago'?'active':''}" title="Marcar como paga" onclick="marcarPago(${l.id})">👍</button>
-        <button class="thumb down ${l.status!=='pago'?'active':''}" title="Marcar como não paga" onclick="desmarcar(${l.id})">👎</button>
+        ${l.status==='pendente'?`<button class="btn sm sec" onclick="marcarPago(${l.id})">Pagar</button>`:`<button class="btn sm ghost" onclick="desmarcar(${l.id})">Desfazer</button>`}
         <button class="btn sm ghost" onclick="delLanc(${l.id})">✕</button>
       </td></tr>`;}).join('')}</tbody></table>`
     :`<div class="empty">Nenhum lançamento ${contasFiltro!=='todas'?'nesse filtro':'neste mês ainda'}.</div>`}
   </div>
   <div class="panel">
-    <h2>Adicionar despesa ${contasTab==='fixa'?'avulsa fixa':'variável'}</h2>
+    <h2>Adicionar despesa avulsa</h2>
     <div class="formRow">
       <div class="field"><label>Nome</label><input id="avNome"></div>
       <div class="field"><label>Categoria</label><select id="avCat">${cats.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div>
-      <div class="field"><label>Valor</label><input id="avValor" inputmode="decimal" placeholder="0,00"></div>
+      <div class="field"><label>Valor</label><input id="avValor" placeholder="0,00"></div>
       <div class="field"><label>Vencimento (dia)</label><input id="avDia" type="number" min="1" max="31"></div>
       <div class="field"><label>Responsável</label><input id="avResp"></div>
       <button class="btn" onclick="addAvulsa()">Adicionar</button>
     </div>
-    <p class="hint" style="margin-top:6px">${contasTab==='fixa'?'Despesa pontual que conta como fixa neste mês. Pra repetir todo mês, cadastre acima nas despesas fixas.':'Despesas variáveis são pontuais: eventos, compras, materiais, imprevistos.'}</p>
-  </div>
-  ${painelRecorrentes}`;
+  </div>`;
 }
 async function gerarMes(){
   const c=S.comp, ld=lastDay(c);
   const recs=await db.get('fin_despesas_recorrentes',`unidade=eq.${S.unidade}&ativo=eq.true&select=*`);
-  if(!recs.length) return toast('Nenhuma despesa fixa cadastrada');
-  const rows=recs.map(r=>({unidade:S.unidade,competencia:c,tipo:'despesa',origem:'recorrente',tipo_despesa:'fixa',recorrente_id:r.id,nome:r.nome,categoria:r.categoria,valor_cents:r.valor_cents||0,vencimento:r.dia_vencimento?`${c}-${String(Math.min(r.dia_vencimento,ld)).padStart(2,'0')}`:null,responsavel:r.responsavel,obs:r.obs}));
+  if(!recs.length) return toast('Nenhuma despesa recorrente cadastrada');
+  const rows=recs.map(r=>({unidade:S.unidade,competencia:c,tipo:'despesa',origem:'recorrente',recorrente_id:r.id,nome:r.nome,categoria:r.categoria,valor_cents:r.valor_cents||0,vencimento:r.dia_vencimento?`${c}-${String(Math.min(r.dia_vencimento,ld)).padStart(2,'0')}`:null,responsavel:r.responsavel,obs:r.obs}));
   await db.ins('fin_lancamentos',rows);
   toast(rows.length+' lançamentos gerados'); render();
 }
@@ -578,165 +495,79 @@ async function delLanc(id){ if(!confirm('Excluir esse lançamento?'))return; awa
 async function addAvulsa(){
   const nome=avNome.value.trim(); if(!nome) return toast('Dê um nome à despesa');
   const dia=+avDia.value, ld=lastDay(S.comp);
-  await db.ins('fin_lancamentos',[{unidade:S.unidade,competencia:S.comp,tipo:'despesa',origem:'avulsa',tipo_despesa:contasTab,nome,categoria:avCat.value,valor_cents:parseBRL(avValor.value),vencimento:dia?`${S.comp}-${String(Math.min(dia,ld)).padStart(2,'0')}`:null,responsavel:avResp.value.trim()||null}]);
+  await db.ins('fin_lancamentos',[{unidade:S.unidade,competencia:S.comp,tipo:'despesa',origem:'avulsa',nome,categoria:avCat.value,valor_cents:parseBRL(avValor.value),vencimento:dia?`${S.comp}-${String(Math.min(dia,ld)).padStart(2,'0')}`:null,responsavel:avResp.value.trim()||null}]);
   toast('Despesa adicionada'); render();
 }
 
-async function vReceber(el){
-  const c=S.comp, hoje=todayISO();
-  const [recb,recAgg]=await Promise.all([
-    db.get('fin_recebiveis',`unidade=eq.${S.unidade}&competencia=eq.${c}&select=*&order=vencimento.asc.nullslast,id.asc`),
-    db.get('fin_receitas',`unidade=eq.${S.unidade}&competencia=eq.${c}&select=faturado_cents,recebido_cents`)
-  ]);
-  const fat=recAgg.reduce((a,r)=>a+r.faturado_cents,0), rebAgg=recAgg.reduce((a,r)=>a+r.recebido_cents,0);
-  const pend=recb.filter(r=>r.status==='pendente');
-  const pendTot=pend.reduce((a,r)=>a+r.valor_cents,0);
-  const atras=pend.filter(r=>r.vencimento&&r.vencimento<hoje);
-  const atrasTot=atras.reduce((a,r)=>a+r.valor_cents,0);
-  const rebTot=recb.filter(r=>r.status==='recebido').reduce((a,r)=>a+r.valor_cents,0);
-  const shown=recb.filter(r=>contasFiltro==='todas'||(contasFiltro==='pend'&&r.status==='pendente')||(contasFiltro==='pago'&&r.status==='recebido'));
-  const diasAtraso=v=>{ if(!v||v>=hoje) return 0; return Math.round((new Date(hoje)-new Date(v))/86400000); };
-
-  el.innerHTML=`
-  <div class="cards">
-    <div class="card"><small>A receber (lista)</small><div class="v">${fmt(pendTot)}</div><div class="d">${pend.length} título${pend.length===1?'':'s'} em aberto</div></div>
-    <div class="card"><small>Em atraso</small><div class="v red">${fmt(atrasTot)}</div><div class="d">${atras.length?atras.length+' vencido'+(atras.length>1?'s':''):'nada vencido'}</div></div>
-    <div class="card"><small>Recebido (desta lista)</small><div class="v ok">${fmt(rebTot)}</div></div>
-    <div class="card"><small>A receber no mês (geral)</small><div class="v">${fmt(Math.max(0,fat-rebAgg))}</div><div class="d">das Receitas: faturado − recebido</div></div>
-  </div>
-  <div class="panel">
-    <div class="panelHead">
-      <h2>Títulos a receber · ${compLabel(c)}</h2>
-      <button class="pill ${contasFiltro==='todas'?'on':''}" onclick="setFiltro('todas')">Todos</button>
-      <button class="pill ${contasFiltro==='pend'?'on':''}" onclick="setFiltro('pend')">Em aberto</button>
-      <button class="pill ${contasFiltro==='pago'?'on':''}" onclick="setFiltro('pago')">Recebidos</button>
-    </div>
-    ${shown.length?`<table><thead><tr><th></th><th>Descrição</th><th>Vence</th><th class="num">Valor</th><th style="text-align:right">Recebido?</th></tr></thead><tbody>${shown.map(r=>{
-      const dd=diasAtraso(r.vencimento), late=r.status==='pendente'&&dd>0;
-      return `<tr class="${r.status==='recebido'?'paid':''}">
-      <td><span class="badge ${late?'late':r.status==='recebido'?'pago':'pend'}">${late?dd+'d atraso':r.status==='recebido'?'Recebido':'Em dia'}</span></td>
-      <td><span class="name">${esc(r.descricao)}</span>${r.obs?`<div class="hint">${esc(r.obs)}</div>`:''}</td>
-      <td>${dBR(r.vencimento)}</td>
-      <td class="num"><input class="mini" inputmode="decimal" value="${(r.valor_cents/100).toFixed(2).replace('.',',')}" onchange="mudaValorReceb(${r.id},this.value)"></td>
-      <td style="text-align:right;white-space:nowrap">
-        <button class="thumb up ${r.status==='recebido'?'active':''}" title="Marcar como recebido" onclick="marcarRecebido(${r.id})">👍</button>
-        <button class="thumb down ${r.status!=='recebido'?'active':''}" title="Marcar como não recebido" onclick="desmarcarReceb(${r.id})">👎</button>
-        <button class="btn sm ghost" onclick="delReceb(${r.id})">✕</button>
-      </td></tr>`;}).join('')}</tbody></table>`
-    :`<div class="empty">Nenhum título ${contasFiltro!=='todas'?'nesse filtro':'lançado neste mês'}. Registre aqui mensalidades em aberto, acordos e outros valores a receber.</div>`}
-  </div>
-  <div class="panel">
-    <h2>Adicionar valor a receber</h2>
-    <div class="formRow">
-      <div class="field"><label>Descrição (aluno/origem)</label><input id="rbDesc"></div>
-      <div class="field"><label>Valor</label><input id="rbValor" inputmode="decimal" placeholder="0,00"></div>
-      <div class="field"><label>Vencimento (dia)</label><input id="rbDia" type="number" min="1" max="31"></div>
-      <div class="field" style="grid-column:span 2"><label>Observação</label><input id="rbObs" placeholder="opcional"></div>
-      <button class="btn" onclick="addReceb()">Adicionar</button>
-    </div>
-    <p class="hint" style="margin-top:6px">Esta lista é o controle título a título (quem deve, quanto e desde quando) e alimenta a Projeção. A aba Receitas continua sendo a visão macro do mês (faturado × recebido total, do CNA Box).</p>
-  </div>`;
-}
-async function marcarRecebido(id){ await db.upd('fin_recebiveis','id=eq.'+id,{status:'recebido',recebido_em:todayISO()}); toast('Recebido registrado'); render(); }
-async function desmarcarReceb(id){ await db.upd('fin_recebiveis','id=eq.'+id,{status:'pendente',recebido_em:null}); render(); }
-async function delReceb(id){ if(!confirm('Excluir esse título?'))return; await db.del('fin_recebiveis','id=eq.'+id); render(); }
-async function mudaValorReceb(id,v){ await db.upd('fin_recebiveis','id=eq.'+id,{valor_cents:parseBRL(v)}); toast('Valor atualizado'); render(); }
-async function addReceb(){
-  const d=rbDesc.value.trim(); if(!d) return toast('Descreva o título (ex: mensalidade do aluno X)');
-  const dia=+rbDia.value, ld=lastDay(S.comp);
-  await db.ins('fin_recebiveis',[{unidade:S.unidade,competencia:S.comp,descricao:d,valor_cents:parseBRL(rbValor.value),vencimento:dia?`${S.comp}-${String(Math.min(dia,ld)).padStart(2,'0')}`:null,obs:rbObs.value.trim()||null}]);
-  toast('Título adicionado'); render();
-}
-
 /* ================= FOLHA ================= */
-let folhaData={funcs:[],rows:{},vales:[],diasDescanso:5,fechada:false};
+let folhaData={funcs:[],rows:{},vales:[]};
 async function vFolha(el){
   const c=S.comp;
-  const [funcs,rows,vales,fcfg]=await Promise.all([
+  const [funcs,rows,vales]=await Promise.all([
     db.get('fin_funcionarios',`unidade=eq.${S.unidade}&ativo=eq.true&select=*&order=tipo.asc,nome.asc`),
     db.get('fin_folha',`unidade=eq.${S.unidade}&competencia=eq.${c}&select=*`),
-    db.get('fin_vales','ativo=eq.true&select=*'),
-    db.get('fin_folha_config',`unidade=eq.${S.unidade}&competencia=eq.${c}&select=*`)
+    db.get('fin_vales','ativo=eq.true&select=*')
   ]);
-  folhaData={funcs,rows:{},vales,diasDescanso:(fcfg[0]&&fcfg[0].dias_descanso)||5,fechada:false};
+  folhaData={funcs,rows:{},vales};
   funcs.forEach(f=>{
     const ex=rows.find(r=>r.funcionario_id===f.id);
     const valeSug=vales.filter(v=>v.funcionario_id===f.id&&v.parcelas_pagas<v.parcelas_total).reduce((a,v)=>a+v.valor_parcela_cents,0);
-    folhaData.rows[f.id]=ex||{unidade:S.unidade,competencia:c,funcionario_id:f.id,horas:0,matriculas:0,dias_trabalhados:26,comissao_manual_cents:null,adiantamento_cents:0,desconto_vale_cents:valeSug,ajuste_cents:0,obs:null,fechada:false};
-    if(folhaData.rows[f.id].dias_trabalhados==null) folhaData.rows[f.id].dias_trabalhados=26;
+    folhaData.rows[f.id]=ex||{unidade:S.unidade,competencia:c,funcionario_id:f.id,horas:0,matriculas:0,comissao_manual_cents:null,adiantamento_cents:0,desconto_vale_cents:valeSug,ajuste_cents:0,obs:null,fechada:false};
   });
-  folhaData.fechada=rows.length>0&&rows.every(r=>r.fechada);
-  drawFolha(el);
+  const fechada=rows.length>0&&rows.every(r=>r.fechada);
+  drawFolha(el,fechada);
 }
-function drawFolha(el){
-  const {funcs,fechada}=folhaData;
+function drawFolha(el,fechada){
+  const {funcs}=folhaData;
   const mens=funcs.filter(f=>f.tipo==='mensalista'), hor=funcs.filter(f=>f.tipo==='horista');
-  const dis=fechada?'disabled':'';
-  const comVal=(S.cfg.comissao_matricula&&S.cfg.comissao_matricula.valor)||5000;
+  let totL=0,totC=0,totI=0,totV=0,totF=0,totProv=0;
   const rowHTML=f=>{
     const r=folhaData.rows[f.id], k=calcRow(f,r);
+    totL+=k.liquido_cents; totC+=k.custo_total_cents; totI+=f.ifood_cents||0; totV+=f.vt_cents||0; totF+=k.fgts_cents; totProv+=k.ferias_prov_cents+k.decimo_prov_cents;
+    const dis=fechada?'disabled':'';
     return `<tr>
       <td><b>${esc(f.nome)}</b><div class="hint">${esc(f.funcao||'')}</div></td>
       ${f.tipo==='horista'
-        ?`<td class="num"><input class="mini2" inputmode="decimal" ${dis} value="${r.horas||0}" oninput="fEdit(${f.id},'horas',parseNum(this.value))"> h</td>`
-        :`<td class="num">${f.comissionado?`<input class="mini2" inputmode="numeric" ${dis} value="${r.matriculas||0}" oninput="fEdit(${f.id},'matriculas',parseInt(this.value)||0)"> mat`:'—'}</td>`}
-      <td class="num">${f.tipo==='mensalista'&&f.comissionado?`<input class="mini2" inputmode="numeric" ${dis} value="${r.dias_trabalhados||26}" oninput="fEdit(${f.id},'dias_trabalhados',parseNum(this.value)||26)">`:'—'}</td>
-      <td class="num" id="cBase_${f.id}">${fmt(k.salario_base_cents)}</td>
-      <td class="num" id="cCom_${f.id}">${k.comissao_cents||k.dsr_cents?fmt(k.comissao_cents+k.dsr_cents):'—'}</td>
-      <td class="num"><input class="mini" inputmode="decimal" ${dis} value="${((r.adiantamento_cents||0)/100).toFixed(2).replace('.',',')}" onchange="fEdit(${f.id},'adiantamento_cents',parseBRL(this.value))"></td>
-      <td class="num"><input class="mini" inputmode="decimal" ${dis} value="${((r.desconto_vale_cents||0)/100).toFixed(2).replace('.',',')}" onchange="fEdit(${f.id},'desconto_vale_cents',parseBRL(this.value))"></td>
-      <td class="num" id="cInss_${f.id}">${fmt(k.inss_cents)}</td>
-      <td class="num" id="cLiq_${f.id}"><b>${fmt(k.liquido_cents)}</b></td>
+        ?`<td class="num"><input class="mini2" ${dis} value="${r.horas||0}" onchange="fEdit(${f.id},'horas',parseNum(this.value))"> h</td>`
+        :`<td class="num">${f.comissionado?`<input class="mini2" ${dis} value="${r.matriculas||0}" onchange="fEdit(${f.id},'matriculas',parseInt(this.value)||0)"> mat`:'—'}</td>`}
+      <td class="num">${fmt(k.salario_base_cents)}</td>
+      <td class="num">${k.comissao_cents||k.dsr_cents?fmt(k.comissao_cents+k.dsr_cents):'—'}</td>
+      <td class="num"><input class="mini" ${dis} value="${((r.adiantamento_cents||0)/100).toFixed(2).replace('.',',')}" onchange="fEdit(${f.id},'adiantamento_cents',parseBRL(this.value))"></td>
+      <td class="num"><input class="mini" ${dis} value="${((r.desconto_vale_cents||0)/100).toFixed(2).replace('.',',')}" onchange="fEdit(${f.id},'desconto_vale_cents',parseBRL(this.value))"></td>
+      <td class="num">${fmt(k.inss_cents)}</td>
+      <td class="num"><b>${fmt(k.liquido_cents)}</b></td>
+      <td class="num" style="color:var(--gray)">${fmt(k.custo_total_cents)}</td>
     </tr>`;
   };
-  const head=`<thead><tr><th>Funcionário</th><th class="num">Horas / Matr.</th><th class="num">Dias trab.</th><th class="num">Base</th><th class="num">Comissão+DSR</th><th class="num">Adiant.</th><th class="num">Vale/Desc.</th><th class="num">INSS</th><th class="num">Líquido</th></tr></thead>`;
+  const head=`<thead><tr><th>Funcionário</th><th class="num">Horas / Matr.</th><th class="num">Base</th><th class="num">Comissão+DSR</th><th class="num">Adiant.</th><th class="num">Vale/Desc.</th><th class="num">INSS</th><th class="num">Líquido</th><th class="num">Custo total</th></tr></thead>`;
+  const mensHTML=mens.map(rowHTML).join(''), horHTML=hor.map(rowHTML).join('');
 
   el.innerHTML=`
   ${fechada?`<div class="panel" style="border-color:var(--ok);background:var(--okBg)"><b style="color:var(--ok)">Folha de ${compLabel(S.comp)} fechada.</b> Os lançamentos foram gerados no contas a pagar. <button class="btn sm sec" style="margin-left:8px" onclick="reabrirFolha()">Reabrir pra editar</button></div>`:''}
-  <div class="panel" style="display:flex;gap:16px;align-items:end;flex-wrap:wrap">
-    <div class="field" style="margin:0"><label>Dias de descanso no mês (DSR)</label><input class="mini2" inputmode="numeric" ${dis} value="${folhaData.diasDescanso}" oninput="fDescanso(this.value)"></div>
-    <div class="field" style="margin:0"><label>Comissão por matrícula</label><input class="mini" value="${(comVal/100).toFixed(2).replace('.',',')}" disabled></div>
-    <span class="hint" style="flex:1;min-width:200px">DSR = comissão ÷ dias trabalhados × dias de descanso. A comissão por matrícula é fixa (ajuste em Cadastros → Parâmetros). Impostos e provisões não entram: a folha considera só o líquido pago a cada pessoa.</span>
-  </div>
   <div class="panel"><div class="panelHead"><h2>Administrativo (mensalistas)</h2></div>
-    <table>${head}<tbody>${mens.map(rowHTML).join('')}</tbody></table></div>
+    <table>${head}<tbody>${mensHTML}</tbody></table></div>
   <div class="panel"><div class="panelHead"><h2>Professores (horistas)</h2></div>
-    <table>${head}<tbody>${hor.map(rowHTML).join('')}</tbody></table></div>
-  <div class="cards" id="folhaCards"></div>
-  <div class="panel" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-    <button class="btn sec" onclick="salvarFolha(false)" ${dis}>Salvar rascunho</button>
-    <button class="btn" onclick="salvarFolha(true)" ${dis}>Fechar folha e lançar no contas a pagar</button>
-    <span class="hint">Fechar a folha grava tudo e cria 3 lançamentos fixos: Folha (líquidos, venc. dia 5 do mês seguinte), iFood e Vale Transporte (venc. dia 27).</span>
-  </div>`;
-  updateTotais();
-}
-function fEdit(fid,campo,valor){
-  folhaData.rows[fid][campo]=valor;
-  const f=folhaData.funcs.find(x=>x.id===fid), k=calcRow(f,folhaData.rows[fid]);
-  const set=(id,html)=>{const e=document.getElementById(id); if(e) e.innerHTML=html;};
-  set('cBase_'+fid, fmt(k.salario_base_cents));
-  set('cCom_'+fid, (k.comissao_cents||k.dsr_cents)?fmt(k.comissao_cents+k.dsr_cents):'—');
-  set('cInss_'+fid, fmt(k.inss_cents));
-  set('cLiq_'+fid, '<b>'+fmt(k.liquido_cents)+'</b>');
-  updateTotais();
-}
-function fDescanso(v){ folhaData.diasDescanso=parseInt(v)||0; folhaData.funcs.forEach(f=>fEdit(f.id,'__touch',folhaData.rows[f.id]['__touch'])); }
-function updateTotais(){
-  let totL=0,totI=0,totV=0;
-  folhaData.funcs.forEach(f=>{ const k=calcRow(f,folhaData.rows[f.id]); totL+=k.liquido_cents; totI+=f.ifood_cents||0; totV+=f.vt_cents||0; });
-  const el=document.getElementById('folhaCards'); if(!el) return;
-  el.innerHTML=`
+    <table>${head}<tbody>${horHTML}</tbody></table></div>
+  <div class="cards">
     <div class="card"><small>Total líquido (salários)</small><div class="v red">${fmt(totL)}</div><div class="d">a pagar dia 5 do mês seguinte</div></div>
     <div class="card"><small>iFood</small><div class="v">${fmt(totI)}</div></div>
     <div class="card"><small>Vale transporte</small><div class="v">${fmt(totV)}</div></div>
-    <div class="card"><small>Total pago no mês</small><div class="v red">${fmt(totL+totI+totV)}</div><div class="d">líquidos + benefícios, sem impostos embutidos</div></div>`;
+    <div class="card"><small>FGTS do mês</small><div class="v blue">${fmt(totF)}</div><div class="d">recolhido na guia mensal</div></div>
+    <div class="card"><small>Provisões férias + 13º</small><div class="v blue">${fmt(totProv)}</div><div class="d">não-caixa, informativo</div></div>
+    <div class="card"><small>Custo total da folha</small><div class="v">${fmt(totC)}</div></div>
+  </div>
+  <div class="panel" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <button class="btn sec" onclick="salvarFolha(false)" ${fechada?'disabled':''}>Salvar rascunho</button>
+    <button class="btn" onclick="salvarFolha(true)" ${fechada?'disabled':''}>Fechar folha e lançar no contas a pagar</button>
+    <span class="hint">Fechar a folha grava os cálculos e cria/atualiza 3 lançamentos: Folha (líquidos, venc. dia 5 do mês seguinte), iFood e Vale Transporte (venc. dia 27). FGTS e INSS patronal já entram pela guia recorrente "Simples + FGTS + INSS".</span>
+  </div>`;
 }
+function fEdit(fid,campo,valor){ folhaData.rows[fid][campo]=valor; drawFolha(document.getElementById('view'),false); }
 async function salvarFolha(fechar){
   const c=S.comp;
-  await db.upsert('fin_folha_config',[{unidade:S.unidade,competencia:c,dias_descanso:folhaData.diasDescanso,updated_at:new Date().toISOString()}],'unidade,competencia');
   const payload=folhaData.funcs.map(f=>{
     const r=folhaData.rows[f.id], k=calcRow(f,r);
-    return {unidade:S.unidade,competencia:c,funcionario_id:f.id,horas:r.horas||0,matriculas:r.matriculas||0,dias_trabalhados:r.dias_trabalhados||26,comissao_manual_cents:r.comissao_manual_cents,adiantamento_cents:r.adiantamento_cents||0,desconto_vale_cents:r.desconto_vale_cents||0,ajuste_cents:r.ajuste_cents||0,obs:r.obs,...k,fechada:!!fechar,updated_at:new Date().toISOString()};
+    return {unidade:S.unidade,competencia:c,funcionario_id:f.id,horas:r.horas||0,matriculas:r.matriculas||0,comissao_manual_cents:r.comissao_manual_cents,adiantamento_cents:r.adiantamento_cents||0,desconto_vale_cents:r.desconto_vale_cents||0,ajuste_cents:r.ajuste_cents||0,obs:r.obs,...k,fechada:!!fechar,updated_at:new Date().toISOString()};
   });
   await db.upsert('fin_folha',payload,'competencia,funcionario_id');
   if(fechar){
@@ -751,7 +582,7 @@ async function salvarFolha(fechar){
     for(const it of itens){
       const ex=await db.get('fin_lancamentos',`unidade=eq.${S.unidade}&competencia=eq.${c}&origem=eq.folha&nome=eq.${encodeURIComponent(it.nome)}&select=id`);
       if(ex.length) await db.upd('fin_lancamentos','id=eq.'+ex[0].id,{valor_cents:it.valor,vencimento:it.venc});
-      else await db.ins('fin_lancamentos',[{unidade:S.unidade,competencia:c,tipo:'despesa',origem:'folha',tipo_despesa:'fixa',nome:it.nome,categoria:'Pessoal',valor_cents:it.valor,vencimento:it.venc}]);
+      else await db.ins('fin_lancamentos',[{unidade:S.unidade,competencia:c,tipo:'despesa',origem:'folha',nome:it.nome,categoria:'Pessoal',valor_cents:it.valor,vencimento:it.venc}]);
     }
     for(const v of folhaData.vales){
       const r=folhaData.rows[v.funcionario_id];
@@ -802,9 +633,9 @@ async function vDRE(el){
   const comps=[]; for(let i=11;i>=0;i--) comps.push(nextComp(c,-i));
   const inList=comps.map(x=>'"'+x+'"').join(',');
   const [lanc,rec,folha]=await Promise.all([
-    db.get('fin_lancamentos',`unidade=eq.${S.unidade}&competencia=in.(${inList})&select=competencia,categoria,nome,valor_cents,status,tipo_despesa,vencimento`),
+    db.get('fin_lancamentos',`unidade=eq.${S.unidade}&competencia=in.(${inList})&select=competencia,categoria,valor_cents,status`),
     db.get('fin_receitas',`unidade=eq.${S.unidade}&competencia=in.(${inList})&select=competencia,faturado_cents,recebido_cents`),
-    Promise.resolve([])
+    S.role==='admin'?db.get('fin_folha',`unidade=eq.${S.unidade}&competencia=eq.${c}&select=ferias_prov_cents,decimo_prov_cents,fgts_cents`):Promise.resolve([])
   ]);
   const mes=lanc.filter(l=>l.competencia===c);
   const fat=rec.filter(r=>r.competencia===c).reduce((a,r)=>a+r.faturado_cents,0);
@@ -813,6 +644,7 @@ async function vDRE(el){
   mes.forEach(l=>{ porCat[l.categoria]=(porCat[l.categoria]||0)+l.valor_cents; });
   const despTot=mes.reduce((a,l)=>a+l.valor_cents,0);
   const despPagas=mes.filter(l=>l.status==='pago').reduce((a,l)=>a+l.valor_cents,0);
+  const prov=folha.reduce((a,f)=>a+f.ferias_prov_cents+f.decimo_prov_cents,0);
   const saldo=fat-despTot, margem=fat?saldo/fat:0;
   const cats=Object.entries(porCat).sort((a,b)=>b[1]-a[1]);
 
@@ -833,14 +665,11 @@ async function vDRE(el){
   <div class="grid2">
     <div class="panel">
       <h2>Despesas por categoria · ${compLabel(c)}</h2>
-      ${cats.length?`<table><tbody>${cats.map(([k,v],ci)=>{
-        const itens=mes.filter(l=>l.categoria===k).sort((a,b)=>b.valor_cents-a.valor_cents);
-        return `<tr class="catRow" id="cat_${ci}" onclick="toggleCat(${ci})"><td><span class="arr">›</span>${esc(k)} <span class="hint">(${itens.length})</span></td><td class="num">${fmt(v)}</td><td class="num" style="color:var(--gray);width:60px">${fat?(v/fat*100).toFixed(1)+'%':'—'}</td></tr>`+
-        itens.map(l=>`<tr class="catDetail cd_${ci}" style="display:none"><td><b>${esc(l.nome)}</b>${l.tipo_despesa==='variavel'?' · variável':''}${l.vencimento?' · venc. '+dBR(l.vencimento):''}</td><td class="num">${fmt(l.valor_cents)}</td><td class="num"><span class="badge ${l.status==='pago'?'pago':'pend'}">${l.status==='pago'?'Paga':'Pendente'}</span></td></tr>`).join('');
-      }).join('')}
+      ${cats.length?`<table><tbody>${cats.map(([k,v])=>`<tr><td>${esc(k)}</td><td class="num">${fmt(v)}</td><td class="num" style="color:var(--gray);width:60px">${fat?(v/fat*100).toFixed(1)+'%':'—'}</td></tr>`).join('')}
       <tr style="border-top:2px solid var(--line)"><td><b>Total</b></td><td class="num"><b>${fmt(despTot)}</b></td><td class="num"><b>${fat?(despTot/fat*100).toFixed(1)+'%':'—'}</b></td></tr></tbody></table>
-      <p class="hint" style="margin-top:8px">Toque numa categoria pra abrir o detalhamento. Percentuais sobre a receita faturada do mês.</p>`
+      <p class="hint" style="margin-top:8px">Percentuais sobre a receita faturada do mês (não sobre o recebido parcial).</p>`
       :'<div class="empty">Sem lançamentos neste mês.</div>'}
+      ${prov?`<div class="divider"></div><div class="hint">Provisões da folha (férias 1/3 + 13º, não-caixa): <b>${fmt(prov)}</b></div>`:''}
     </div>
     <div class="panel">
       <h2>Resultado mensal (últimos 12 meses)</h2>
@@ -850,123 +679,7 @@ async function vDRE(el){
   </div>`;
 }
 
-function toggleCat(ci){
-  const row=document.getElementById('cat_'+ci); if(!row) return;
-  const open=row.classList.toggle('open');
-  document.querySelectorAll('.cd_'+ci).forEach(tr=>tr.style.display=open?'':'none');
-}
-
-/* ================= PROJEÇÃO ================= */
-async function vProjecao(el){
-  const c=S.comp;
-  const meses6=[]; for(let i=5;i>=0;i--) meses6.push(nextComp(c,-i));
-  const inList=meses6.map(x=>'"'+x+'"').join(',');
-  const [lanc,recAll,recs,folhaLanc,recbv]=await Promise.all([
-    db.get('fin_lancamentos',`unidade=eq.${S.unidade}&competencia=eq.${c}&select=*`),
-    db.get('fin_receitas',`unidade=eq.${S.unidade}&competencia=in.(${inList})&select=competencia,faturado_cents,recebido_cents`),
-    db.get('fin_despesas_recorrentes',`unidade=eq.${S.unidade}&ativo=eq.true&select=valor_cents,nome`),
-    db.get('fin_lancamentos',`unidade=eq.${S.unidade}&origem=eq.folha&select=competencia,valor_cents&order=competencia.desc&limit=9`),
-    db.get('fin_recebiveis',`unidade=eq.${S.unidade}&competencia=eq.${c}&status=eq.pendente&select=valor_cents,vencimento`)
-  ]);
-  const hoje=todayISO(), ld=lastDay(c);
-  const diaHoje = c===curComp() ? (new Date()).getDate() : ld;
-  const fat=recAll.filter(r=>r.competencia===c).reduce((a,r)=>a+r.faturado_cents,0);
-  const receb=recAll.filter(r=>r.competencia===c).reduce((a,r)=>a+r.recebido_cents,0);
-  const aReceber=Math.max(0,fat-receb);
-  const despTot=lanc.reduce((a,l)=>a+l.valor_cents,0);
-  const pend=lanc.filter(l=>l.status==='pendente');
-  const pendTot=pend.reduce((a,l)=>a+l.valor_cents,0);
-  const atras=pend.filter(l=>l.vencimento&&l.vencimento<hoje);
-  const atrasTot=atras.reduce((a,l)=>a+l.valor_cents,0);
-  const saldoProj=fat-despTot;
-
-  // ---- Fluxo semanal do mês (contas pendentes por semana + entrada estimada linear) ----
-  const semanas=[[1,7],[8,14],[15,21],[22,ld]];
-  const diasRestantes=Math.max(1, ld-diaHoje+1);
-  const entradaDia=aReceber/diasRestantes;
-  const usaTitulos=recbv.length>0;
-  const linhas=semanas.map(([d1,d2],i)=>{
-    const sai=pend.filter(l=>{ if(!l.vencimento) return i===3; const d=+l.vencimento.slice(8); return d>=d1&&d<=d2; }).reduce((a,l)=>a+l.valor_cents,0);
-    let entra;
-    if(usaTitulos){
-      entra=recbv.filter(r=>{ if(!r.vencimento) return i===3; const d=+r.vencimento.slice(8); return d>=d1&&d<=d2; }).reduce((a,r)=>a+r.valor_cents,0);
-    } else {
-      const diasSem=Math.max(0, Math.min(d2,ld)-Math.max(d1,diaHoje)+1);
-      entra=Math.round(entradaDia*diasSem);
-    }
-    return {rot:`${String(d1).padStart(2,'0')} a ${String(Math.min(d2,ld)).padStart(2,'0')}`, sai, entra, passada:d2<diaHoje};
-  });
-  let acum=0;
-  const linhasHTML=linhas.map(l=>{
-    acum+=l.entra-l.sai;
-    return `<tr style="${l.passada?'opacity:.45':''}"><td>${l.rot}${l.passada?' <span class="hint">(passada)</span>':''}</td>
-      <td class="num" style="color:var(--ok)">${l.entra?fmt(l.entra):'—'}</td>
-      <td class="num" style="color:var(--redDark)">${l.sai?fmt(l.sai):'—'}</td>
-      <td class="num"><b style="color:${acum>=0?'var(--ok)':'var(--redDark)'}">${fmt(acum)}</b></td></tr>`;
-  }).join('');
-
-  // ---- Projeção 3 meses à frente ----
-  const fixasMes=recs.reduce((a,r)=>a+(r.valor_cents||0),0);
-  const folhaVals=folhaLanc.map(l=>l.valor_cents);
-  const folhaMedia=folhaVals.length?Math.round(folhaVals.slice(0,3).reduce((a,v)=>a+v,0)/Math.min(3,folhaVals.length)):0;
-  const fatHist=recAll.filter(r=>r.faturado_cents>0).map(r=>r.faturado_cents);
-  const fatMedia=fatHist.length?Math.round(fatHist.reduce((a,v)=>a+v,0)/fatHist.length):0;
-  const despProj=fixasMes+(folhaMedia&&!recs.some(r=>r.nome&&r.nome.toLowerCase().includes('folha'))?folhaMedia:0);
-  const proj3=[1,2,3].map(i=>{
-    const m=nextComp(c,i);
-    return `<tr><td style="text-transform:capitalize">${compLabel(m)}</td>
-      <td class="num">${fmt(fatMedia)}</td><td class="num">${fmt(despProj)}</td>
-      <td class="num"><b style="color:${fatMedia-despProj>=0?'var(--ok)':'var(--redDark)'}">${fmt(fatMedia-despProj)}</b></td></tr>`;
-  }).join('');
-
-  // ---- Motor de sugestões ----
-  const sugs=[];
-  if(atras.length) sugs.push({n:'alerta',t:`${atras.length} conta${atras.length>1?'s':''} em atraso somando ${fmt(atrasTot)}`,d:'Quite ou renegocie primeiro o que já venceu: atraso vira juros e multa, o custo mais caro e evitável do mês.'});
-  const pctReceb=fat?receb/fat:0;
-  if(fat&&diaHoje>=15&&pctReceb<0.6) sugs.push({n:'alerta',t:`Só ${Math.round(pctReceb*100)}% do faturado entrou no caixa até o dia ${diaHoje}`,d:`Há ${fmt(aReceber)} a receber. Rode a régua de cobrança (lembrete no vencimento, contato em 5 dias, renegociação em 15) antes de comprometer novos gastos.`});
-  else if(fat&&pctReceb<0.85&&diaHoje>=25) sugs.push({n:'atencao',t:`Recebimento em ${Math.round(pctReceb*100)}% com o mês acabando`,d:'Revise a lista de mensalidades em aberto no CNA Box e priorize contato com responsáveis antes da virada do mês.'});
-  const titAtras=recbv.filter(r=>r.vencimento&&r.vencimento<hoje);
-  if(titAtras.length) sugs.push({n:'alerta',t:`${titAtras.length} título${titAtras.length>1?'s':''} a receber vencido${titAtras.length>1?'s':''}, somando ${fmt(titAtras.reduce((a,r)=>a+r.valor_cents,0))}`,d:'Lista pronta no Contas a receber. Contato hoje: quanto mais recente o atraso, maior a chance de recuperar.'});
-  const semCritica=linhas.reduce((m,l)=>l.sai>m.sai?l:m,{sai:0});
-  if(semCritica.sai>0&&pendTot>0&&semCritica.sai/pendTot>0.45) sugs.push({n:'atencao',t:`A semana de ${semCritica.rot} concentra ${fmt(semCritica.sai)} em vencimentos`,d:'Se o caixa estiver curto, antecipe recebíveis ou negocie um ou dois vencimentos dessa janela pra semana seguinte.'});
-  const proLab=lanc.filter(l=>l.categoria==='Pró-labore').reduce((a,l)=>a+l.valor_cents,0);
-  if(fat&&proLab&&saldoProj<0&&saldoProj+proLab>=0) sugs.push({n:'atencao',t:'O mês fecha negativo por causa do pró-labore',d:`Resultado operacional antes das retiradas: ${fmt(saldoProj+proLab)}. Avaliem um teto de retirada atrelado ao recebido do mês, não ao faturado.`});
-  else if(fat&&saldoProj<0) sugs.push({n:'alerta',t:`Mês projetado negativo em ${fmt(-saldoProj)}`,d:'Com o faturamento atual, as despesas não cabem. Comece cortando pelas variáveis e renegociando as 3 maiores fixas.'});
-  if(fat&&fixasMes/Math.max(1,fat)>0.75) sugs.push({n:'atencao',t:`Despesas fixas consomem ${Math.round(fixasMes/fat*100)}% da receita`,d:'Estrutura acima de 75% deixa a escola vulnerável a qualquer queda de matrícula. Meta saudável: fixas até 65% da receita.'});
-  const variaveis=lanc.filter(l=>l.tipo_despesa==='variavel').reduce((a,l)=>a+l.valor_cents,0);
-  if(fat&&variaveis>fat*0.12) sugs.push({n:'atencao',t:`Variáveis já somam ${fmt(variaveis)} (${Math.round(variaveis/fat*100)}% da receita)`,d:'Defina um teto mensal de variáveis e aprove acima dele só com contrapartida (evento que gera matrícula, por exemplo).'});
-  if(!sugs.length) sugs.push({n:'ok',t:'Nenhum alerta crítico neste mês',d:'Contas em dia e recebimento dentro do esperado. Bom momento pra reforçar a reserva de caixa (meta: 2 meses de despesas fixas).'});
-  sugs.push({n:'ok',t:'Reserva de emergência recomendada: '+fmt(fixasMes*2),d:'Equivalente a 2 meses de despesas fixas. Com ela, um mês fraco de matrículas não vira crise.'});
-
-  el.innerHTML=`
-  <div class="cards">
-    <div class="card"><small>Saldo projetado do mês</small><div class="v ${saldoProj>=0?'ok':'red'}">${fmt(saldoProj)}</div><div class="d">faturado − todas as despesas</div></div>
-    <div class="card"><small>A receber até o fim do mês</small><div class="v">${fmt(aReceber)}</div><div class="d">${fat?Math.round(pctReceb*100)+'% já recebido':'—'}</div></div>
-    <div class="card"><small>A pagar (pendente)</small><div class="v red">${fmt(pendTot)}</div><div class="d">${atras.length?atras.length+' em atraso':'nada em atraso'}</div></div>
-    <div class="card"><small>Folga projetada</small><div class="v ${aReceber-pendTot>=0?'ok':'red'}">${fmt(aReceber-pendTot)}</div><div class="d">a receber − a pagar</div></div>
-  </div>
-  <div class="grid2">
-    <div class="panel">
-      <h2>Fluxo do mês, semana a semana</h2>
-      <table><thead><tr><th>Semana</th><th class="num">Entrada estimada</th><th class="num">Contas a vencer</th><th class="num">Acumulado</th></tr></thead>
-      <tbody>${linhasHTML}</tbody></table>
-      <p class="hint" style="margin-top:8px">${usaTitulos?`Entradas vêm dos títulos em aberto no Contas a receber (${recbv.length} título${recbv.length>1?"s":""}), por data de vencimento.`:`Entrada estimada distribui o saldo a receber (${fmt(aReceber)}) de forma linear pelos dias restantes. Lance os títulos no Contas a receber pra esta projeção usar datas reais.`} As saídas são as contas pendentes reais.</p>
-    </div>
-    <div class="panel">
-      <h2>Projeção dos próximos 3 meses</h2>
-      <table><thead><tr><th>Mês</th><th class="num">Receita projetada</th><th class="num">Despesa projetada</th><th class="num">Resultado</th></tr></thead>
-      <tbody>${proj3}</tbody></table>
-      <p class="hint" style="margin-top:8px">Receita = média do faturado dos últimos meses registrados. Despesa = soma das fixas ativas${folhaMedia?' + média da folha fechada':''}. Refina sozinha conforme os meses são preenchidos.</p>
-    </div>
-  </div>
-  <div class="panel">
-    <h2>Sugestões do mês</h2>
-    ${sugs.map(s=>`<div class="sug ${s.n}"><b>${s.t}</b>${s.d}</div>`).join('')}
-  </div>`;
-}
-
 /* ================= DF ================= */
-
 async function vDF(el){
   const c=S.comp;
   const [dfRows,rec,folha]=await Promise.all([
@@ -1034,43 +747,71 @@ Salários pedagógicos: ${fmt(sp)}`:''}`;
 /* ================= CADASTROS ================= */
 async function vCadastros(el){
   const admin=S.role==='admin';
-  if(!admin){ el.innerHTML='<div class="panel"><p>Os cadastros de funcionários e parâmetros são visíveis só pra administradores. As despesas fixas e variáveis ficam na aba Contas a pagar.</p></div>'; return; }
-  const funcs=await db.get('fin_funcionarios',`unidade=eq.${S.unidade}&select=*&order=ativo.desc,tipo.asc,nome.asc`);
-  const cfg=S.cfg;
+  const recs=await db.get('fin_despesas_recorrentes',`unidade=eq.${S.unidade}&select=*&order=dia_vencimento.asc.nullslast,nome.asc`);
+  const cats=S.cfg.categorias_despesa||[];
+  let funcsHTML='', cfgHTML='';
+  if(admin){
+    const funcs=await db.get('fin_funcionarios',`unidade=eq.${S.unidade}&select=*&order=ativo.desc,tipo.asc,nome.asc`);
+    funcsHTML=`
+    <div class="panel"><div class="panelHead"><h2>Funcionários</h2></div>
+    <table><thead><tr><th>Nome</th><th>Função</th><th>Tipo</th><th class="num">Salário / hora</th><th class="num">VT</th><th class="num">iFood</th><th class="num">Plano</th><th>Comis.</th><th></th></tr></thead><tbody>
+    ${funcs.map(f=>`<tr style="${f.ativo?'':'opacity:.45'}">
+      <td><b>${esc(f.nome)}</b></td><td>${esc(f.funcao||'')}</td><td>${f.tipo==='mensalista'?'Mensal':'Horista'}</td>
+      <td class="num">${f.tipo==='mensalista'?fmt(f.salario_cents):fmt(f.valor_hora_cents)+'/h'}</td>
+      <td class="num">${f.vt_cents?fmt(f.vt_cents):'—'}</td><td class="num">${f.ifood_cents?fmt(f.ifood_cents):'—'}</td>
+      <td class="num">${f.plano_saude_cents?fmt(f.plano_saude_cents):'—'}</td>
+      <td>${f.comissionado?'Sim':'—'}</td>
+      <td style="text-align:right"><button class="btn sm ghost" onclick="toggleFunc(${f.id},${!f.ativo})">${f.ativo?'Desativar':'Reativar'}</button></td></tr>`).join('')}
+    </tbody></table>
+    <div class="divider"></div>
+    <div class="formRow" style="grid-template-columns:1.6fr 1.3fr 1fr 1fr 1fr auto">
+      <div class="field"><label>Nome</label><input id="nfNome"></div>
+      <div class="field"><label>Função</label><input id="nfFuncao"></div>
+      <div class="field"><label>Tipo</label><select id="nfTipo"><option value="mensalista">Mensalista</option><option value="horista">Horista</option></select></div>
+      <div class="field"><label>Salário / valor hora</label><input id="nfValor" placeholder="0,00"></div>
+      <div class="field"><label>iFood</label><input id="nfIfood" placeholder="0,00"></div>
+      <button class="btn" onclick="addFunc()">Adicionar</button>
+    </div></div>`;
+    const cfg=S.cfg;
+    cfgHTML=`
+    <div class="panel"><h2>Parâmetros de cálculo — ${esc(UNIDADES.find(x=>x.id===S.unidade).nome)}</h2>
+    <div class="grid3">
+      <div class="field"><label>Comissão usada por matrícula</label>
+        <select id="cfComKey">${['padrao','comissao','geral'].map(k=>`<option value="${k}" ${((cfg.comissao_valor_ativo||'comissao')===k)?'selected':''}>${k} · ${fmt((cfg.comissao_matricula||{})[k]||0)}</option>`).join('')}</select></div>
+      <div class="field"><label>DSR: dias úteis</label><input id="cfDU" type="number" value="${(cfg.dsr||{}).dias_uteis||25}"></div>
+      <div class="field"><label>DSR: dias de descanso</label><input id="cfDD" type="number" value="${(cfg.dsr||{}).dias_descanso||5}"></div>
+      <div class="field"><label>Alíquota efetiva Simples (%)</label><input id="cfAliq" value="${(((cfg.simples||{}).aliquota_efetiva||0)*100).toFixed(4).replace('.',',')}"></div>
+      <div class="field" style="grid-column:span 2"><label>Faixas INSS (centavos · JSON)</label><input id="cfINSS" value='${esc(JSON.stringify(cfg.inss_faixas||[]))}'></div>
+    </div>
+    <p class="hint" style="margin:8px 0 12px">⚠️ As faixas de INSS estão com a tabela de 2025. A planilha antiga usava a tabela de 2024 (desatualizada). Confirme com o contador os valores vigentes de 2026 e atualize aqui.</p>
+    <button class="btn" onclick="salvaCfg()">Salvar parâmetros</button></div>`;
+  }
   el.innerHTML=`
-  <div class="panel"><div class="panelHead"><h2>Funcionários</h2></div>
-  <table><thead><tr><th>Nome</th><th>Função</th><th>Tipo</th><th class="num">Salário / hora</th><th class="num">VT</th><th class="num">iFood</th><th class="num">Plano</th><th>Comis.</th><th></th></tr></thead><tbody>
-  ${funcs.map(f=>`<tr style="${f.ativo?'':'opacity:.45'}">
-    <td><b>${esc(f.nome)}</b></td><td>${esc(f.funcao||'')}</td><td>${f.tipo==='mensalista'?'Mensal':'Horista'}</td>
-    <td class="num">${f.tipo==='mensalista'?fmt(f.salario_cents):fmt(f.valor_hora_cents)+'/h'}</td>
-    <td class="num">${f.vt_cents?fmt(f.vt_cents):'—'}</td><td class="num">${f.ifood_cents?fmt(f.ifood_cents):'—'}</td>
-    <td class="num">${f.plano_saude_cents?fmt(f.plano_saude_cents):'—'}</td>
-    <td>${f.comissionado?'Sim':'—'}</td>
-    <td style="text-align:right"><button class="btn sm ghost" onclick="toggleFunc(${f.id},${!f.ativo})">${f.ativo?'Desativar':'Reativar'}</button></td></tr>`).join('')}
+  <div class="panel"><div class="panelHead"><h2>Despesas recorrentes (geram o mês automaticamente)</h2></div>
+  <table><thead><tr><th>Nome</th><th>Categoria</th><th class="num">Valor</th><th>Dia</th><th>Resp.</th><th></th></tr></thead><tbody>
+  ${recs.map(r=>`<tr style="${r.ativo?'':'opacity:.45'}">
+    <td><b>${esc(r.nome)}</b>${r.obs?`<div class="hint">${esc(r.obs)}</div>`:''}</td>
+    <td><span class="badge cat">${esc(r.categoria)}</span></td>
+    <td class="num">${r.valor_cents!=null?fmt(r.valor_cents):'variável'}</td>
+    <td>${r.dia_vencimento||'—'}</td><td>${esc(r.responsavel||'—')}</td>
+    <td style="text-align:right"><button class="btn sm ghost" onclick="toggleRec(${r.id},${!r.ativo})">${r.ativo?'Desativar':'Reativar'}</button></td></tr>`).join('')}
   </tbody></table>
   <div class="divider"></div>
-  <div class="formRow" style="grid-template-columns:1.6fr 1.3fr 1fr 1fr 1fr auto">
-    <div class="field"><label>Nome</label><input id="nfNome"></div>
-    <div class="field"><label>Função</label><input id="nfFuncao"></div>
-    <div class="field"><label>Tipo</label><select id="nfTipo"><option value="mensalista">Mensalista</option><option value="horista">Horista</option></select></div>
-    <div class="field"><label>Salário / valor hora</label><input id="nfValor" inputmode="decimal" placeholder="0,00"></div>
-    <div class="field"><label>iFood</label><input id="nfIfood" inputmode="decimal" placeholder="0,00"></div>
-    <button class="btn" onclick="addFunc()">Adicionar</button>
+  <div class="formRow">
+    <div class="field"><label>Nome</label><input id="nrNome"></div>
+    <div class="field"><label>Categoria</label><select id="nrCat">${cats.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div>
+    <div class="field"><label>Valor</label><input id="nrValor" placeholder="vazio = variável"></div>
+    <div class="field"><label>Dia venc.</label><input id="nrDia" type="number" min="1" max="31"></div>
+    <div class="field"><label>Responsável</label><input id="nrResp"></div>
+    <button class="btn" onclick="addRec()">Adicionar</button>
   </div></div>
-  <div class="panel"><h2>Parâmetros de cálculo — ${esc(UNIDADES.find(x=>x.id===S.unidade).nome)}</h2>
-  <div class="grid3">
-    <div class="field"><label>Comissão por matrícula (R$)</label><input id="cfCom" inputmode="decimal" value="${(((cfg.comissao_matricula||{}).valor||5000)/100).toFixed(2).replace('.',',')}"></div>
-    <div class="field"><label>Alíquota efetiva Simples (%)</label><input id="cfAliq" inputmode="decimal" value="${(((cfg.simples||{}).aliquota_efetiva||0)*100).toFixed(4).replace('.',',')}"></div>
-    <div class="field" style="grid-column:span 3"><label>Faixas INSS 2026 (centavos · JSON)</label><input id="cfINSS" value='${esc(JSON.stringify(cfg.inss_faixas||[]))}'></div>
-  </div>
-  <p class="hint" style="margin:8px 0 12px">Faixas do INSS já na tabela 2026 (Portaria MPS/MF nº 13/2026): 7,5% até R$1.621,00 · 9% até R$2.902,84 · 12% até R$4.354,27 · 14% até o teto de R$8.475,55. Quando sair a tabela 2027, atualize aqui. Os dias de descanso do DSR ficam direto na Folha, mês a mês.</p>
-  <button class="btn" onclick="salvaCfg()">Salvar parâmetros</button></div>`;
+  ${funcsHTML}${cfgHTML}`;
 }
 async function toggleRec(id,ativo){ await db.upd('fin_despesas_recorrentes','id=eq.'+id,{ativo}); render(); }
 async function addRec(){
-  if(!nrNome.value.trim()) return toast('D\u00ea um nome');
-  await db.ins('fin_despesas_recorrentes',[{unidade:S.unidade,nome:nrNome.value.trim(),categoria:nrCat.value,tipo_despesa:'fixa',valor_cents:nrValor.value.trim()?parseBRL(nrValor.value):null,dia_vencimento:+nrDia.value||null,responsavel:nrResp.value.trim()||null}]);
-  toast('Despesa fixa adicionada \u2014 entra na gera\u00e7\u00e3o do pr\u00f3ximo m\u00eas'); render();
+  if(!nrNome.value.trim()) return toast('Dê um nome');
+  await db.ins('fin_despesas_recorrentes',[{unidade:S.unidade,nome:nrNome.value.trim(),categoria:nrCat.value,valor_cents:nrValor.value.trim()?parseBRL(nrValor.value):null,dia_vencimento:+nrDia.value||null,responsavel:nrResp.value.trim()||null}]);
+  toast('Recorrente adicionada — entra na geração do próximo mês'); render();
 }
 async function toggleFunc(id,ativo){ await db.upd('fin_funcionarios','id=eq.'+id,{ativo}); render(); }
 async function addFunc(){
@@ -1081,15 +822,16 @@ async function addFunc(){
 }
 async function salvaCfg(){
   let faixas; try{ faixas=JSON.parse(document.getElementById('cfINSS').value) }catch{ return toast('JSON das faixas INSS inválido'); }
-  const comissao={valor:parseBRL(cfCom.value)||5000};
+  const dsr={dias_uteis:+cfDU.value||25,dias_descanso:+cfDD.value||5};
   const simples={...(S.cfg.simples||{}),aliquota_efetiva:(parseFloat(String(cfAliq.value).replace(',','.'))||0)/100};
   const updates=[
-    {chave:'comissao_matricula',valor:comissao},
+    {chave:'comissao_valor_ativo',valor:cfComKey.value},
+    {chave:'dsr',valor:dsr},
     {chave:'simples',valor:simples},
     {chave:'inss_faixas',valor:faixas}
   ];
   for(const u of updates){ await db.upd('fin_config','unidade=eq.'+S.unidade+'&chave=eq.'+u.chave,{valor:u.valor,updated_at:new Date().toISOString()}); }
-  S.cfg.comissao_matricula=comissao; S.cfg.simples=simples; S.cfg.inss_faixas=faixas;
+  S.cfg.comissao_valor_ativo=cfComKey.value; S.cfg.dsr=dsr; S.cfg.simples=simples; S.cfg.inss_faixas=faixas;
   toast('Parâmetros salvos'); render();
 }
 
