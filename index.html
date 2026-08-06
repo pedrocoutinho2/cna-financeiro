@@ -374,9 +374,10 @@ function calcINSS(brutoCents){
   return Math.round(inss);
 }
 function calcRow(f,r){
-  const cfg=S.cfg, dsrCfg=cfg.dsr||{dias_uteis:25,dias_descanso:5};
+  const cfg=S.cfg, _d=cfg.dsr||{};
+  const dsrCfg={dias_uteis:(+_d.dias_uteis||+_d.dias_trabalhados||26),dias_descanso:(+_d.dias_descanso||5)};
   const comKey=(cfg.comissao_valor_ativo||'comissao'), comVal=(cfg.comissao_matricula||{})[comKey]||5000;
-  const prov=cfg.provisoes||{ferias_divisor:36,decimo_divisor:12};
+  const prov=cfg.provisoes||{ferias_divisor:9,decimo_divisor:12};
   let base=0, comissao=0, dsr=0;
   if(f.tipo==='mensalista'){
     base=f.salario_cents||0;
@@ -393,8 +394,10 @@ function calcRow(f,r){
   const fgts=Math.round(bruto*(cfg.fgts_aliquota||0.08));
   const ferias=Math.round(bruto/prov.ferias_divisor);
   const decimo=Math.round(bruto/prov.decimo_divisor);
-  const custo=bruto+fgts+ferias+decimo+(f.ifood_cents||0)+(f.vt_cents||0);
-  return {salario_base_cents:base,comissao_cents:comissao,dsr_cents:dsr,bruto_cents:bruto,inss_cents:inss,liquido_cents:liquido,fgts_cents:fgts,ferias_prov_cents:ferias,decimo_prov_cents:decimo,custo_total_cents:custo};
+  const fgtsProv=Math.round((ferias+decimo)*(cfg.fgts_aliquota||0.08));
+  const custo=bruto+fgts+ferias+decimo+fgtsProv+(f.ifood_cents||0)+(f.vt_cents||0);
+  const _n=v=>Number.isFinite(v)?v:0;
+  return {salario_base_cents:_n(base),comissao_cents:_n(comissao),dsr_cents:_n(dsr),bruto_cents:_n(bruto),inss_cents:_n(inss),liquido_cents:_n(liquido),fgts_cents:_n(fgts),ferias_prov_cents:_n(ferias),decimo_prov_cents:_n(decimo),custo_total_cents:_n(custo)};
 }
 
 /* ================= RESUMO ================= */
