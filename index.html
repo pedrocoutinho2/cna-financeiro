@@ -12,6 +12,8 @@
   --gray:#5A5A5A; --line:#E4E4E7; --surface:#F7F7F9; --white:#FFFFFF;
   --ok:#1B7A3D; --okBg:#E7F5EC; --warn:#B45309; --warnBg:#FEF3E2;
   --onDark:#FFFFFF; --onDarkMut:#C7C7CC; --onDarkFaint:#8E8E93; --onDarkLine:#3A3A3C;
+  --onRed:#FFFFFF; --onRedLine:rgba(255,255,255,.28);
+  --onRedHover:rgba(255,255,255,.14); --onRedActive:rgba(0,0,0,.20);
   --focus:#19408B; --pastelBlue:#EAF0FA;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -34,8 +36,8 @@ h2{font-size:15px;font-weight:700;color:var(--blue);margin:0 0 10px}
 .logoImg{width:150px;display:block;margin-bottom:10px}
 .logoImg.side{width:96px;margin:0;display:block}
 .logoChip{background:#fff;border-radius:9px;padding:9px 12px 7px;display:inline-block;margin-bottom:8px}
-aside{background:var(--ink);border-bottom:none}
-aside::after{content:'';display:block;height:6px;background:var(--red);margin-top:14px}
+aside{background:var(--red);border-bottom:none}
+aside::after{content:'';display:block;height:6px;background:var(--blue);margin-top:14px}
 .tableWrap,.panel{overflow-x:auto}
 
 /* ---------- auth ---------- */
@@ -60,14 +62,14 @@ aside::after{content:'';display:block;height:6px;background:var(--red);margin-to
 #app{display:none;min-height:100vh}
 .shell{display:flex;min-height:100vh}
 aside{width:210px;color:#fff;padding:20px 0;display:flex;flex-direction:column;flex-shrink:0}
-aside .brand{padding:0 20px 16px;border-bottom:1px solid var(--onDarkLine);margin-bottom:12px}
-aside .brand small{display:block;color:var(--onDarkFaint);font-weight:400;font-size:11px;margin-top:2px}
-nav a{display:block;padding:9px 20px;color:var(--onDarkMut);text-decoration:none;font-weight:500;font-size:13.5px;border-left:3px solid transparent;cursor:pointer}
-nav a:hover{color:var(--onDark);background:rgba(255,255,255,.06)}
-nav a.on{color:var(--onDark);border-left-color:var(--red);background:rgba(230,20,60,.12)}
-aside .foot{margin-top:auto;padding:14px 20px;font-size:12px;color:var(--onDarkFaint)}
-aside .foot b{color:var(--onDarkMut);display:block}
-aside .foot button{color:var(--onDarkMut);font-size:12px;padding:0;margin-top:6px;text-decoration:underline}
+aside .brand{padding:0 20px 16px;border-bottom:1px solid var(--onRedLine);margin-bottom:12px}
+aside .brand small{display:block;color:var(--onRed);font-weight:400;font-size:11px;margin-top:2px}
+nav a{display:block;padding:9px 20px;color:var(--onRed);text-decoration:none;font-weight:500;font-size:13.5px;border-left:3px solid transparent;cursor:pointer;transition:background .15s}
+nav a:hover{background:var(--onRedHover)}
+nav a.on{font-weight:700;border-left-color:var(--onRed);background:var(--onRedActive)}
+aside .foot{margin-top:auto;padding:14px 20px;font-size:12px;color:var(--onRed)}
+aside .foot b{color:var(--onRed);display:block}
+aside .foot button{color:var(--onRed);font-size:12px;padding:0;margin-top:6px;text-decoration:underline}
 main{flex:1;padding:22px 26px 60px;max-width:1180px;width:100%;margin-inline:auto}
 .topbar{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
 .topbar h1{margin-right:auto}
@@ -148,7 +150,7 @@ input.mini,input.mini2{text-align:right}
   aside .brand small{margin:0;font-size:11px}
   nav{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 6px}
   nav a{border-left:none;border-bottom:3px solid transparent;padding:10px 12px;white-space:nowrap;font-size:13px}
-  nav a.on{border-bottom-color:var(--red);border-left:none;background:none}
+  nav a.on{border-bottom-color:var(--onRed);border-left:none;background:var(--onRedActive);font-weight:700}
   aside .foot{display:none}
   main{padding:16px 12px 70px;max-width:100%}
   .topbar{gap:10px}
