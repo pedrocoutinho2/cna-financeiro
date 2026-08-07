@@ -80,6 +80,17 @@ main{flex:1;padding:22px 26px 60px;max-width:1180px;width:100%;margin-inline:aut
 }
 aside :is(a,button):focus-visible{outline-color:var(--onDark)}
 ::placeholder{color:#6B7280;opacity:1}
+@media(max-width:860px){
+  .panel table.cardify{min-width:0}
+  .panel table.cardify thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .panel table.cardify tr{display:block;border:1px solid var(--line);border-radius:10px;
+    padding:10px 12px;margin-bottom:10px;background:var(--white)}
+  .panel table.cardify td{display:flex;justify-content:space-between;gap:12px;
+    border:none;padding:5px 0;text-align:right}
+  .panel table.cardify td::before{content:attr(data-label);font-weight:600;color:var(--gray);
+    text-align:left;flex:0 0 45%}
+  .panel table.cardify td:empty{display:none}
+}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
@@ -172,22 +183,12 @@ input.mini,input.mini2{text-align:right}
       <div class="field"><label>E-mail</label><input id="loEmail" type="email" autocomplete="email"></div>
       <div class="field"><label>Senha</label><input id="loPass" type="password" autocomplete="current-password"></div>
       <button class="btn" onclick="doLogin()">Entrar</button>
-      <div class="authSwitch">Primeiro acesso? <a onclick="showSignup()">Criar conta</a></div>
+      <div class="authSwitch">Acesso restrito. Fale com a coordenação para liberar seu login.</div>
     </div>
 
-    <div id="signupBox" style="display:none">
-      <div class="field"><label>Nome</label><input id="suNome"></div>
-      <div class="field"><label>E-mail</label><input id="suEmail" type="email"></div>
-      <div class="field"><label>Senha (mín. 6 caracteres)</label><input id="suPass" type="password"></div>
-      <div class="field"><label>Código de convite</label><input id="suCode" placeholder="Fornecido pela coordenação"></div>
-      <button class="btn" onclick="doSignup()">Criar conta</button>
-      <div class="authSwitch"><a onclick="showLogin()">Voltar ao login</a></div>
-    </div>
 
     <div id="inviteBox" style="display:none">
-      <div class="field"><label>Código de convite</label><input id="ivCode"></div>
-      <p class="hint" style="margin-bottom:10px">Sua conta existe mas ainda não foi ativada. Informe o código de convite pra liberar o acesso.</p>
-      <button class="btn" onclick="doInvite()">Ativar acesso</button>
+      <p class="hint" style="margin-bottom:10px">Sua conta existe mas ainda nao foi liberada. Peca a um administrador para aprovar seu acesso.</p>
       <div class="authSwitch"><a onclick="logout()">Sair</a></div>
     </div>
 
@@ -287,9 +288,8 @@ async function refreshToken(){
 
 /* ================= AUTH ================= */
 function authMsg(t,ok){ const el=document.getElementById('authMsg'); el.textContent=t; el.className='msg '+(ok?'ok':'err'); if(!t) el.className='msg'; }
-function showSignup(){ authMsg(''); loginBox.style.display='none'; inviteBox.style.display='none'; unitBox.style.display='none'; signupBox.style.display='block'; }
-function showLogin(){ authMsg(''); signupBox.style.display='none'; inviteBox.style.display='none'; unitBox.style.display='none'; loginBox.style.display='block'; }
-function showInvite(){ authMsg(''); signupBox.style.display='none'; loginBox.style.display='none'; unitBox.style.display='none'; inviteBox.style.display='block'; }
+function showLogin(){ authMsg(''); inviteBox.style.display='none'; unitBox.style.display='none'; loginBox.style.display='block'; }
+function showInvite(){ authMsg(''); loginBox.style.display='none'; unitBox.style.display='none'; inviteBox.style.display='block'; }
 
 async function doLogin(){
   authMsg('');
@@ -299,25 +299,6 @@ async function doLogin(){
     if(!r.ok) throw new Error(d.error_description||d.msg||'E-mail ou senha incorretos');
     S.token=d.access_token; S.refresh=d.refresh_token; S.uid=d.user.id;
     await afterLogin();
-  }catch(e){ authMsg(e.message); }
-}
-async function doSignup(){
-  authMsg('');
-  if((suPass.value||'').length<6) return authMsg('A senha precisa de pelo menos 6 caracteres');
-  try{
-    const r = await fetch(SUPA+'/auth/v1/signup',{method:'POST',headers:{'apikey':ANON,'Content-Type':'application/json'},body:JSON.stringify({email:suEmail.value.trim(),password:suPass.value,data:{nome:suNome.value.trim()}})});
-    const d = await r.json();
-    if(!r.ok) throw new Error(d.error_description||d.msg||'Não foi possível criar a conta');
-    if(d.access_token){
-      S.token=d.access_token; S.refresh=d.refresh_token; S.uid=d.user.id;
-      const rr = await db.rpc('fin_ativar_com_convite',{codigo_convite:suCode.value.trim()});
-      if(!rr.ok){ showInvite(); return authMsg(rr.erro); }
-      if(suNome.value.trim()) await db.upd('fin_usuarios','id=eq.'+S.uid,{nome:suNome.value.trim()}).catch(()=>{});
-      await afterLogin();
-    } else {
-      showLogin();
-      authMsg('Conta criada! Confirme o e-mail que enviamos e depois faça login pra ativar com o código de convite.',true);
-    }
   }catch(e){ authMsg(e.message); }
 }
 async function doInvite(){
@@ -339,7 +320,7 @@ async function afterLogin(){
   showUnitPicker();
 }
 function showUnitPicker(){
-  authMsg(''); signupBox.style.display='none'; loginBox.style.display='none'; inviteBox.style.display='none';
+  authMsg(''); loginBox.style.display='none'; inviteBox.style.display='none';
   unitBox.style.display='block';
   document.getElementById('app').style.display='none';
   document.getElementById('auth').style.display='flex';
@@ -851,6 +832,21 @@ async function salvaCfg(){
 }
 
 document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&document.getElementById('auth').style.display!=='none'){ if(loginBox.style.display!=='none') doLogin(); }});
+
+// rotula celulas para o layout de cartao no mobile
+function cardifyTables(){
+  document.querySelectorAll('.panel table').forEach(t=>{
+    const ths=[...t.querySelectorAll('thead th')].map(th=>th.textContent.trim());
+    if(!ths.length) return;
+    t.classList.add('cardify');
+    t.querySelectorAll('tbody tr').forEach(tr=>{
+      [...tr.children].forEach((td,i)=>{ if(ths[i]) td.setAttribute('data-label',ths[i]); });
+    });
+  });
+}
+new MutationObserver(()=>cardifyTables())
+  .observe(document.body,{childList:true,subtree:true});
+document.addEventListener('DOMContentLoaded',cardifyTables);
 </script>
 </body>
 </html>
