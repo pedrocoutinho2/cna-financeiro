@@ -17,7 +17,8 @@
   --focus:#19408B; --pastelBlue:#EAF0FA;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Poppins',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface);color:var(--ink);font-size:14px;line-height:1.45}
+html{overflow-x:clip}
+body{overflow-x:clip;max-width:100%;font-family:'Poppins',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface);color:var(--ink);font-size:14px;line-height:1.45}
 button{font:inherit;cursor:pointer;border:none;background:none}
 input,select,textarea{font:inherit;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:7px 9px;background:#fff;width:100%}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--blue);outline-offset:0;border-color:var(--blue)}
@@ -60,21 +61,27 @@ aside::after{content:'';display:block;height:6px;background:var(--blue);margin-t
 .unitBtn:hover{border-color:var(--red);box-shadow:0 3px 12px rgba(230,20,60,.12)}
 .unitBtn b{display:block;font-size:15px;color:var(--ink)}
 .unitBtn span{font-size:12px;color:var(--gray)}
-.unitSel{width:auto;font-weight:700;color:var(--blue);border-radius:8px;padding:8px 10px;background:#fff;cursor:pointer}
+.unitSel{width:100%;font-weight:700;color:var(--blue);border-radius:8px;padding:9px 10px;background:#fff;cursor:pointer}
 
 /* ---------- shell ---------- */
 #app{display:none;min-height:100vh}
-.shell{display:flex;min-height:100vh}
+.shell{display:flex;min-height:100vh;max-width:100%}
 aside{width:210px;color:#fff;padding:20px 0;display:flex;flex-direction:column;flex-shrink:0}
 aside .brand{padding:0 20px 16px;border-bottom:1px solid var(--onRedLine);margin-bottom:12px}
 aside .brand small{display:block;color:var(--onRed);font-weight:400;font-size:11px;margin-top:2px}
 nav a{display:block;padding:9px 20px;color:var(--onRed);text-decoration:none;font-weight:500;font-size:13.5px;border-left:3px solid transparent;cursor:pointer;transition:background .15s}
 nav a:hover{background:var(--onRedHover)}
 nav a.on{font-weight:700;border-left-color:var(--onRed);background:var(--onRedActive)}
+.asideBody{display:flex;flex-direction:column;flex:1;min-height:0}
+.unitPick{padding:0 20px 12px;margin-bottom:6px;border-bottom:1px solid var(--onRedLine)}
+.unitPick label{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--onRed);opacity:.75;margin-bottom:5px}
+.burger{display:none}
+.navOverlay{display:none}
 aside .foot{margin-top:auto;padding:14px 20px;font-size:12px;color:var(--onRed)}
 aside .foot b{color:var(--onRed);display:block}
 aside .foot button{color:var(--onRed);font-size:12px;padding:0;margin-top:6px;text-decoration:underline}
-main{flex:1;padding:22px 26px 60px;max-width:1180px;width:100%;margin-inline:auto}
+main{flex:1;min-width:0;padding:22px 26px 60px;max-width:1180px;width:100%;margin-inline:auto}
 .topbar{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
 .topbar h1{margin-right:auto}
 .monthPick{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:4px 6px}
@@ -91,10 +98,13 @@ aside :is(a,button):focus-visible{outline-color:var(--onDark)}
   .panel table.cardify thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
   .panel table.cardify tr{display:block;border:1px solid var(--line);border-radius:10px;
     padding:10px 12px;margin-bottom:10px;background:var(--white)}
-  .panel table.cardify td{display:flex;justify-content:space-between;gap:12px;
-    border:none;padding:5px 0;text-align:right}
+  .panel table.cardify td{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:baseline;
+    gap:3px 10px;border:none;padding:5px 0;text-align:right;overflow-wrap:anywhere;min-width:0}
+  .panel table.cardify td>*{min-width:0;max-width:100%}
   .panel table.cardify td::before{content:attr(data-label);font-weight:600;color:var(--gray);
-    text-align:left;flex:0 0 45%}
+    text-align:left;flex:0 1 auto;margin-right:auto}
+  .panel table.cardify td .hint{flex:0 0 100%;order:9;text-align:right}
+  .panel table.cardify td.acoes{justify-content:flex-end;white-space:normal}
   .panel table.cardify td:empty{display:none}
 }
 #printHead{display:none}
@@ -120,12 +130,9 @@ aside :is(a,button):focus-visible{outline-color:var(--onDark)}
 .navGroup{padding:12px 20px 4px;font-size:10.5px;font-weight:700;letter-spacing:.08em;
   text-transform:uppercase;color:var(--onRed);opacity:.75}
 nav a.sub{padding-left:32px;font-size:13px}
-@media(max-width:860px){ .navGroup{display:none} nav a.sub{padding-left:12px} }
+@media(max-width:860px){ nav a.sub{padding-left:34px} }
 
 .acoes{text-align:right;white-space:nowrap}
-.prodF{display:inline-flex;align-items:center;gap:3px;margin-left:6px}
-.prodF span{font-size:10.5px;color:var(--gray)}
-.mini3{width:52px;text-align:right}
 .ico{background:none;border:1px solid transparent;border-radius:7px;font-size:16px;line-height:1;
   padding:6px 8px;cursor:pointer;opacity:.4;transition:opacity .15s,background .15s}
 .ico:hover{opacity:1;background:var(--surface)}
@@ -184,20 +191,40 @@ input.mini,input.mini2{text-align:right}
 @media(max-width:860px){
   body{font-size:14.5px}
   .shell{flex-direction:column}
-  aside{width:100%;flex-direction:column;padding:10px 0 0;position:sticky;top:0;z-index:20}
+  aside{width:100%;flex-direction:column;padding:8px 0 0;position:sticky;top:0;z-index:40}
   aside::after{margin-top:0;height:4px}
-  aside .brand{border:none;padding:2px 14px 8px;margin:0;display:flex;align-items:center;gap:10px}
+  aside .brand{border:none;padding:2px 10px 8px;margin:0;display:flex;align-items:center;gap:10px}
   .logoImg.side{width:74px}
   .logoChip{padding:6px 9px 4px;margin:0}
-  aside .brand small{margin:0;font-size:11px}
-  nav{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 6px}
-  nav a{border-left:none;border-bottom:3px solid transparent;padding:10px 12px;white-space:nowrap;font-size:13px}
-  nav a.on{border-bottom-color:var(--onRed);border-left:none;background:var(--onRedActive);font-weight:700}
-  aside .foot{display:none}
+  aside .brand small{margin:0;font-size:11px;margin-right:auto;min-width:0}
+
+  /* botao hamburguer */
+  .burger{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+    width:44px;height:44px;flex-shrink:0;border-radius:9px;background:var(--onRedHover)}
+  .burger span{display:block;width:21px;height:2.5px;background:var(--onRed);border-radius:2px;
+    transition:transform .22s ease,opacity .16s ease}
+  body.navOpen .burger span:nth-child(1){transform:translateY(7.5px) rotate(45deg)}
+  body.navOpen .burger span:nth-child(2){opacity:0}
+  body.navOpen .burger span:nth-child(3){transform:translateY(-7.5px) rotate(-45deg)}
+
+  /* menu lateral deslizante */
+  .asideBody{position:fixed;top:0;left:0;height:100dvh;width:min(290px,84vw);
+    background:var(--red);padding:18px 0 18px;z-index:60;overflow-y:auto;
+    -webkit-overflow-scrolling:touch;transform:translateX(-102%);
+    transition:transform .24s ease;box-shadow:2px 0 22px rgba(0,0,0,.28)}
+  body.navOpen .asideBody{transform:translateX(0)}
+  .navOverlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;
+    opacity:0;pointer-events:none;transition:opacity .24s ease}
+  body.navOpen .navOverlay{opacity:1;pointer-events:auto}
+  body.navOpen{overflow:hidden}
+  .unitPick{padding:0 20px 14px}
+  nav{display:block;overflow:visible;padding:0}
+  nav a{border-left:3px solid transparent;border-bottom:none;padding:11px 20px;white-space:normal;font-size:14px}
+  nav a.on{border-left-color:var(--onRed);border-bottom:none;background:var(--onRedActive);font-weight:700}
+  aside .foot{display:block;margin-top:auto;padding:16px 20px 0;border-top:1px solid var(--onRedLine)}
   main{padding:16px 12px 70px;max-width:100%}
   .topbar{gap:10px}
   .topbar h1{width:100%;font-size:17px}
-  .unitSel{flex:1;min-width:0}
   .monthPick{width:100%;justify-content:space-between}
   .monthPick button{padding:8px 16px;font-size:18px}
   .cards{grid-template-columns:1fr 1fr;gap:8px}
@@ -207,6 +234,7 @@ input.mini,input.mini2{text-align:right}
   .formRow{grid-template-columns:1fr 1fr}
   .panel{padding:13px 12px}
   .panel table{min-width:640px}
+  .selInp,.mini,.mini2,.dateInp,.txtInp{min-width:0;width:100%}
   .btn{padding:12px 18px;min-height:44px}
   .btn.sm{padding:10px 14px;min-height:40px}
   nav a{min-height:44px;display:flex;align-items:center}
@@ -248,8 +276,18 @@ input.mini,input.mini2{text-align:right}
 <!-- ================= APP ================= -->
 <div id="app">
 <div class="shell">
+  <div class="navOverlay" id="navOverlay" onclick="closeNav()"></div>
   <aside>
-    <div class="brand"><span class="logoChip"><img class="logoImg side" alt="CNA idiomas"></span><small id="sideUnit">Financeiro</small></div>
+    <div class="brand">
+      <span class="logoChip"><img class="logoImg side" alt="CNA idiomas"></span>
+      <small id="sideUnit">Financeiro</small>
+      <button class="burger" id="burger" onclick="toggleNav()" aria-label="Abrir menu" aria-expanded="false" aria-controls="asideBody"><span></span><span></span><span></span></button>
+    </div>
+    <div class="asideBody" id="asideBody">
+    <div class="unitPick">
+      <label for="unitSel">Unidade</label>
+      <select id="unitSel" class="unitSel" onchange="switchUnidade(this.value)" aria-label="Trocar de unidade"></select>
+    </div>
     <nav id="nav">
       <a data-v="resumo" class="on" onclick="go('resumo')">Resumo</a>
       <div class="navGroup">Contas a pagar</div>
@@ -261,12 +299,12 @@ input.mini,input.mini2{text-align:right}
       <a data-v="df" onclick="go('df')">DF · Franquia</a>
     </nav>
     <div class="foot"><b id="whoName"></b><span id="whoRole"></span><br><button onclick="logout()">Sair</button></div>
+    </div>
   </aside>
   <main>
       <div id="printHead"><img src="" id="printLogo" alt=""><h1 id="printTitle"></h1></div>
     <div class="topbar">
       <h1 id="viewTitle">Resumo</h1>
-      <select id="unitSel" class="unitSel" onchange="switchUnidade(this.value)" aria-label="Trocar de unidade"></select>
       <div class="monthPick">
         <button onclick="shiftMonth(-1)" aria-label="Mês anterior">‹</button>
         <b id="monthLabel"></b>
@@ -397,14 +435,21 @@ async function loadUnidade(id){
   document.getElementById('app').style.display='block';
   go('resumo');
 }
-function switchUnidade(id){ loadUnidade(id).then(()=>toast('Você está em '+UNIDADES.find(x=>x.id===id).nome)).catch(e=>toast(e.message)); }
-function logout(){ S={token:null,refresh:null,uid:null,role:null,nome:null,unidade:null,comp:curComp(),view:'resumo',cfg:{}}; document.getElementById('app').style.display='none'; document.getElementById('auth').style.display='flex'; showLogin(); }
+function switchUnidade(id){ closeNav(); loadUnidade(id).then(()=>toast('Você está em '+UNIDADES.find(x=>x.id===id).nome)).catch(e=>toast(e.message)); }
+
+/* ================= MENU MOBILE ================= */
+function openNav(){ document.body.classList.add('navOpen'); const b=document.getElementById('burger'); if(b){b.setAttribute('aria-expanded','true');b.setAttribute('aria-label','Fechar menu');} }
+function closeNav(){ document.body.classList.remove('navOpen'); const b=document.getElementById('burger'); if(b){b.setAttribute('aria-expanded','false');b.setAttribute('aria-label','Abrir menu');} }
+function toggleNav(){ document.body.classList.contains('navOpen')?closeNav():openNav(); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeNav(); });
+window.addEventListener('resize',()=>{ if(window.innerWidth>860) closeNav(); });
+function logout(){ closeNav(); S={token:null,refresh:null,uid:null,role:null,nome:null,unidade:null,comp:curComp(),view:'resumo',cfg:{}}; document.getElementById('app').style.display='none'; document.getElementById('auth').style.display='flex'; showLogin(); }
 
 /* ================= ROUTER ================= */
 const TITLES={resumo:'Resumo do mês',fixas:'Contas a pagar · Despesas fixas',variaveis:'Contas a pagar · Despesas variáveis',folha:'Folha de pagamento',receitas:'Receitas',dre:'DRE',df:'DF · Relatório de franquia'};
 function go(v){
   if(v==='folha'&&S.role!=='admin') return;
-  S.view=v;
+  S.view=v; closeNav();
   document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on',a.dataset.v===v));
   document.getElementById('viewTitle').textContent=TITLES[v];
   render();
@@ -428,19 +473,22 @@ function calcINSS(brutoCents){
 }
 function comissaoDe(f,r,todos,rows){
   const cfg=S.cfg;
-  const vMat=(cfg.comissao_matricula||{})[cfg.comissao_valor_ativo||'comissao']||5000;
+  const comKey=(cfg.comissao_valor_ativo||'comissao');
+  const vMat=(cfg.comissao_matricula||{})[comKey]||5000;
   const vPag=((cfg.comissao_pagamento||{}).valor_cents)||0;
   if(r.comissao_manual_cents!=null && r.comissao_manual_cents!=='') return +r.comissao_manual_cents;
-  if(f.tipo==='horista' || f.comissao_tipo==='nenhuma') return 0;
-  if(f.comissao_tipo==='coord_comercial'){
-    let base=0;
-    (todos||[]).filter(x=>x.setor==='Comercial').forEach(x=>{
-      const rr=(rows||{})[x.id]||{}; base += (rr.matriculas||0)*vMat;
-    });
-    return Math.round(base*0.5) + (r.matriculas||0)*vMat + (r.pagamentos||0)*vPag;
+  switch(f.comissao_tipo){
+    case 'matricula':  return (r.matriculas||0)*vMat;
+    case 'pagamentos': return (r.pagamentos||0)*vPag;
+    case 'coord_comercial': {
+      let base=0;
+      (todos||[]).filter(x=>x.comissao_tipo==='matricula').forEach(x=>{
+        const rr=(rows||{})[x.id]||{}; base += (rr.matriculas||0)*vMat;
+      });
+      return Math.round(base*0.5);
+    }
+    default: return 0;
   }
-  // matriculas e pagamentos somam: quem e de pagamentos pode fazer matricula pontual
-  return (r.matriculas||0)*vMat + (r.pagamentos||0)*vPag;
 }
 function calcRow(f,r,todos,rows){
   const cfg=S.cfg, _d=cfg.dsr||{};
@@ -647,14 +695,13 @@ function drawFolha(el,fechada){
       totF+=k.fgts_cents; totProv+=k.ferias_prov_cents+k.decimo_prov_cents; }
     const dis=fechada?'disabled':'';
     const ed=editFunc===f.id, prof=f.tipo==='horista';
-    const inpMat=`<label class="prodF" title="Matrículas"><input class="mini3" ${dis} value="${r.matriculas||0}" onchange="fEdit(${f.id},'matriculas',parseInt(this.value)||0)"><span>mat</span></label>`;
-    const inpPag=`<label class="prodF" title="Pagamentos recebidos"><input class="mini3" ${dis} value="${r.pagamentos||0}" onchange="fEdit(${f.id},'pagamentos',parseInt(this.value)||0)"><span>pg</span></label>`;
     const producao = prof
-      ? `<label class="prodF" title="Horas/aula"><input class="mini3" ${dis} value="${r.horas||0}" onchange="fEdit(${f.id},'horas',parseNum(this.value))"><span>h</span></label>`
-      : f.comissao_tipo==='matricula' ? inpMat
-      : f.comissao_tipo==='pagamentos' ? inpPag+inpMat
-      : f.comissao_tipo==='coord_comercial' ? `<span class="hint">50% Comercial</span>`+inpMat
-      : '—';
+      ? `<input class="mini2" ${dis} value="${r.horas||0}" onchange="fEdit(${f.id},'horas',parseNum(this.value))"> h`
+      : f.comissao_tipo==='matricula'
+        ? `<input class="mini2" ${dis} value="${r.matriculas||0}" onchange="fEdit(${f.id},'matriculas',parseInt(this.value)||0)"> mat`
+        : f.comissao_tipo==='pagamentos'
+          ? `<input class="mini2" ${dis} value="${r.pagamentos||0}" onchange="fEdit(${f.id},'pagamentos',parseInt(this.value)||0)"> pg`
+          : f.comissao_tipo==='coord_comercial' ? `<span class="hint">50% do Comercial</span>` : '—';
     const acoes=`
       <button class="ico" title="${ed?'Concluir':'Editar cadastro'}" onclick="toggleEditFunc(${f.id})">${ed?'✔':'✏️'}</button>
       <button class="ico" title="${f.ativo?'Desativar':'Reativar'}" onclick="toggleFunc(${f.id},${!f.ativo})">${f.ativo?'🚫':'↩'}</button>
