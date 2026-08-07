@@ -146,9 +146,13 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:now
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .formRow{display:grid;grid-template-columns:2fr 1.4fr 1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:6px}
 .formRow .field{margin:0}
-.mini{width:86px}
+.mini{width:112px}
 input.mini,input.mini2{text-align:right}
-.mini2{width:70px}
+.mini2{width:72px}
+.dateInp{width:150px;text-align:left!important}
+.txtInp{width:100%;min-width:110px;text-align:left!important}
+.selInp{width:100%;min-width:120px}
+@media(max-width:860px){ .dateInp,.mini,.txtInp{width:100%} }
 .hint{font-size:12px;color:var(--gray)}
 .divider{border-top:1px solid var(--line);margin:14px 0}
 .bars{display:flex;align-items:flex-end;gap:6px;height:130px;padding-top:8px}
@@ -482,13 +486,14 @@ async function vContas(el,tipo){
     recHTML=`
     <div class="panel"><div class="panelHead"><h2>Despesas recorrentes</h2>
       <span class="hint">Geram os lançamentos fixos de cada mês automaticamente.</span></div>
-    <table><thead><tr><th>Nome</th><th>Categoria</th><th class="num">Valor</th><th>Dia venc.</th><th>Resp.</th><th></th></tr></thead><tbody>
+    <table><thead><tr><th>Nome</th><th>Categoria</th><th class="num">Valor</th><th>Dia venc.</th><th>Resp.</th><th>Obs.</th><th></th></tr></thead><tbody>
     ${recs.map(r=>`<tr style="${r.ativo?'':'opacity:.45'}">
-      <td><b>${esc(r.nome)}</b>${r.obs?`<div class="hint">${esc(r.obs)}</div>`:''}</td>
-      <td><span class="badge cat">${esc(r.categoria)}</span></td>
+      <td><input class="txtInp" value="${esc(r.nome)}" onchange="mudaRec(${r.id},'nome',this.value)"></td>
+      <td><select class="selInp" onchange="mudaRec(${r.id},'categoria',this.value)">${cats.map(x=>`<option ${x===r.categoria?'selected':''}>${esc(x)}</option>`).join('')}</select></td>
       <td class="num"><input class="mini money" value="${r.valor_cents!=null?moneyVal(r.valor_cents):''}" placeholder="variável" onchange="mudaRec(${r.id},'valor_cents',this.value?parseBRL(this.value):null)"></td>
       <td><input class="mini2" type="number" min="1" max="31" value="${r.dia_vencimento||''}" onchange="mudaRec(${r.id},'dia_vencimento',+this.value||null)"></td>
-      <td>${esc(r.responsavel||'—')}</td>
+      <td><input class="txtInp" value="${esc(r.responsavel||'')}" onchange="mudaRec(${r.id},'responsavel',this.value||null)"></td>
+      <td><input class="txtInp" value="${esc(r.obs||'')}" placeholder="obs" onchange="mudaRec(${r.id},'obs',this.value||null)"></td>
       <td style="text-align:right;white-space:nowrap">
         <button class="btn sm ghost" onclick="toggleRec(${r.id},${!r.ativo})">${r.ativo?'Desativar':'Reativar'}</button>
         <button class="btn sm ghost" onclick="delRec(${r.id})">✕</button></td></tr>`).join('')}
@@ -522,10 +527,10 @@ async function vContas(el,tipo){
       const late=l.status==='pendente'&&l.vencimento&&l.vencimento<hoje;
       return `<tr class="${l.status==='pago'?'paid':''}">
       <td><span class="badge ${late?'late':l.status==='pago'?'pago':'pend'}">${late?'Atrasada':l.status==='pago'?'Paga':'Pendente'}</span></td>
-      <td><span class="name">${esc(l.nome)}</span>${l.origem==='folha'?'<span class="tag">FOLHA</span>':''}${l.obs?`<div class="hint">${esc(l.obs)}</div>`:''}</td>
-      <td><span class="badge cat">${esc(l.categoria)}</span></td>
-      <td><input class="mini2" type="date" value="${l.vencimento||''}" onchange="mudaVenc(${l.id},this.value)"></td>
-      <td>${esc(l.responsavel||'—')}</td>
+      <td><input class="txtInp" value="${esc(l.nome)}" onchange="mudaLanc(${l.id},'nome',this.value)">${l.origem==='folha'?'<span class="tag">FOLHA</span>':''}</td>
+      <td><select class="selInp" onchange="mudaLanc(${l.id},'categoria',this.value)">${cats.map(x=>`<option ${x===l.categoria?'selected':''}>${esc(x)}</option>`).join('')}</select></td>
+      <td><input class="dateInp" type="date" value="${l.vencimento||''}" onchange="mudaVenc(${l.id},this.value)"></td>
+      <td><input class="txtInp" value="${esc(l.responsavel||'')}" onchange="mudaLanc(${l.id},'responsavel',this.value||null)"></td>
       <td class="num"><input class="mini money" value="${moneyVal(l.valor_cents)}" onchange="mudaValor(${l.id},this.value)"></td>
       <td style="text-align:right;white-space:nowrap">
         ${l.status==='pendente'?`<button class="btn sm sec" onclick="marcarPago(${l.id})">Pagar</button>`:`<button class="btn sm ghost" onclick="desmarcar(${l.id})">Desfazer</button>`}
@@ -534,17 +539,18 @@ async function vContas(el,tipo){
     :`<div class="empty">Nenhuma despesa ${LBL} ${contasFiltro!=='todas'?'nesse filtro':'neste mês ainda'}.</div>`}
   </div>
   ${recHTML}
+  ${tipo==='variavel'?`
   <div class="panel">
-    <h2>Adicionar despesa ${tipo==='fixa'?'fixa':'variável'} avulsa</h2>
+    <h2>Adicionar despesa variável</h2>
     <div class="formRow">
       <div class="field"><label>Nome</label><input id="avNome"></div>
       <div class="field"><label>Categoria</label><select id="avCat">${cats.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div>
       <div class="field"><label>Valor</label><input id="avValor" class="money" placeholder="R$ 0,00"></div>
-      <div class="field"><label>Vencimento</label><input id="avVenc" type="date" value="${c}-01"></div>
+      <div class="field"><label>Vencimento</label><input id="avVenc" class="dateInp" type="date" value="${c}-01"></div>
       <div class="field"><label>Responsável</label><input id="avResp"></div>
-      <button class="btn" onclick="addAvulsa('${tipo}')">Adicionar</button>
+      <button class="btn" onclick="addAvulsa('variavel')">Adicionar</button>
     </div>
-  </div>`;
+  </div>`:''}`;
 }
 async function gerarMes(){
   const c=S.comp, ld=lastDay(c);
@@ -555,6 +561,7 @@ async function gerarMes(){
   toast(rows.length+' lançamentos gerados'); render();
 }
 async function mudaValor(id,v){ await db.upd('fin_lancamentos','id=eq.'+id,{valor_cents:parseBRL(v)}); toast('Valor atualizado'); render(); }
+async function mudaLanc(id,campo,v){ await db.upd('fin_lancamentos','id=eq.'+id,{[campo]:v}); toast('Atualizado'); }
 async function mudaVenc(id,v){ await db.upd('fin_lancamentos','id=eq.'+id,{vencimento:v||null}); toast('Vencimento atualizado'); render(); }
 async function mudaRec(id,campo,v){ await db.upd('fin_despesas_recorrentes','id=eq.'+id,{[campo]:v}); toast('Recorrente atualizada'); render(); }
 async function delRec(id){ if(!confirm('Excluir essa despesa recorrente?'))return; await db.del('fin_despesas_recorrentes','id=eq.'+id); render(); }
@@ -638,31 +645,34 @@ function painelFuncionarios(){
   return `
   <div class="panel"><div class="panelHead"><h2>Funcionários</h2>
     <span class="hint">Inclusão, edição e exclusão do time direto aqui.</span></div>
-  <table><thead><tr><th>Nome</th><th>Função</th><th>Tipo</th><th class="num">Salário / hora</th>
-    <th class="num">VT</th><th class="num">iFood</th><th class="num">Plano</th><th>Comis.</th><th></th></tr></thead><tbody>
+  <table><thead><tr><th>Nome</th><th>Função</th><th>Tipo</th><th class="num">Salário mensal</th>
+    <th class="num">Valor / hora</th><th class="num">VT</th><th class="num">iFood</th><th class="num">Plano saúde</th>
+    <th>Comis.</th><th></th></tr></thead><tbody>
   ${funcs.map(f=>`<tr style="${f.ativo?'':'opacity:.45'}">
-    <td><input class="mini2" value="${esc(f.nome)}" onchange="funcEdit(${f.id},'nome',this.value)"></td>
-    <td><input class="mini2" value="${esc(f.funcao||'')}" onchange="funcEdit(${f.id},'funcao',this.value)"></td>
-    <td><select class="mini2" onchange="funcEdit(${f.id},'tipo',this.value)">
-      <option value="mensalista" ${f.tipo==='mensalista'?'selected':''}>Mensal</option>
+    <td><input class="txtInp" value="${esc(f.nome)}" onchange="funcEdit(${f.id},'nome',this.value)"></td>
+    <td><input class="txtInp" value="${esc(f.funcao||'')}" onchange="funcEdit(${f.id},'funcao',this.value)"></td>
+    <td><select class="selInp" onchange="funcEdit(${f.id},'tipo',this.value)">
+      <option value="mensalista" ${f.tipo==='mensalista'?'selected':''}>Mensalista</option>
       <option value="horista" ${f.tipo==='horista'?'selected':''}>Horista</option></select></td>
-    <td class="num"><input class="mini money" value="${moneyVal(f.tipo==='mensalista'?f.salario_cents:f.valor_hora_cents)}"
-      onchange="funcEdit(${f.id},'${f.tipo==='mensalista'?'salario_cents':'valor_hora_cents'}',parseBRL(this.value))"></td>
+    <td class="num"><input class="mini money" value="${moneyVal(f.salario_cents)}" onchange="funcEdit(${f.id},'salario_cents',parseBRL(this.value))"></td>
+    <td class="num"><input class="mini money" value="${moneyVal(f.valor_hora_cents)}" onchange="funcEdit(${f.id},'valor_hora_cents',parseBRL(this.value))"></td>
     <td class="num"><input class="mini money" value="${moneyVal(f.vt_cents)}" onchange="funcEdit(${f.id},'vt_cents',parseBRL(this.value))"></td>
     <td class="num"><input class="mini money" value="${moneyVal(f.ifood_cents)}" onchange="funcEdit(${f.id},'ifood_cents',parseBRL(this.value))"></td>
     <td class="num"><input class="mini money" value="${moneyVal(f.plano_saude_cents)}" onchange="funcEdit(${f.id},'plano_saude_cents',parseBRL(this.value))"></td>
-    <td><input type="checkbox" ${f.comissionado?'checked':''} onchange="funcEdit(${f.id},'comissionado',this.checked)"></td>
+    <td style="text-align:center"><input type="checkbox" ${f.comissionado?'checked':''} onchange="funcEdit(${f.id},'comissionado',this.checked)"></td>
     <td style="text-align:right;white-space:nowrap">
       <button class="btn sm ghost" onclick="toggleFunc(${f.id},${!f.ativo})">${f.ativo?'Desativar':'Reativar'}</button>
       <button class="btn sm ghost" onclick="delFunc(${f.id})">✕</button></td></tr>`).join('')}
   </tbody></table>
   <div class="divider"></div>
-  <div class="formRow" style="grid-template-columns:1.6fr 1.3fr 1fr 1fr 1fr auto">
+  <div class="formRow">
     <div class="field"><label>Nome</label><input id="nfNome"></div>
     <div class="field"><label>Função</label><input id="nfFuncao"></div>
     <div class="field"><label>Tipo</label><select id="nfTipo"><option value="mensalista">Mensalista</option><option value="horista">Horista</option></select></div>
     <div class="field"><label>Salário / valor hora</label><input id="nfValor" class="money" placeholder="R$ 0,00"></div>
+    <div class="field"><label>VT</label><input id="nfVt" class="money" placeholder="R$ 0,00"></div>
     <div class="field"><label>iFood</label><input id="nfIfood" class="money" placeholder="R$ 0,00"></div>
+    <div class="field"><label>Plano saúde</label><input id="nfPlano" class="money" placeholder="R$ 0,00"></div>
     <button class="btn" onclick="addFunc()">Adicionar</button>
   </div></div>`;
 }
@@ -888,7 +898,10 @@ async function toggleFunc(id,ativo){ await db.upd('fin_funcionarios','id=eq.'+id
 async function addFunc(){
   if(!nfNome.value.trim()) return toast('Dê um nome');
   const tipo=nfTipo.value, v=parseBRL(nfValor.value);
-  await db.ins('fin_funcionarios',[{unidade:S.unidade,nome:nfNome.value.trim(),funcao:nfFuncao.value.trim()||null,tipo,salario_cents:tipo==='mensalista'?v:0,valor_hora_cents:tipo==='horista'?v:0,ifood_cents:parseBRL(nfIfood.value),comissionado:false}]);
+  await db.ins('fin_funcionarios',[{unidade:S.unidade,nome:nfNome.value.trim(),funcao:nfFuncao.value.trim()||null,
+    tipo,salario_cents:tipo==='mensalista'?v:0,valor_hora_cents:tipo==='horista'?v:0,
+    vt_cents:parseBRL(nfVt.value),ifood_cents:parseBRL(nfIfood.value),plano_saude_cents:parseBRL(nfPlano.value),
+    comissionado:false,ativo:true}]);
   toast('Funcionário adicionado'); render();
 }
 async function salvaCfg(){
