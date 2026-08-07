@@ -118,6 +118,16 @@ aside :is(a,button):focus-visible{outline-color:var(--onDark)}
 nav a.sub{padding-left:32px;font-size:13px}
 @media(max-width:860px){ .navGroup{display:none} nav a.sub{padding-left:12px} }
 
+.acoes{text-align:right;white-space:nowrap}
+.ico{background:none;border:1px solid transparent;border-radius:7px;font-size:16px;line-height:1;
+  padding:6px 8px;cursor:pointer;opacity:.4;transition:opacity .15s,background .15s}
+.ico:hover{opacity:1;background:var(--surface)}
+.ico.on{opacity:1;background:var(--okBg);border-color:var(--ok)}
+.ico.del:hover{background:var(--redBg,#FDECEF)}
+tr.editing{background:var(--surface)}
+tr.editing td{border-top:2px solid var(--red)}
+@media(max-width:860px){ .ico{padding:9px 10px;font-size:18px} }
+
 /* ---------- components ---------- */
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:18px}
 .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px}
@@ -472,6 +482,9 @@ async function marcarPago(id){ await db.upd('fin_lancamentos','id=eq.'+id,{statu
 /* ================= CONTAS ================= */
 let contasFiltro='todas';
 function setFiltro(f){ contasFiltro=f; render(); }
+let editRow=null, novoAberto=false;
+function toggleEdit(id){ editRow = (editRow===id?null:id); render(); }
+function toggleNovo(){ novoAberto=!novoAberto; render(); }
 async function vContas(el,tipo){
   const c=S.comp, LBL = tipo==='fixa'?'fixas':'variáveis';
   const lanc = await db.get('fin_lancamentos',`unidade=eq.${S.unidade}&competencia=eq.${c}&tipo_despesa=eq.${tipo}&select=*&order=vencimento.asc.nullslast,id.asc`);
@@ -480,34 +493,31 @@ async function vContas(el,tipo){
   const tot=lanc.reduce((a,l)=>a+l.valor_cents,0), pg=lanc.filter(l=>l.status==='pago').reduce((a,l)=>a+l.valor_cents,0);
   const shown=lanc.filter(l=>contasFiltro==='todas'||(contasFiltro==='pend'&&l.status==='pendente')||(contasFiltro==='pago'&&l.status==='pago'));
 
-  let recHTML='';
-  if(tipo==='fixa'){
-    const recs=await db.get('fin_despesas_recorrentes',`unidade=eq.${S.unidade}&select=*&order=dia_vencimento.asc.nullslast,nome.asc`);
-    recHTML=`
-    <div class="panel"><div class="panelHead"><h2>Despesas recorrentes</h2>
-      <span class="hint">Geram os lançamentos fixos de cada mês automaticamente.</span></div>
-    <table><thead><tr><th>Nome</th><th>Categoria</th><th class="num">Valor</th><th>Dia venc.</th><th>Resp.</th><th>Obs.</th><th></th></tr></thead><tbody>
-    ${recs.map(r=>`<tr style="${r.ativo?'':'opacity:.45'}">
-      <td><input class="txtInp" value="${esc(r.nome)}" onchange="mudaRec(${r.id},'nome',this.value)"></td>
-      <td><select class="selInp" onchange="mudaRec(${r.id},'categoria',this.value)">${cats.map(x=>`<option ${x===r.categoria?'selected':''}>${esc(x)}</option>`).join('')}</select></td>
-      <td class="num"><input class="mini money" value="${r.valor_cents!=null?moneyVal(r.valor_cents):''}" placeholder="variável" onchange="mudaRec(${r.id},'valor_cents',this.value?parseBRL(this.value):null)"></td>
-      <td><input class="mini2" type="number" min="1" max="31" value="${r.dia_vencimento||''}" onchange="mudaRec(${r.id},'dia_vencimento',+this.value||null)"></td>
-      <td><input class="txtInp" value="${esc(r.responsavel||'')}" onchange="mudaRec(${r.id},'responsavel',this.value||null)"></td>
-      <td><input class="txtInp" value="${esc(r.obs||'')}" placeholder="obs" onchange="mudaRec(${r.id},'obs',this.value||null)"></td>
-      <td style="text-align:right;white-space:nowrap">
-        <button class="btn sm ghost" onclick="toggleRec(${r.id},${!r.ativo})">${r.ativo?'Desativar':'Reativar'}</button>
-        <button class="btn sm ghost" onclick="delRec(${r.id})">✕</button></td></tr>`).join('')}
-    </tbody></table>
-    <div class="divider"></div>
-    <div class="formRow">
-      <div class="field"><label>Nome</label><input id="nrNome"></div>
-      <div class="field"><label>Categoria</label><select id="nrCat">${cats.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div>
-      <div class="field"><label>Valor</label><input id="nrValor" class="money" placeholder="vazio = variável"></div>
-      <div class="field"><label>Dia venc.</label><input id="nrDia" type="number" min="1" max="31"></div>
-      <div class="field"><label>Responsável</label><input id="nrResp"></div>
-      <button class="btn" onclick="addRec()">Adicionar</button>
-    </div></div>`;
-  }
+  const linha=l=>{
+    const late=l.status==='pendente'&&l.vencimento&&l.vencimento<hoje;
+    const ed = editRow===l.id;
+    const acoes=`
+      <button class="ico ${l.status==='pago'?'on':''}" title="Marcar como paga" onclick="setPago(${l.id},true)">👍</button>
+      <button class="ico ${l.status==='pendente'?'on':''}" title="Marcar como pendente" onclick="setPago(${l.id},false)">👎</button>
+      <button class="ico" title="${ed?'Concluir edição':'Editar'}" onclick="toggleEdit(${l.id})">${ed?'✔':'✏️'}</button>
+      <button class="ico del" title="Excluir" onclick="delLanc(${l.id})">🗑</button>`;
+    if(!ed) return `<tr class="${l.status==='pago'?'paid':''}">
+      <td><span class="badge ${late?'late':l.status==='pago'?'pago':'pend'}">${late?'Atrasada':l.status==='pago'?'Paga':'Pendente'}</span></td>
+      <td><span class="name">${esc(l.nome)}</span>${l.origem==='folha'?'<span class="tag">FOLHA</span>':''}${l.obs?`<div class="hint">${esc(l.obs)}</div>`:''}</td>
+      <td><span class="badge cat">${esc(l.categoria)}</span></td>
+      <td>${l.vencimento?dBRfull(l.vencimento):'—'}</td>
+      <td>${esc(l.responsavel||'—')}</td>
+      <td class="num"><b>${fmt(l.valor_cents)}</b></td>
+      <td class="acoes">${acoes}</td></tr>`;
+    return `<tr class="editing">
+      <td><span class="badge ${late?'late':l.status==='pago'?'pago':'pend'}">${late?'Atrasada':l.status==='pago'?'Paga':'Pendente'}</span></td>
+      <td><input class="txtInp" value="${esc(l.nome)}" onchange="mudaLanc(${l.id},'nome',this.value)"></td>
+      <td><select class="selInp" onchange="mudaLanc(${l.id},'categoria',this.value)">${cats.map(x=>`<option ${x===l.categoria?'selected':''}>${esc(x)}</option>`).join('')}</select></td>
+      <td><input class="dateInp" type="date" value="${l.vencimento||''}" onchange="mudaLanc(${l.id},'vencimento',this.value||null)"></td>
+      <td><input class="txtInp" value="${esc(l.responsavel||'')}" onchange="mudaLanc(${l.id},'responsavel',this.value||null)"></td>
+      <td class="num"><input class="mini money" value="${moneyVal(l.valor_cents)}" onchange="mudaLanc(${l.id},'valor_cents',parseBRL(this.value))"></td>
+      <td class="acoes">${acoes}</td></tr>`;
+  };
 
   el.innerHTML=`
   <div class="cards">
@@ -515,42 +525,36 @@ async function vContas(el,tipo){
     <div class="card"><small>Já pago</small><div class="v ok">${fmt(pg)}</div></div>
     <div class="card"><small>Pendente</small><div class="v red">${fmt(tot-pg)}</div></div>
   </div>
-  <div class="panel">
-    <div class="panelHead">
-      <h2>Despesas ${LBL} · ${compLabel(c)}</h2>
-      <button class="pill ${contasFiltro==='todas'?'on':''}" onclick="setFiltro('todas')">Todas</button>
-      <button class="pill ${contasFiltro==='pend'?'on':''}" onclick="setFiltro('pend')">Pendentes</button>
-      <button class="pill ${contasFiltro==='pago'?'on':''}" onclick="setFiltro('pago')">Pagas</button>
-      ${tipo==='fixa'&&lanc.length===0?`<button class="btn sm" onclick="gerarMes()">Gerar lançamentos do mês</button>`:''}
-    </div>
-    ${shown.length?`<table><thead><tr><th></th><th>Conta</th><th>Categoria</th><th>Vencimento</th><th>Resp.</th><th class="num">Valor</th><th></th></tr></thead><tbody>${shown.map(l=>{
-      const late=l.status==='pendente'&&l.vencimento&&l.vencimento<hoje;
-      return `<tr class="${l.status==='pago'?'paid':''}">
-      <td><span class="badge ${late?'late':l.status==='pago'?'pago':'pend'}">${late?'Atrasada':l.status==='pago'?'Paga':'Pendente'}</span></td>
-      <td><input class="txtInp" value="${esc(l.nome)}" onchange="mudaLanc(${l.id},'nome',this.value)">${l.origem==='folha'?'<span class="tag">FOLHA</span>':''}</td>
-      <td><select class="selInp" onchange="mudaLanc(${l.id},'categoria',this.value)">${cats.map(x=>`<option ${x===l.categoria?'selected':''}>${esc(x)}</option>`).join('')}</select></td>
-      <td><input class="dateInp" type="date" value="${l.vencimento||''}" onchange="mudaVenc(${l.id},this.value)"></td>
-      <td><input class="txtInp" value="${esc(l.responsavel||'')}" onchange="mudaLanc(${l.id},'responsavel',this.value||null)"></td>
-      <td class="num"><input class="mini money" value="${moneyVal(l.valor_cents)}" onchange="mudaValor(${l.id},this.value)"></td>
-      <td style="text-align:right;white-space:nowrap">
-        ${l.status==='pendente'?`<button class="btn sm sec" onclick="marcarPago(${l.id})">Pagar</button>`:`<button class="btn sm ghost" onclick="desmarcar(${l.id})">Desfazer</button>`}
-        <button class="btn sm ghost" onclick="delLanc(${l.id})">✕</button>
-      </td></tr>`;}).join('')}</tbody></table>`
-    :`<div class="empty">Nenhuma despesa ${LBL} ${contasFiltro!=='todas'?'nesse filtro':'neste mês ainda'}.</div>`}
+
+  <div class="panelHead" style="margin-bottom:10px">
+    <button class="btn" onclick="toggleNovo()">${novoAberto?'Cancelar':'+ Nova despesa '+(tipo==='fixa'?'fixa':'variável')}</button>
+    ${tipo==='fixa'&&lanc.length===0?`<button class="btn sm sec" onclick="gerarMes()">Gerar lançamentos do mês</button>`:''}
   </div>
-  ${recHTML}
-  ${tipo==='variavel'?`
-  <div class="panel">
-    <h2>Adicionar despesa variável</h2>
+
+  ${novoAberto?`
+  <div class="panel" style="border-left:4px solid var(--red)">
+    <h2>Nova despesa ${tipo==='fixa'?'fixa':'variável'}</h2>
     <div class="formRow">
       <div class="field"><label>Nome</label><input id="avNome"></div>
       <div class="field"><label>Categoria</label><select id="avCat">${cats.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div>
       <div class="field"><label>Valor</label><input id="avValor" class="money" placeholder="R$ 0,00"></div>
       <div class="field"><label>Vencimento</label><input id="avVenc" class="dateInp" type="date" value="${c}-01"></div>
       <div class="field"><label>Responsável</label><input id="avResp"></div>
-      <button class="btn" onclick="addAvulsa('variavel')">Adicionar</button>
+      <button class="btn" onclick="addAvulsa('${tipo}')">Salvar</button>
     </div>
-  </div>`:''}`;
+    ${tipo==='fixa'?`<p class="hint">Despesa fixa entra também no cadastro de recorrentes e passa a ser gerada todo mês.</p>`:''}
+  </div>`:''}
+
+  <div class="panel">
+    <div class="panelHead">
+      <h2>Despesas ${LBL} · ${compLabel(c)}</h2>
+      <button class="pill ${contasFiltro==='todas'?'on':''}" onclick="setFiltro('todas')">Todas</button>
+      <button class="pill ${contasFiltro==='pend'?'on':''}" onclick="setFiltro('pend')">Pendentes</button>
+      <button class="pill ${contasFiltro==='pago'?'on':''}" onclick="setFiltro('pago')">Pagas</button>
+    </div>
+    ${shown.length?`<table><thead><tr><th></th><th>Conta</th><th>Categoria</th><th>Vencimento</th><th>Resp.</th><th class="num">Valor</th><th></th></tr></thead><tbody>${shown.map(linha).join('')}</tbody></table>`
+    :`<div class="empty">Nenhuma despesa ${LBL} ${contasFiltro!=='todas'?'nesse filtro':'neste mês ainda'}.</div>`}
+  </div>`;
 }
 async function gerarMes(){
   const c=S.comp, ld=lastDay(c);
@@ -569,11 +573,23 @@ async function desmarcar(id){ await db.upd('fin_lancamentos','id=eq.'+id,{status
 async function delLanc(id){ if(!confirm('Excluir esse lançamento?'))return; await db.del('fin_lancamentos','id=eq.'+id); render(); }
 async function addAvulsa(tipo){
   const nome=avNome.value.trim(); if(!nome) return toast('Dê um nome à despesa');
-  await db.ins('fin_lancamentos',[{unidade:S.unidade,competencia:S.comp,tipo:'despesa',origem:'avulsa',
-    nome,categoria:avCat.value,tipo_despesa:tipo,valor_cents:parseBRL(avValor.value),
-    vencimento:avVenc.value||null,responsavel:avResp.value.trim()||null}]);
-  toast('Despesa adicionada'); render();
+  const valor=parseBRL(avValor.value), venc=avVenc.value||null, resp=avResp.value.trim()||null;
+  let recId=null;
+  if(tipo==='fixa'){
+    const r=await db.ins('fin_despesas_recorrentes',[{unidade:S.unidade,nome,categoria:avCat.value,
+      valor_cents:valor,dia_vencimento:venc?+venc.slice(-2):null,responsavel:resp,ativo:true}]);
+    recId=(r&&r[0]&&r[0].id)||null;
+  }
+  await db.ins('fin_lancamentos',[{unidade:S.unidade,competencia:S.comp,tipo:'despesa',
+    origem:tipo==='fixa'?'recorrente':'avulsa',recorrente_id:recId,nome,categoria:avCat.value,
+    tipo_despesa:tipo,valor_cents:valor,vencimento:venc,responsavel:resp}]);
+  novoAberto=false; toast('Despesa adicionada'); render();
 }
+async function setPago(id,pago){
+  await db.upd('fin_lancamentos','id=eq.'+id,{status:pago?'pago':'pendente',pago_em:pago?todayISO():null});
+  render();
+}
+function dBRfull(iso){ if(!iso) return '—'; const [y,m,d]=iso.split('-'); return d+'/'+m+'/'+y; }
 
 /* ================= FOLHA ================= */
 let folhaData={funcs:[],rows:{},vales:[]};
