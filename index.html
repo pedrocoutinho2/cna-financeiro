@@ -93,9 +93,30 @@ aside :is(a,button):focus-visible{outline-color:var(--onDark)}
     text-align:left;flex:0 0 45%}
   .panel table.cardify td:empty{display:none}
 }
+#printHead{display:none}
+@media print{
+  @page{size:A4 landscape;margin:12mm}
+  aside,.topbar,.pill,.btn,#printHead img{display:none!important}
+  body.printFolha #printHead{display:block;margin-bottom:10px;border-bottom:3px solid var(--red);padding-bottom:8px}
+  body.printFolha #printHead h1{font-size:16pt;color:var(--red);margin:0}
+  .shell{display:block}
+  main{padding:0;max-width:100%}
+  .panel{break-inside:avoid;border:1px solid #999;box-shadow:none;margin-bottom:10px}
+  table{font-size:9pt;width:100%}
+  input,select{border:none!important;background:none!important;padding:0!important;
+    font-size:9pt;color:#000;-webkit-appearance:none;appearance:none;text-align:right}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr)}
+  .hint,.divider,.formRow{display:none!important}
+  body.printFolha .panel:last-of-type{display:none}
+}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
+
+.navGroup{padding:12px 20px 4px;font-size:10.5px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--onRed);opacity:.75}
+nav a.sub{padding-left:32px;font-size:13px}
+@media(max-width:860px){ .navGroup{display:none} nav a.sub{padding-left:12px} }
 
 /* ---------- components ---------- */
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:18px}
@@ -210,16 +231,18 @@ input.mini,input.mini2{text-align:right}
     <div class="brand"><span class="logoChip"><img class="logoImg side" alt="CNA idiomas"></span><small id="sideUnit">Financeiro</small></div>
     <nav id="nav">
       <a data-v="resumo" class="on" onclick="go('resumo')">Resumo</a>
-      <a data-v="contas" onclick="go('contas')">Contas a pagar</a>
-      <a data-v="folha" data-admin onclick="go('folha')">Folha</a>
+      <div class="navGroup">Contas a pagar</div>
+      <a data-v="fixas" class="sub" onclick="go('fixas')">Despesas fixas</a>
+      <a data-v="variaveis" class="sub" onclick="go('variaveis')">Despesas variáveis</a>
+      <a data-v="folha" data-admin onclick="go('folha')">Folha de pagamento</a>
       <a data-v="receitas" onclick="go('receitas')">Receitas</a>
       <a data-v="dre" onclick="go('dre')">DRE</a>
       <a data-v="df" onclick="go('df')">DF · Franquia</a>
-      <a data-v="cadastros" onclick="go('cadastros')">Cadastros</a>
     </nav>
     <div class="foot"><b id="whoName"></b><span id="whoRole"></span><br><button onclick="logout()">Sair</button></div>
   </aside>
   <main>
+      <div id="printHead"><img src="" id="printLogo" alt=""><h1 id="printTitle"></h1></div>
     <div class="topbar">
       <h1 id="viewTitle">Resumo</h1>
       <select id="unitSel" class="unitSel" onchange="switchUnidade(this.value)" aria-label="Trocar de unidade"></select>
@@ -255,6 +278,20 @@ function nextComp(c,delta){ let [y,m]=c.split('-').map(Number); m+=delta; while(
 /* ================= HELPERS ================= */
 function fmt(c){ if(c==null||isNaN(c)) c=0; const v=(c/100).toFixed(2); const [i,d]=v.split('.'); const neg=c<0; const ii=Math.abs(+i).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.'); return (neg?'-':'')+'R$ '+ii+','+d; }
 function parseBRL(s){ if(s==null||s==='') return 0; s=String(s).replace(/[R$\s.]/g,'').replace(',','.'); const v=parseFloat(s); return isNaN(v)?0:Math.round(v*100); }
+function maskMoney(v){
+  let d=String(v).replace(/\D/g,'').replace(/^0+/,'');
+  if(!d) return '';
+  while(d.length<3) d='0'+d;
+  return 'R$ '+d.slice(0,-2).replace(/\B(?=(\d{3})+(?!\d))/g,'.')+','+d.slice(-2);
+}
+function moneyVal(c){ return maskMoney(String(Math.round(Math.abs(c||0)))); }
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t && t.classList && t.classList.contains('money')){
+    t.value=maskMoney(t.value);
+    t.setSelectionRange(t.value.length,t.value.length);
+  }
+},true);
 function parseNum(s){ if(s==null||s==='') return 0; const v=parseFloat(String(s).replace(',','.')); return isNaN(v)?0:v; }
 function esc(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 function dBR(iso){ if(!iso) return '—'; const [y,m,d]=iso.split('-'); return d+'/'+m; }
@@ -343,7 +380,7 @@ function switchUnidade(id){ loadUnidade(id).then(()=>toast('Você está em '+UNI
 function logout(){ S={token:null,refresh:null,uid:null,role:null,nome:null,unidade:null,comp:curComp(),view:'resumo',cfg:{}}; document.getElementById('app').style.display='none'; document.getElementById('auth').style.display='flex'; showLogin(); }
 
 /* ================= ROUTER ================= */
-const TITLES={resumo:'Resumo do mês',contas:'Contas a pagar',folha:'Folha de pagamento',receitas:'Receitas',dre:'DRE',df:'DF · Relatório de franquia',cadastros:'Cadastros'};
+const TITLES={resumo:'Resumo do mês',fixas:'Contas a pagar · Despesas fixas',variaveis:'Contas a pagar · Despesas variáveis',folha:'Folha de pagamento',receitas:'Receitas',dre:'DRE',df:'DF · Relatório de franquia'};
 function go(v){
   if(v==='folha'&&S.role!=='admin') return;
   S.view=v;
@@ -356,7 +393,7 @@ function render(){
   document.getElementById('monthLabel').textContent=compLabel(S.comp);
   const el=document.getElementById('view');
   el.innerHTML='<div class="empty">Carregando…</div>';
-  ({resumo:vResumo,contas:vContas,folha:vFolha,receitas:vReceitas,dre:vDRE,df:vDF,cadastros:vCadastros})[S.view](el).catch(e=>{ el.innerHTML=`<div class="panel"><b style="color:var(--redDark)">Erro:</b> ${esc(e.message)}</div>`; });
+  ({resumo:vResumo,fixas:el2=>vContas(el2,'fixa'),variaveis:el2=>vContas(el2,'variavel'),folha:vFolha,receitas:vReceitas,dre:vDRE,df:vDF})[S.view](el).catch(e=>{ el.innerHTML=`<div class="panel"><b style="color:var(--redDark)">Erro:</b> ${esc(e.message)}</div>`; });
 }
 
 /* ================= CÁLCULOS DA FOLHA ================= */
@@ -431,51 +468,81 @@ async function marcarPago(id){ await db.upd('fin_lancamentos','id=eq.'+id,{statu
 /* ================= CONTAS ================= */
 let contasFiltro='todas';
 function setFiltro(f){ contasFiltro=f; render(); }
-async function vContas(el){
-  const c=S.comp;
-  const lanc = await db.get('fin_lancamentos',`unidade=eq.${S.unidade}&competencia=eq.${c}&select=*&order=vencimento.asc.nullslast,id.asc`);
+async function vContas(el,tipo){
+  const c=S.comp, LBL = tipo==='fixa'?'fixas':'variáveis';
+  const lanc = await db.get('fin_lancamentos',`unidade=eq.${S.unidade}&competencia=eq.${c}&tipo_despesa=eq.${tipo}&select=*&order=vencimento.asc.nullslast,id.asc`);
   const cats=S.cfg.categorias_despesa||[];
   const hoje=todayISO();
   const tot=lanc.reduce((a,l)=>a+l.valor_cents,0), pg=lanc.filter(l=>l.status==='pago').reduce((a,l)=>a+l.valor_cents,0);
   const shown=lanc.filter(l=>contasFiltro==='todas'||(contasFiltro==='pend'&&l.status==='pendente')||(contasFiltro==='pago'&&l.status==='pago'));
 
+  let recHTML='';
+  if(tipo==='fixa'){
+    const recs=await db.get('fin_despesas_recorrentes',`unidade=eq.${S.unidade}&select=*&order=dia_vencimento.asc.nullslast,nome.asc`);
+    recHTML=`
+    <div class="panel"><div class="panelHead"><h2>Despesas recorrentes</h2>
+      <span class="hint">Geram os lançamentos fixos de cada mês automaticamente.</span></div>
+    <table><thead><tr><th>Nome</th><th>Categoria</th><th class="num">Valor</th><th>Dia venc.</th><th>Resp.</th><th></th></tr></thead><tbody>
+    ${recs.map(r=>`<tr style="${r.ativo?'':'opacity:.45'}">
+      <td><b>${esc(r.nome)}</b>${r.obs?`<div class="hint">${esc(r.obs)}</div>`:''}</td>
+      <td><span class="badge cat">${esc(r.categoria)}</span></td>
+      <td class="num"><input class="mini money" value="${r.valor_cents!=null?moneyVal(r.valor_cents):''}" placeholder="variável" onchange="mudaRec(${r.id},'valor_cents',this.value?parseBRL(this.value):null)"></td>
+      <td><input class="mini2" type="number" min="1" max="31" value="${r.dia_vencimento||''}" onchange="mudaRec(${r.id},'dia_vencimento',+this.value||null)"></td>
+      <td>${esc(r.responsavel||'—')}</td>
+      <td style="text-align:right;white-space:nowrap">
+        <button class="btn sm ghost" onclick="toggleRec(${r.id},${!r.ativo})">${r.ativo?'Desativar':'Reativar'}</button>
+        <button class="btn sm ghost" onclick="delRec(${r.id})">✕</button></td></tr>`).join('')}
+    </tbody></table>
+    <div class="divider"></div>
+    <div class="formRow">
+      <div class="field"><label>Nome</label><input id="nrNome"></div>
+      <div class="field"><label>Categoria</label><select id="nrCat">${cats.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div>
+      <div class="field"><label>Valor</label><input id="nrValor" class="money" placeholder="vazio = variável"></div>
+      <div class="field"><label>Dia venc.</label><input id="nrDia" type="number" min="1" max="31"></div>
+      <div class="field"><label>Responsável</label><input id="nrResp"></div>
+      <button class="btn" onclick="addRec()">Adicionar</button>
+    </div></div>`;
+  }
+
   el.innerHTML=`
   <div class="cards">
-    <div class="card"><small>Total do mês</small><div class="v">${fmt(tot)}</div></div>
+    <div class="card"><small>Total ${LBL} do mês</small><div class="v">${fmt(tot)}</div></div>
     <div class="card"><small>Já pago</small><div class="v ok">${fmt(pg)}</div></div>
     <div class="card"><small>Pendente</small><div class="v red">${fmt(tot-pg)}</div></div>
   </div>
   <div class="panel">
     <div class="panelHead">
-      <h2>Lançamentos · ${compLabel(c)}</h2>
+      <h2>Despesas ${LBL} · ${compLabel(c)}</h2>
       <button class="pill ${contasFiltro==='todas'?'on':''}" onclick="setFiltro('todas')">Todas</button>
       <button class="pill ${contasFiltro==='pend'?'on':''}" onclick="setFiltro('pend')">Pendentes</button>
       <button class="pill ${contasFiltro==='pago'?'on':''}" onclick="setFiltro('pago')">Pagas</button>
-      ${lanc.length===0?`<button class="btn sm" onclick="gerarMes()">Gerar lançamentos do mês</button>`:''}
+      ${tipo==='fixa'&&lanc.length===0?`<button class="btn sm" onclick="gerarMes()">Gerar lançamentos do mês</button>`:''}
     </div>
-    ${shown.length?`<table><thead><tr><th></th><th>Conta</th><th>Categoria</th><th>Vence</th><th>Resp.</th><th class="num">Valor</th><th></th></tr></thead><tbody>${shown.map(l=>{
+    ${shown.length?`<table><thead><tr><th></th><th>Conta</th><th>Categoria</th><th>Vencimento</th><th>Resp.</th><th class="num">Valor</th><th></th></tr></thead><tbody>${shown.map(l=>{
       const late=l.status==='pendente'&&l.vencimento&&l.vencimento<hoje;
       return `<tr class="${l.status==='pago'?'paid':''}">
       <td><span class="badge ${late?'late':l.status==='pago'?'pago':'pend'}">${late?'Atrasada':l.status==='pago'?'Paga':'Pendente'}</span></td>
       <td><span class="name">${esc(l.nome)}</span>${l.origem==='folha'?'<span class="tag">FOLHA</span>':''}${l.obs?`<div class="hint">${esc(l.obs)}</div>`:''}</td>
       <td><span class="badge cat">${esc(l.categoria)}</span></td>
-      <td>${dBR(l.vencimento)}</td><td>${esc(l.responsavel||'—')}</td>
-      <td class="num"><input class="mini" value="${(l.valor_cents/100).toFixed(2).replace('.',',')}" onchange="mudaValor(${l.id},this.value)"></td>
+      <td><input class="mini2" type="date" value="${l.vencimento||''}" onchange="mudaVenc(${l.id},this.value)"></td>
+      <td>${esc(l.responsavel||'—')}</td>
+      <td class="num"><input class="mini money" value="${moneyVal(l.valor_cents)}" onchange="mudaValor(${l.id},this.value)"></td>
       <td style="text-align:right;white-space:nowrap">
         ${l.status==='pendente'?`<button class="btn sm sec" onclick="marcarPago(${l.id})">Pagar</button>`:`<button class="btn sm ghost" onclick="desmarcar(${l.id})">Desfazer</button>`}
         <button class="btn sm ghost" onclick="delLanc(${l.id})">✕</button>
       </td></tr>`;}).join('')}</tbody></table>`
-    :`<div class="empty">Nenhum lançamento ${contasFiltro!=='todas'?'nesse filtro':'neste mês ainda'}.</div>`}
+    :`<div class="empty">Nenhuma despesa ${LBL} ${contasFiltro!=='todas'?'nesse filtro':'neste mês ainda'}.</div>`}
   </div>
+  ${recHTML}
   <div class="panel">
-    <h2>Adicionar despesa avulsa</h2>
+    <h2>Adicionar despesa ${tipo==='fixa'?'fixa':'variável'} avulsa</h2>
     <div class="formRow">
       <div class="field"><label>Nome</label><input id="avNome"></div>
       <div class="field"><label>Categoria</label><select id="avCat">${cats.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div>
-      <div class="field"><label>Valor</label><input id="avValor" placeholder="0,00"></div>
-      <div class="field"><label>Vencimento (dia)</label><input id="avDia" type="number" min="1" max="31"></div>
+      <div class="field"><label>Valor</label><input id="avValor" class="money" placeholder="R$ 0,00"></div>
+      <div class="field"><label>Vencimento</label><input id="avVenc" type="date" value="${c}-01"></div>
       <div class="field"><label>Responsável</label><input id="avResp"></div>
-      <button class="btn" onclick="addAvulsa()">Adicionar</button>
+      <button class="btn" onclick="addAvulsa('${tipo}')">Adicionar</button>
     </div>
   </div>`;
 }
@@ -483,17 +550,21 @@ async function gerarMes(){
   const c=S.comp, ld=lastDay(c);
   const recs=await db.get('fin_despesas_recorrentes',`unidade=eq.${S.unidade}&ativo=eq.true&select=*`);
   if(!recs.length) return toast('Nenhuma despesa recorrente cadastrada');
-  const rows=recs.map(r=>({unidade:S.unidade,competencia:c,tipo:'despesa',origem:'recorrente',recorrente_id:r.id,nome:r.nome,categoria:r.categoria,valor_cents:r.valor_cents||0,vencimento:r.dia_vencimento?`${c}-${String(Math.min(r.dia_vencimento,ld)).padStart(2,'0')}`:null,responsavel:r.responsavel,obs:r.obs}));
+  const rows=recs.map(r=>({unidade:S.unidade,competencia:c,tipo:'despesa',origem:'recorrente',recorrente_id:r.id,nome:r.nome,categoria:r.categoria,tipo_despesa:'fixa',valor_cents:r.valor_cents||0,vencimento:r.dia_vencimento?`${c}-${String(Math.min(r.dia_vencimento,ld)).padStart(2,'0')}`:null,responsavel:r.responsavel,obs:r.obs}));
   await db.ins('fin_lancamentos',rows);
   toast(rows.length+' lançamentos gerados'); render();
 }
 async function mudaValor(id,v){ await db.upd('fin_lancamentos','id=eq.'+id,{valor_cents:parseBRL(v)}); toast('Valor atualizado'); render(); }
+async function mudaVenc(id,v){ await db.upd('fin_lancamentos','id=eq.'+id,{vencimento:v||null}); toast('Vencimento atualizado'); render(); }
+async function mudaRec(id,campo,v){ await db.upd('fin_despesas_recorrentes','id=eq.'+id,{[campo]:v}); toast('Recorrente atualizada'); render(); }
+async function delRec(id){ if(!confirm('Excluir essa despesa recorrente?'))return; await db.del('fin_despesas_recorrentes','id=eq.'+id); render(); }
 async function desmarcar(id){ await db.upd('fin_lancamentos','id=eq.'+id,{status:'pendente',pago_em:null}); render(); }
 async function delLanc(id){ if(!confirm('Excluir esse lançamento?'))return; await db.del('fin_lancamentos','id=eq.'+id); render(); }
-async function addAvulsa(){
+async function addAvulsa(tipo){
   const nome=avNome.value.trim(); if(!nome) return toast('Dê um nome à despesa');
-  const dia=+avDia.value, ld=lastDay(S.comp);
-  await db.ins('fin_lancamentos',[{unidade:S.unidade,competencia:S.comp,tipo:'despesa',origem:'avulsa',nome,categoria:avCat.value,valor_cents:parseBRL(avValor.value),vencimento:dia?`${S.comp}-${String(Math.min(dia,ld)).padStart(2,'0')}`:null,responsavel:avResp.value.trim()||null}]);
+  await db.ins('fin_lancamentos',[{unidade:S.unidade,competencia:S.comp,tipo:'despesa',origem:'avulsa',
+    nome,categoria:avCat.value,tipo_despesa:tipo,valor_cents:parseBRL(avValor.value),
+    vencimento:avVenc.value||null,responsavel:avResp.value.trim()||null}]);
   toast('Despesa adicionada'); render();
 }
 
@@ -502,12 +573,12 @@ let folhaData={funcs:[],rows:{},vales:[]};
 async function vFolha(el){
   const c=S.comp;
   const [funcs,rows,vales]=await Promise.all([
-    db.get('fin_funcionarios',`unidade=eq.${S.unidade}&ativo=eq.true&select=*&order=tipo.asc,nome.asc`),
+    db.get('fin_funcionarios',`unidade=eq.${S.unidade}&select=*&order=ativo.desc,tipo.asc,nome.asc`),
     db.get('fin_folha',`unidade=eq.${S.unidade}&competencia=eq.${c}&select=*`),
     db.get('fin_vales','ativo=eq.true&select=*')
   ]);
-  folhaData={funcs,rows:{},vales};
-  funcs.forEach(f=>{
+  folhaData={funcs:funcs.filter(f=>f.ativo),todos:funcs,rows:{},vales};
+  folhaData.funcs.forEach(f=>{
     const ex=rows.find(r=>r.funcionario_id===f.id);
     const valeSug=vales.filter(v=>v.funcionario_id===f.id&&v.parcelas_pagas<v.parcelas_total).reduce((a,v)=>a+v.valor_parcela_cents,0);
     folhaData.rows[f.id]=ex||{unidade:S.unidade,competencia:c,funcionario_id:f.id,horas:0,matriculas:0,comissao_manual_cents:null,adiantamento_cents:0,desconto_vale_cents:valeSug,ajuste_cents:0,obs:null,fechada:false};
@@ -530,8 +601,8 @@ function drawFolha(el,fechada){
         :`<td class="num">${f.comissionado?`<input class="mini2" ${dis} value="${r.matriculas||0}" onchange="fEdit(${f.id},'matriculas',parseInt(this.value)||0)"> mat`:'—'}</td>`}
       <td class="num">${fmt(k.salario_base_cents)}</td>
       <td class="num">${k.comissao_cents||k.dsr_cents?fmt(k.comissao_cents+k.dsr_cents):'—'}</td>
-      <td class="num"><input class="mini" ${dis} value="${((r.adiantamento_cents||0)/100).toFixed(2).replace('.',',')}" onchange="fEdit(${f.id},'adiantamento_cents',parseBRL(this.value))"></td>
-      <td class="num"><input class="mini" ${dis} value="${((r.desconto_vale_cents||0)/100).toFixed(2).replace('.',',')}" onchange="fEdit(${f.id},'desconto_vale_cents',parseBRL(this.value))"></td>
+      <td class="num"><input class="mini" ${dis} class="money" value="${moneyVal(r.adiantamento_cents||0)}" onchange="fEdit(${f.id},'adiantamento_cents',parseBRL(this.value))"></td>
+      <td class="num"><input class="mini" ${dis} class="money" value="${moneyVal(r.desconto_vale_cents||0)}" onchange="fEdit(${f.id},'desconto_vale_cents',parseBRL(this.value))"></td>
       <td class="num">${fmt(k.inss_cents)}</td>
       <td class="num"><b>${fmt(k.liquido_cents)}</b></td>
       <td class="num" style="color:var(--gray)">${fmt(k.custo_total_cents)}</td>
@@ -556,10 +627,74 @@ function drawFolha(el,fechada){
   </div>
   <div class="panel" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
     <button class="btn sec" onclick="salvarFolha(false)" ${fechada?'disabled':''}>Salvar rascunho</button>
+    <button class="btn sec" onclick="exportarFolhaPDF()">Exportar PDF para o contador</button>
     <button class="btn" onclick="salvarFolha(true)" ${fechada?'disabled':''}>Fechar folha e lançar no contas a pagar</button>
     <span class="hint">Fechar a folha grava os cálculos e cria/atualiza 3 lançamentos: Folha (líquidos, venc. dia 5 do mês seguinte), iFood e Vale Transporte (venc. dia 27). FGTS e INSS patronal já entram pela guia recorrente "Simples + FGTS + INSS".</span>
-  </div>`;
+  </div>
+  ${painelFuncionarios()}${painelParametros()}`;
 }
+function painelFuncionarios(){
+  const funcs=folhaData.todos||[];
+  return `
+  <div class="panel"><div class="panelHead"><h2>Funcionários</h2>
+    <span class="hint">Inclusão, edição e exclusão do time direto aqui.</span></div>
+  <table><thead><tr><th>Nome</th><th>Função</th><th>Tipo</th><th class="num">Salário / hora</th>
+    <th class="num">VT</th><th class="num">iFood</th><th class="num">Plano</th><th>Comis.</th><th></th></tr></thead><tbody>
+  ${funcs.map(f=>`<tr style="${f.ativo?'':'opacity:.45'}">
+    <td><input class="mini2" value="${esc(f.nome)}" onchange="funcEdit(${f.id},'nome',this.value)"></td>
+    <td><input class="mini2" value="${esc(f.funcao||'')}" onchange="funcEdit(${f.id},'funcao',this.value)"></td>
+    <td><select class="mini2" onchange="funcEdit(${f.id},'tipo',this.value)">
+      <option value="mensalista" ${f.tipo==='mensalista'?'selected':''}>Mensal</option>
+      <option value="horista" ${f.tipo==='horista'?'selected':''}>Horista</option></select></td>
+    <td class="num"><input class="mini money" value="${moneyVal(f.tipo==='mensalista'?f.salario_cents:f.valor_hora_cents)}"
+      onchange="funcEdit(${f.id},'${f.tipo==='mensalista'?'salario_cents':'valor_hora_cents'}',parseBRL(this.value))"></td>
+    <td class="num"><input class="mini money" value="${moneyVal(f.vt_cents)}" onchange="funcEdit(${f.id},'vt_cents',parseBRL(this.value))"></td>
+    <td class="num"><input class="mini money" value="${moneyVal(f.ifood_cents)}" onchange="funcEdit(${f.id},'ifood_cents',parseBRL(this.value))"></td>
+    <td class="num"><input class="mini money" value="${moneyVal(f.plano_saude_cents)}" onchange="funcEdit(${f.id},'plano_saude_cents',parseBRL(this.value))"></td>
+    <td><input type="checkbox" ${f.comissionado?'checked':''} onchange="funcEdit(${f.id},'comissionado',this.checked)"></td>
+    <td style="text-align:right;white-space:nowrap">
+      <button class="btn sm ghost" onclick="toggleFunc(${f.id},${!f.ativo})">${f.ativo?'Desativar':'Reativar'}</button>
+      <button class="btn sm ghost" onclick="delFunc(${f.id})">✕</button></td></tr>`).join('')}
+  </tbody></table>
+  <div class="divider"></div>
+  <div class="formRow" style="grid-template-columns:1.6fr 1.3fr 1fr 1fr 1fr auto">
+    <div class="field"><label>Nome</label><input id="nfNome"></div>
+    <div class="field"><label>Função</label><input id="nfFuncao"></div>
+    <div class="field"><label>Tipo</label><select id="nfTipo"><option value="mensalista">Mensalista</option><option value="horista">Horista</option></select></div>
+    <div class="field"><label>Salário / valor hora</label><input id="nfValor" class="money" placeholder="R$ 0,00"></div>
+    <div class="field"><label>iFood</label><input id="nfIfood" class="money" placeholder="R$ 0,00"></div>
+    <button class="btn" onclick="addFunc()">Adicionar</button>
+  </div></div>`;
+}
+function painelParametros(){
+  const cfg=S.cfg;
+  return `
+  <div class="panel"><h2>Parâmetros de cálculo</h2>
+  <div class="grid3">
+    <div class="field"><label>Comissão por matrícula</label>
+      <select id="cfComKey">${['padrao','comissao','geral'].map(k=>`<option value="${k}" ${((cfg.comissao_valor_ativo||'comissao')===k)?'selected':''}>${k} · ${fmt((cfg.comissao_matricula||{})[k]||0)}</option>`).join('')}</select></div>
+    <div class="field"><label>DSR: dias úteis</label><input id="cfDU" type="number" value="${(cfg.dsr||{}).dias_uteis||26}"></div>
+    <div class="field"><label>DSR: dias de descanso</label><input id="cfDD" type="number" value="${(cfg.dsr||{}).dias_descanso||5}"></div>
+    <div class="field"><label>Alíquota efetiva Simples (%)</label><input id="cfAliq" value="${(((cfg.simples||{}).aliquota_efetiva||0)*100).toFixed(4).replace('.',',')}"></div>
+    <div class="field" style="grid-column:span 2"><label>Faixas INSS (centavos · JSON)</label><input id="cfINSS" value='${esc(JSON.stringify(cfg.inss_faixas||[]))}'></div>
+  </div>
+  <p class="hint" style="margin:8px 0 12px">Tabela de INSS 2026 conferida: mínimo R$ 1.621,00, teto R$ 8.475,55, alíquotas de 7,5% a 14% por faixa. Provisão de férias em 1/9 (férias + terço).</p>
+  <button class="btn" onclick="salvaCfg()">Salvar parâmetros</button></div>`;
+}
+async function funcEdit(id,campo,v){ await db.upd('fin_funcionarios','id=eq.'+id,{[campo]:v}); toast('Funcionário atualizado'); render(); }
+async function delFunc(id){
+  if(!confirm('Excluir esse funcionário? Se já houver folha lançada, prefira Desativar.')) return;
+  try{ await db.del('fin_funcionarios','id=eq.'+id); toast('Funcionário excluído'); }
+  catch(e){ toast('Não deu para excluir (há folha vinculada). Use Desativar.'); }
+  render();
+}
+async function exportarFolhaPDF(){
+  document.getElementById('printTitle').textContent='CNA Taquara · Folha de pagamento · '+compLabel(S.comp);
+  document.body.classList.add('printFolha');
+  window.print();
+  setTimeout(()=>document.body.classList.remove('printFolha'),800);
+}
+
 function fEdit(fid,campo,valor){ folhaData.rows[fid][campo]=valor; drawFolha(document.getElementById('view'),false); }
 async function salvarFolha(fechar){
   const c=S.comp;
@@ -743,68 +878,6 @@ Salários pedagógicos: ${fmt(sp)}`:''}`;
 }
 
 /* ================= CADASTROS ================= */
-async function vCadastros(el){
-  const admin=S.role==='admin';
-  const recs=await db.get('fin_despesas_recorrentes',`unidade=eq.${S.unidade}&select=*&order=dia_vencimento.asc.nullslast,nome.asc`);
-  const cats=S.cfg.categorias_despesa||[];
-  let funcsHTML='', cfgHTML='';
-  if(admin){
-    const funcs=await db.get('fin_funcionarios',`unidade=eq.${S.unidade}&select=*&order=ativo.desc,tipo.asc,nome.asc`);
-    funcsHTML=`
-    <div class="panel"><div class="panelHead"><h2>Funcionários</h2></div>
-    <table><thead><tr><th>Nome</th><th>Função</th><th>Tipo</th><th class="num">Salário / hora</th><th class="num">VT</th><th class="num">iFood</th><th class="num">Plano</th><th>Comis.</th><th></th></tr></thead><tbody>
-    ${funcs.map(f=>`<tr style="${f.ativo?'':'opacity:.45'}">
-      <td><b>${esc(f.nome)}</b></td><td>${esc(f.funcao||'')}</td><td>${f.tipo==='mensalista'?'Mensal':'Horista'}</td>
-      <td class="num">${f.tipo==='mensalista'?fmt(f.salario_cents):fmt(f.valor_hora_cents)+'/h'}</td>
-      <td class="num">${f.vt_cents?fmt(f.vt_cents):'—'}</td><td class="num">${f.ifood_cents?fmt(f.ifood_cents):'—'}</td>
-      <td class="num">${f.plano_saude_cents?fmt(f.plano_saude_cents):'—'}</td>
-      <td>${f.comissionado?'Sim':'—'}</td>
-      <td style="text-align:right"><button class="btn sm ghost" onclick="toggleFunc(${f.id},${!f.ativo})">${f.ativo?'Desativar':'Reativar'}</button></td></tr>`).join('')}
-    </tbody></table>
-    <div class="divider"></div>
-    <div class="formRow" style="grid-template-columns:1.6fr 1.3fr 1fr 1fr 1fr auto">
-      <div class="field"><label>Nome</label><input id="nfNome"></div>
-      <div class="field"><label>Função</label><input id="nfFuncao"></div>
-      <div class="field"><label>Tipo</label><select id="nfTipo"><option value="mensalista">Mensalista</option><option value="horista">Horista</option></select></div>
-      <div class="field"><label>Salário / valor hora</label><input id="nfValor" placeholder="0,00"></div>
-      <div class="field"><label>iFood</label><input id="nfIfood" placeholder="0,00"></div>
-      <button class="btn" onclick="addFunc()">Adicionar</button>
-    </div></div>`;
-    const cfg=S.cfg;
-    cfgHTML=`
-    <div class="panel"><h2>Parâmetros de cálculo — ${esc(UNIDADES.find(x=>x.id===S.unidade).nome)}</h2>
-    <div class="grid3">
-      <div class="field"><label>Comissão usada por matrícula</label>
-        <select id="cfComKey">${['padrao','comissao','geral'].map(k=>`<option value="${k}" ${((cfg.comissao_valor_ativo||'comissao')===k)?'selected':''}>${k} · ${fmt((cfg.comissao_matricula||{})[k]||0)}</option>`).join('')}</select></div>
-      <div class="field"><label>DSR: dias úteis</label><input id="cfDU" type="number" value="${(cfg.dsr||{}).dias_uteis||25}"></div>
-      <div class="field"><label>DSR: dias de descanso</label><input id="cfDD" type="number" value="${(cfg.dsr||{}).dias_descanso||5}"></div>
-      <div class="field"><label>Alíquota efetiva Simples (%)</label><input id="cfAliq" value="${(((cfg.simples||{}).aliquota_efetiva||0)*100).toFixed(4).replace('.',',')}"></div>
-      <div class="field" style="grid-column:span 2"><label>Faixas INSS (centavos · JSON)</label><input id="cfINSS" value='${esc(JSON.stringify(cfg.inss_faixas||[]))}'></div>
-    </div>
-    <p class="hint" style="margin:8px 0 12px">⚠️ As faixas de INSS estão com a tabela de 2025. A planilha antiga usava a tabela de 2024 (desatualizada). Confirme com o contador os valores vigentes de 2026 e atualize aqui.</p>
-    <button class="btn" onclick="salvaCfg()">Salvar parâmetros</button></div>`;
-  }
-  el.innerHTML=`
-  <div class="panel"><div class="panelHead"><h2>Despesas recorrentes (geram o mês automaticamente)</h2></div>
-  <table><thead><tr><th>Nome</th><th>Categoria</th><th class="num">Valor</th><th>Dia</th><th>Resp.</th><th></th></tr></thead><tbody>
-  ${recs.map(r=>`<tr style="${r.ativo?'':'opacity:.45'}">
-    <td><b>${esc(r.nome)}</b>${r.obs?`<div class="hint">${esc(r.obs)}</div>`:''}</td>
-    <td><span class="badge cat">${esc(r.categoria)}</span></td>
-    <td class="num">${r.valor_cents!=null?fmt(r.valor_cents):'variável'}</td>
-    <td>${r.dia_vencimento||'—'}</td><td>${esc(r.responsavel||'—')}</td>
-    <td style="text-align:right"><button class="btn sm ghost" onclick="toggleRec(${r.id},${!r.ativo})">${r.ativo?'Desativar':'Reativar'}</button></td></tr>`).join('')}
-  </tbody></table>
-  <div class="divider"></div>
-  <div class="formRow">
-    <div class="field"><label>Nome</label><input id="nrNome"></div>
-    <div class="field"><label>Categoria</label><select id="nrCat">${cats.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div>
-    <div class="field"><label>Valor</label><input id="nrValor" placeholder="vazio = variável"></div>
-    <div class="field"><label>Dia venc.</label><input id="nrDia" type="number" min="1" max="31"></div>
-    <div class="field"><label>Responsável</label><input id="nrResp"></div>
-    <button class="btn" onclick="addRec()">Adicionar</button>
-  </div></div>
-  ${funcsHTML}${cfgHTML}`;
-}
 async function toggleRec(id,ativo){ await db.upd('fin_despesas_recorrentes','id=eq.'+id,{ativo}); render(); }
 async function addRec(){
   if(!nrNome.value.trim()) return toast('Dê um nome');
