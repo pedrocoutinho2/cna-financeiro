@@ -123,6 +123,9 @@ nav a.sub{padding-left:32px;font-size:13px}
 @media(max-width:860px){ .navGroup{display:none} nav a.sub{padding-left:12px} }
 
 .acoes{text-align:right;white-space:nowrap}
+.prodF{display:inline-flex;align-items:center;gap:3px;margin-left:6px}
+.prodF span{font-size:10.5px;color:var(--gray)}
+.mini3{width:52px;text-align:right}
 .ico{background:none;border:1px solid transparent;border-radius:7px;font-size:16px;line-height:1;
   padding:6px 8px;cursor:pointer;opacity:.4;transition:opacity .15s,background .15s}
 .ico:hover{opacity:1;background:var(--surface)}
@@ -425,22 +428,19 @@ function calcINSS(brutoCents){
 }
 function comissaoDe(f,r,todos,rows){
   const cfg=S.cfg;
-  const comKey=(cfg.comissao_valor_ativo||'comissao');
-  const vMat=(cfg.comissao_matricula||{})[comKey]||5000;
+  const vMat=(cfg.comissao_matricula||{})[cfg.comissao_valor_ativo||'comissao']||5000;
   const vPag=((cfg.comissao_pagamento||{}).valor_cents)||0;
   if(r.comissao_manual_cents!=null && r.comissao_manual_cents!=='') return +r.comissao_manual_cents;
-  switch(f.comissao_tipo){
-    case 'matricula':  return (r.matriculas||0)*vMat;
-    case 'pagamentos': return (r.pagamentos||0)*vPag;
-    case 'coord_comercial': {
-      let base=0;
-      (todos||[]).filter(x=>x.comissao_tipo==='matricula').forEach(x=>{
-        const rr=(rows||{})[x.id]||{}; base += (rr.matriculas||0)*vMat;
-      });
-      return Math.round(base*0.5);
-    }
-    default: return 0;
+  if(f.tipo==='horista' || f.comissao_tipo==='nenhuma') return 0;
+  if(f.comissao_tipo==='coord_comercial'){
+    let base=0;
+    (todos||[]).filter(x=>x.setor==='Comercial').forEach(x=>{
+      const rr=(rows||{})[x.id]||{}; base += (rr.matriculas||0)*vMat;
+    });
+    return Math.round(base*0.5) + (r.matriculas||0)*vMat + (r.pagamentos||0)*vPag;
   }
+  // matriculas e pagamentos somam: quem e de pagamentos pode fazer matricula pontual
+  return (r.matriculas||0)*vMat + (r.pagamentos||0)*vPag;
 }
 function calcRow(f,r,todos,rows){
   const cfg=S.cfg, _d=cfg.dsr||{};
@@ -647,13 +647,14 @@ function drawFolha(el,fechada){
       totF+=k.fgts_cents; totProv+=k.ferias_prov_cents+k.decimo_prov_cents; }
     const dis=fechada?'disabled':'';
     const ed=editFunc===f.id, prof=f.tipo==='horista';
+    const inpMat=`<label class="prodF" title="Matrículas"><input class="mini3" ${dis} value="${r.matriculas||0}" onchange="fEdit(${f.id},'matriculas',parseInt(this.value)||0)"><span>mat</span></label>`;
+    const inpPag=`<label class="prodF" title="Pagamentos recebidos"><input class="mini3" ${dis} value="${r.pagamentos||0}" onchange="fEdit(${f.id},'pagamentos',parseInt(this.value)||0)"><span>pg</span></label>`;
     const producao = prof
-      ? `<input class="mini2" ${dis} value="${r.horas||0}" onchange="fEdit(${f.id},'horas',parseNum(this.value))"> h`
-      : f.comissao_tipo==='matricula'
-        ? `<input class="mini2" ${dis} value="${r.matriculas||0}" onchange="fEdit(${f.id},'matriculas',parseInt(this.value)||0)"> mat`
-        : f.comissao_tipo==='pagamentos'
-          ? `<input class="mini2" ${dis} value="${r.pagamentos||0}" onchange="fEdit(${f.id},'pagamentos',parseInt(this.value)||0)"> pg`
-          : f.comissao_tipo==='coord_comercial' ? `<span class="hint">50% do Comercial</span>` : '—';
+      ? `<label class="prodF" title="Horas/aula"><input class="mini3" ${dis} value="${r.horas||0}" onchange="fEdit(${f.id},'horas',parseNum(this.value))"><span>h</span></label>`
+      : f.comissao_tipo==='matricula' ? inpMat
+      : f.comissao_tipo==='pagamentos' ? inpPag+inpMat
+      : f.comissao_tipo==='coord_comercial' ? `<span class="hint">50% Comercial</span>`+inpMat
+      : '—';
     const acoes=`
       <button class="ico" title="${ed?'Concluir':'Editar cadastro'}" onclick="toggleEditFunc(${f.id})">${ed?'✔':'✏️'}</button>
       <button class="ico" title="${f.ativo?'Desativar':'Reativar'}" onclick="toggleFunc(${f.id},${!f.ativo})">${f.ativo?'🚫':'↩'}</button>
