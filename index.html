@@ -38,7 +38,11 @@ h2{font-size:15px;font-weight:700;color:var(--blue);margin:0 0 10px}
 .logoChip{background:#fff;border-radius:9px;padding:9px 12px 7px;display:inline-block;margin-bottom:8px}
 aside{background:var(--red);border-bottom:none}
 aside::after{content:'';display:block;height:6px;background:var(--blue);margin-top:14px}
-.tableWrap,.panel{overflow-x:auto}
+.tableWrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.tableWrap::-webkit-scrollbar{height:9px}
+.tableWrap::-webkit-scrollbar-thumb{background:var(--grayLine,#E4E4E7);border-radius:5px}
+.tableWrap::-webkit-scrollbar-thumb:hover{background:var(--gray)}
+.panel{overflow-x:auto}
 
 /* ---------- auth ---------- */
 #auth{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(160deg,#fff 0%,var(--surface) 60%)}
@@ -419,20 +423,37 @@ function calcINSS(brutoCents){
   for(const f of faixas){ if(base>prev){ inss+=(Math.min(base,f.ate)-prev)*f.aliq; prev=f.ate; } }
   return Math.round(inss);
 }
-function calcRow(f,r){
+function comissaoDe(f,r,todos,rows){
+  const cfg=S.cfg;
+  const comKey=(cfg.comissao_valor_ativo||'comissao');
+  const vMat=(cfg.comissao_matricula||{})[comKey]||5000;
+  const vPag=((cfg.comissao_pagamento||{}).valor_cents)||0;
+  if(r.comissao_manual_cents!=null && r.comissao_manual_cents!=='') return +r.comissao_manual_cents;
+  switch(f.comissao_tipo){
+    case 'matricula':  return (r.matriculas||0)*vMat;
+    case 'pagamentos': return (r.pagamentos||0)*vPag;
+    case 'coord_comercial': {
+      let base=0;
+      (todos||[]).filter(x=>x.comissao_tipo==='matricula').forEach(x=>{
+        const rr=(rows||{})[x.id]||{}; base += (rr.matriculas||0)*vMat;
+      });
+      return Math.round(base*0.5);
+    }
+    default: return 0;
+  }
+}
+function calcRow(f,r,todos,rows){
   const cfg=S.cfg, _d=cfg.dsr||{};
   const dsrCfg={dias_uteis:(+_d.dias_uteis||+_d.dias_trabalhados||26),dias_descanso:(+_d.dias_descanso||5)};
-  const comKey=(cfg.comissao_valor_ativo||'comissao'), comVal=(cfg.comissao_matricula||{})[comKey]||5000;
   const prov=cfg.provisoes||{ferias_divisor:9,decimo_divisor:12};
   let base=0, comissao=0, dsr=0;
   if(f.tipo==='mensalista'){
     base=f.salario_cents||0;
-    comissao = r.comissao_manual_cents!=null && r.comissao_manual_cents!=='' ? +r.comissao_manual_cents : (f.comissionado?(r.matriculas||0)*comVal:0);
-    dsr = Math.round(comissao*(dsrCfg.dias_descanso/dsrCfg.dias_uteis));
+    comissao=comissaoDe(f,r,todos,rows);
+    dsr = comissao>0 ? Math.round(comissao*(dsrCfg.dias_descanso/dsrCfg.dias_uteis)) : 0;
   } else {
     base=Math.round((r.horas||0)*(f.valor_hora_cents||0));
-    comissao = r.comissao_manual_cents!=null && r.comissao_manual_cents!=='' ? +r.comissao_manual_cents : 0;
-    dsr=0;
+    comissao=0; dsr=0;
   }
   const bruto=base+comissao+dsr+(r.ajuste_cents||0);
   const inss=calcINSS(bruto);
@@ -604,93 +625,123 @@ async function vFolha(el){
   folhaData.funcs.forEach(f=>{
     const ex=rows.find(r=>r.funcionario_id===f.id);
     const valeSug=vales.filter(v=>v.funcionario_id===f.id&&v.parcelas_pagas<v.parcelas_total).reduce((a,v)=>a+v.valor_parcela_cents,0);
-    folhaData.rows[f.id]=ex||{unidade:S.unidade,competencia:c,funcionario_id:f.id,horas:0,matriculas:0,comissao_manual_cents:null,adiantamento_cents:0,desconto_vale_cents:valeSug,ajuste_cents:0,obs:null,fechada:false};
+    folhaData.rows[f.id]=ex||{unidade:S.unidade,competencia:c,funcionario_id:f.id,horas:0,matriculas:0,pagamentos:0,comissao_manual_cents:null,adiantamento_cents:0,desconto_vale_cents:valeSug,ajuste_cents:0,obs:null,fechada:false};
   });
   const fechada=rows.length>0&&rows.every(r=>r.fechada);
   drawFolha(el,fechada);
 }
+let editFunc=null, novoFunc=false;
+const SETORES=['Comercial','Coordenação','Administrativo','Professores'];
+function toggleEditFunc(id){ editFunc=(editFunc===id?null:id); drawFolha(document.getElementById('view'),folhaData.fechada); }
+function toggleNovoFunc(){ novoFunc=!novoFunc; drawFolha(document.getElementById('view'),folhaData.fechada); }
 function drawFolha(el,fechada){
-  const {funcs}=folhaData;
-  const mens=funcs.filter(f=>f.tipo==='mensalista'), hor=funcs.filter(f=>f.tipo==='horista');
+  folhaData.fechada=fechada;
+  const {funcs,todos}=folhaData;
+  const funcoes=S.cfg.funcoes||[];
   let totL=0,totC=0,totI=0,totV=0,totF=0,totProv=0;
+
   const rowHTML=f=>{
-    const r=folhaData.rows[f.id], k=calcRow(f,r);
-    totL+=k.liquido_cents; totC+=k.custo_total_cents; totI+=f.ifood_cents||0; totV+=f.vt_cents||0; totF+=k.fgts_cents; totProv+=k.ferias_prov_cents+k.decimo_prov_cents;
+    const r=folhaData.rows[f.id]||{};
+    const k=calcRow(f,r,funcs,folhaData.rows);
+    if(f.ativo){ totL+=k.liquido_cents; totC+=k.custo_total_cents; totI+=f.ifood_cents||0; totV+=f.vt_cents||0;
+      totF+=k.fgts_cents; totProv+=k.ferias_prov_cents+k.decimo_prov_cents; }
     const dis=fechada?'disabled':'';
-    return `<tr>
+    const ed=editFunc===f.id, prof=f.tipo==='horista';
+    const producao = prof
+      ? `<input class="mini2" ${dis} value="${r.horas||0}" onchange="fEdit(${f.id},'horas',parseNum(this.value))"> h`
+      : f.comissao_tipo==='matricula'
+        ? `<input class="mini2" ${dis} value="${r.matriculas||0}" onchange="fEdit(${f.id},'matriculas',parseInt(this.value)||0)"> mat`
+        : f.comissao_tipo==='pagamentos'
+          ? `<input class="mini2" ${dis} value="${r.pagamentos||0}" onchange="fEdit(${f.id},'pagamentos',parseInt(this.value)||0)"> pg`
+          : f.comissao_tipo==='coord_comercial' ? `<span class="hint">50% do Comercial</span>` : '—';
+    const acoes=`
+      <button class="ico" title="${ed?'Concluir':'Editar cadastro'}" onclick="toggleEditFunc(${f.id})">${ed?'✔':'✏️'}</button>
+      <button class="ico" title="${f.ativo?'Desativar':'Reativar'}" onclick="toggleFunc(${f.id},${!f.ativo})">${f.ativo?'🚫':'↩'}</button>
+      <button class="ico del" title="Excluir" onclick="delFunc(${f.id})">🗑</button>`;
+
+    if(!ed) return `<tr style="${f.ativo?'':'opacity:.45'}">
       <td><b>${esc(f.nome)}</b><div class="hint">${esc(f.funcao||'')}</div></td>
-      ${f.tipo==='horista'
-        ?`<td class="num"><input class="mini2" ${dis} value="${r.horas||0}" onchange="fEdit(${f.id},'horas',parseNum(this.value))"> h</td>`
-        :`<td class="num">${f.comissionado?`<input class="mini2" ${dis} value="${r.matriculas||0}" onchange="fEdit(${f.id},'matriculas',parseInt(this.value)||0)"> mat`:'—'}</td>`}
+      <td class="num">${producao}</td>
       <td class="num">${fmt(k.salario_base_cents)}</td>
-      <td class="num">${k.comissao_cents||k.dsr_cents?fmt(k.comissao_cents+k.dsr_cents):'—'}</td>
-      <td class="num"><input class="mini" ${dis} class="money" value="${moneyVal(r.adiantamento_cents||0)}" onchange="fEdit(${f.id},'adiantamento_cents',parseBRL(this.value))"></td>
-      <td class="num"><input class="mini" ${dis} class="money" value="${moneyVal(r.desconto_vale_cents||0)}" onchange="fEdit(${f.id},'desconto_vale_cents',parseBRL(this.value))"></td>
+      <td class="num">${prof?'—':(k.comissao_cents||k.dsr_cents?fmt(k.comissao_cents+k.dsr_cents):'—')}</td>
+      <td class="num">${f.vt_cents?fmt(f.vt_cents):'—'}</td>
+      <td class="num">${f.ifood_cents?fmt(f.ifood_cents):'—'}</td>
+      <td class="num">${f.plano_saude_cents?fmt(f.plano_saude_cents):'—'}</td>
       <td class="num">${fmt(k.inss_cents)}</td>
       <td class="num"><b>${fmt(k.liquido_cents)}</b></td>
       <td class="num" style="color:var(--gray)">${fmt(k.custo_total_cents)}</td>
-    </tr>`;
+      <td class="acoes">${acoes}</td></tr>`;
+
+    return `<tr class="editing">
+      <td><input class="txtInp" value="${esc(f.nome)}" onchange="funcEdit(${f.id},'nome',this.value)">
+        <select class="selInp" style="margin-top:4px" onchange="funcEdit(${f.id},'funcao',this.value)">
+          ${funcoes.map(x=>`<option ${x===f.funcao?'selected':''}>${esc(x)}</option>`).join('')}</select></td>
+      <td><select class="selInp" onchange="funcEdit(${f.id},'setor',this.value)">
+          ${SETORES.map(x=>`<option ${x===f.setor?'selected':''}>${esc(x)}</option>`).join('')}</select>
+        <select class="selInp" style="margin-top:4px" onchange="funcEdit(${f.id},'comissao_tipo',this.value)">
+          ${[['nenhuma','Sem comissão'],['matricula','Por matrícula'],['pagamentos','Por pagamento'],['coord_comercial','50% do Comercial']].map(p=>`<option value="${p[0]}" ${p[0]===f.comissao_tipo?'selected':''}>${p[1]}</option>`).join('')}</select></td>
+      <td class="num"><input class="mini money" value="${moneyVal(f.salario_cents)}" onchange="funcEdit(${f.id},'salario_cents',parseBRL(this.value))">
+        <input class="mini money" style="margin-top:4px" value="${moneyVal(f.valor_hora_cents)}" onchange="funcEdit(${f.id},'valor_hora_cents',parseBRL(this.value))"></td>
+      <td><select class="selInp" onchange="funcEdit(${f.id},'tipo',this.value)">
+          <option value="mensalista" ${f.tipo==='mensalista'?'selected':''}>Mensalista</option>
+          <option value="horista" ${f.tipo==='horista'?'selected':''}>Horista</option></select></td>
+      <td class="num"><input class="mini money" value="${moneyVal(f.vt_cents)}" onchange="funcEdit(${f.id},'vt_cents',parseBRL(this.value))"></td>
+      <td class="num"><input class="mini money" value="${moneyVal(f.ifood_cents)}" onchange="funcEdit(${f.id},'ifood_cents',parseBRL(this.value))"></td>
+      <td class="num"><input class="mini money" value="${moneyVal(f.plano_saude_cents)}" onchange="funcEdit(${f.id},'plano_saude_cents',parseBRL(this.value))"></td>
+      <td colspan="2" class="hint">Salário mensal em cima, valor/hora embaixo.</td>
+      <td class="acoes">${acoes}</td></tr>`;
   };
-  const head=`<thead><tr><th>Funcionário</th><th class="num">Horas / Matr.</th><th class="num">Base</th><th class="num">Comissão+DSR</th><th class="num">Adiant.</th><th class="num">Vale/Desc.</th><th class="num">INSS</th><th class="num">Líquido</th><th class="num">Custo total</th></tr></thead>`;
-  const mensHTML=mens.map(rowHTML).join(''), horHTML=hor.map(rowHTML).join('');
+
+  const head=`<thead><tr><th>Funcionário</th><th class="num">Produção</th><th class="num">Base</th>
+    <th class="num">Comissão+DSR</th><th class="num">VT</th><th class="num">iFood</th><th class="num">Plano</th>
+    <th class="num">INSS</th><th class="num">Líquido</th><th class="num">Custo total</th><th></th></tr></thead>`;
+
+  const blocos=SETORES.map(setor=>{
+    const lista=(todos||[]).filter(f=>(f.setor||'Administrativo')===setor);
+    if(!lista.length) return '';
+    return `<div class="panel"><div class="panelHead"><h2>${setor}</h2>
+      <span class="hint">${lista.length} ${lista.length===1?'pessoa':'pessoas'}</span></div>
+      <div class="tableWrap"><table>${head}<tbody>${lista.map(rowHTML).join('')}</tbody></table></div></div>`;
+  }).join('');
 
   el.innerHTML=`
-  ${fechada?`<div class="panel" style="border-color:var(--ok);background:var(--okBg)"><b style="color:var(--ok)">Folha de ${compLabel(S.comp)} fechada.</b> Os lançamentos foram gerados no contas a pagar. <button class="btn sm sec" style="margin-left:8px" onclick="reabrirFolha()">Reabrir pra editar</button></div>`:''}
-  <div class="panel"><div class="panelHead"><h2>Administrativo (mensalistas)</h2></div>
-    <table>${head}<tbody>${mensHTML}</tbody></table></div>
-  <div class="panel"><div class="panelHead"><h2>Professores (horistas)</h2></div>
-    <table>${head}<tbody>${horHTML}</tbody></table></div>
+  ${fechada?`<div class="panel" style="border-color:var(--ok);background:var(--okBg)"><b style="color:var(--ok)">Folha de ${compLabel(S.comp)} fechada.</b> <button class="btn sm sec" style="margin-left:8px" onclick="reabrirFolha()">Reabrir pra editar</button></div>`:''}
+  <div class="panelHead" style="margin-bottom:10px">
+    <button class="btn" onclick="toggleNovoFunc()">${novoFunc?'Cancelar':'+ Novo colaborador'}</button>
+    <button class="btn sec" onclick="exportarFolhaPDF()">Exportar PDF para o contador</button>
+  </div>
+  ${novoFunc?`
+  <div class="panel" style="border-left:4px solid var(--red)">
+    <h2>Novo colaborador</h2>
+    <div class="formRow">
+      <div class="field"><label>Nome</label><input id="nfNome"></div>
+      <div class="field"><label>Função</label><select id="nfFuncao">${funcoes.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div>
+      <div class="field"><label>Setor</label><select id="nfSetor">${SETORES.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div>
+      <div class="field"><label>Tipo</label><select id="nfTipo"><option value="mensalista">Mensalista</option><option value="horista">Horista</option></select></div>
+      <div class="field"><label>Salário / valor hora</label><input id="nfValor" class="money" placeholder="R$ 0,00"></div>
+      <div class="field"><label>VT</label><input id="nfVt" class="money" placeholder="R$ 0,00"></div>
+      <div class="field"><label>iFood</label><input id="nfIfood" class="money" placeholder="R$ 0,00"></div>
+      <div class="field"><label>Plano saúde</label><input id="nfPlano" class="money" placeholder="R$ 0,00"></div>
+      <div class="field"><label>Comissão</label><select id="nfCom">
+        <option value="nenhuma">Sem comissão</option><option value="matricula">Por matrícula</option>
+        <option value="pagamentos">Por pagamento</option><option value="coord_comercial">50% do Comercial</option></select></div>
+      <button class="btn" onclick="addFunc()">Salvar</button>
+    </div>
+  </div>`:''}
+  ${blocos}
   <div class="cards">
     <div class="card"><small>Total líquido (salários)</small><div class="v red">${fmt(totL)}</div><div class="d">a pagar dia 5 do mês seguinte</div></div>
     <div class="card"><small>iFood</small><div class="v">${fmt(totI)}</div></div>
     <div class="card"><small>Vale transporte</small><div class="v">${fmt(totV)}</div></div>
-    <div class="card"><small>FGTS do mês</small><div class="v blue">${fmt(totF)}</div><div class="d">recolhido na guia mensal</div></div>
-    <div class="card"><small>Provisões férias + 13º</small><div class="v blue">${fmt(totProv)}</div><div class="d">não-caixa, informativo</div></div>
+    <div class="card"><small>FGTS do mês</small><div class="v blue">${fmt(totF)}</div></div>
+    <div class="card"><small>Provisões férias + 13º</small><div class="v blue">${fmt(totProv)}</div><div class="d">não-caixa</div></div>
     <div class="card"><small>Custo total da folha</small><div class="v">${fmt(totC)}</div></div>
   </div>
   <div class="panel" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
     <button class="btn sec" onclick="salvarFolha(false)" ${fechada?'disabled':''}>Salvar rascunho</button>
-    <button class="btn sec" onclick="exportarFolhaPDF()">Exportar PDF para o contador</button>
     <button class="btn" onclick="salvarFolha(true)" ${fechada?'disabled':''}>Fechar folha e lançar no contas a pagar</button>
-    <span class="hint">Fechar a folha grava os cálculos e cria/atualiza 3 lançamentos: Folha (líquidos, venc. dia 5 do mês seguinte), iFood e Vale Transporte (venc. dia 27). FGTS e INSS patronal já entram pela guia recorrente "Simples + FGTS + INSS".</span>
   </div>
-  ${painelFuncionarios()}${painelParametros()}`;
-}
-function painelFuncionarios(){
-  const funcs=folhaData.todos||[];
-  return `
-  <div class="panel"><div class="panelHead"><h2>Funcionários</h2>
-    <span class="hint">Inclusão, edição e exclusão do time direto aqui.</span></div>
-  <table><thead><tr><th>Nome</th><th>Função</th><th>Tipo</th><th class="num">Salário mensal</th>
-    <th class="num">Valor / hora</th><th class="num">VT</th><th class="num">iFood</th><th class="num">Plano saúde</th>
-    <th>Comis.</th><th></th></tr></thead><tbody>
-  ${funcs.map(f=>`<tr style="${f.ativo?'':'opacity:.45'}">
-    <td><input class="txtInp" value="${esc(f.nome)}" onchange="funcEdit(${f.id},'nome',this.value)"></td>
-    <td><input class="txtInp" value="${esc(f.funcao||'')}" onchange="funcEdit(${f.id},'funcao',this.value)"></td>
-    <td><select class="selInp" onchange="funcEdit(${f.id},'tipo',this.value)">
-      <option value="mensalista" ${f.tipo==='mensalista'?'selected':''}>Mensalista</option>
-      <option value="horista" ${f.tipo==='horista'?'selected':''}>Horista</option></select></td>
-    <td class="num"><input class="mini money" value="${moneyVal(f.salario_cents)}" onchange="funcEdit(${f.id},'salario_cents',parseBRL(this.value))"></td>
-    <td class="num"><input class="mini money" value="${moneyVal(f.valor_hora_cents)}" onchange="funcEdit(${f.id},'valor_hora_cents',parseBRL(this.value))"></td>
-    <td class="num"><input class="mini money" value="${moneyVal(f.vt_cents)}" onchange="funcEdit(${f.id},'vt_cents',parseBRL(this.value))"></td>
-    <td class="num"><input class="mini money" value="${moneyVal(f.ifood_cents)}" onchange="funcEdit(${f.id},'ifood_cents',parseBRL(this.value))"></td>
-    <td class="num"><input class="mini money" value="${moneyVal(f.plano_saude_cents)}" onchange="funcEdit(${f.id},'plano_saude_cents',parseBRL(this.value))"></td>
-    <td style="text-align:center"><input type="checkbox" ${f.comissionado?'checked':''} onchange="funcEdit(${f.id},'comissionado',this.checked)"></td>
-    <td style="text-align:right;white-space:nowrap">
-      <button class="btn sm ghost" onclick="toggleFunc(${f.id},${!f.ativo})">${f.ativo?'Desativar':'Reativar'}</button>
-      <button class="btn sm ghost" onclick="delFunc(${f.id})">✕</button></td></tr>`).join('')}
-  </tbody></table>
-  <div class="divider"></div>
-  <div class="formRow">
-    <div class="field"><label>Nome</label><input id="nfNome"></div>
-    <div class="field"><label>Função</label><input id="nfFuncao"></div>
-    <div class="field"><label>Tipo</label><select id="nfTipo"><option value="mensalista">Mensalista</option><option value="horista">Horista</option></select></div>
-    <div class="field"><label>Salário / valor hora</label><input id="nfValor" class="money" placeholder="R$ 0,00"></div>
-    <div class="field"><label>VT</label><input id="nfVt" class="money" placeholder="R$ 0,00"></div>
-    <div class="field"><label>iFood</label><input id="nfIfood" class="money" placeholder="R$ 0,00"></div>
-    <div class="field"><label>Plano saúde</label><input id="nfPlano" class="money" placeholder="R$ 0,00"></div>
-    <button class="btn" onclick="addFunc()">Adicionar</button>
-  </div></div>`;
+  ${painelParametros()}`;
 }
 function painelParametros(){
   const cfg=S.cfg;
@@ -707,7 +758,11 @@ function painelParametros(){
   <p class="hint" style="margin:8px 0 12px">Tabela de INSS 2026 conferida: mínimo R$ 1.621,00, teto R$ 8.475,55, alíquotas de 7,5% a 14% por faixa. Provisão de férias em 1/9 (férias + terço).</p>
   <button class="btn" onclick="salvaCfg()">Salvar parâmetros</button></div>`;
 }
-async function funcEdit(id,campo,v){ await db.upd('fin_funcionarios','id=eq.'+id,{[campo]:v}); toast('Funcionário atualizado'); render(); }
+async function funcEdit(id,campo,v){
+  await db.upd('fin_funcionarios','id=eq.'+id,{[campo]:v});
+  const f=(folhaData.todos||[]).find(x=>x.id===id); if(f) f[campo]=v;
+  toast('Atualizado');
+}
 async function delFunc(id){
   if(!confirm('Excluir esse funcionário? Se já houver folha lançada, prefira Desativar.')) return;
   try{ await db.del('fin_funcionarios','id=eq.'+id); toast('Funcionário excluído'); }
@@ -721,17 +776,17 @@ async function exportarFolhaPDF(){
   setTimeout(()=>document.body.classList.remove('printFolha'),800);
 }
 
-function fEdit(fid,campo,valor){ folhaData.rows[fid][campo]=valor; drawFolha(document.getElementById('view'),false); }
+function fEdit(fid,campo,valor){ folhaData.rows[fid][campo]=valor; drawFolha(document.getElementById('view'),folhaData.fechada); }
 async function salvarFolha(fechar){
   const c=S.comp;
   const payload=folhaData.funcs.map(f=>{
-    const r=folhaData.rows[f.id], k=calcRow(f,r);
+    const r=folhaData.rows[f.id], k=calcRow(f,r,folhaData.funcs,folhaData.rows);
     return {unidade:S.unidade,competencia:c,funcionario_id:f.id,horas:r.horas||0,matriculas:r.matriculas||0,comissao_manual_cents:r.comissao_manual_cents,adiantamento_cents:r.adiantamento_cents||0,desconto_vale_cents:r.desconto_vale_cents||0,ajuste_cents:r.ajuste_cents||0,obs:r.obs,...k,fechada:!!fechar,updated_at:new Date().toISOString()};
   });
   await db.upsert('fin_folha',payload,'competencia,funcionario_id');
   if(fechar){
     let totL=0,totI=0,totV=0;
-    folhaData.funcs.forEach(f=>{ const k=calcRow(f,folhaData.rows[f.id]); totL+=k.liquido_cents; totI+=f.ifood_cents||0; totV+=f.vt_cents||0; });
+    folhaData.funcs.forEach(f=>{ const k=calcRow(f,folhaData.rows[f.id],folhaData.funcs,folhaData.rows); totL+=k.liquido_cents; totI+=f.ifood_cents||0; totV+=f.vt_cents||0; });
     const prox=nextComp(c,1);
     const itens=[
       {nome:'Folha de pagamento (líquidos)',valor:totL,venc:`${prox}-05`},
@@ -914,11 +969,11 @@ async function toggleFunc(id,ativo){ await db.upd('fin_funcionarios','id=eq.'+id
 async function addFunc(){
   if(!nfNome.value.trim()) return toast('Dê um nome');
   const tipo=nfTipo.value, v=parseBRL(nfValor.value);
-  await db.ins('fin_funcionarios',[{unidade:S.unidade,nome:nfNome.value.trim(),funcao:nfFuncao.value.trim()||null,
-    tipo,salario_cents:tipo==='mensalista'?v:0,valor_hora_cents:tipo==='horista'?v:0,
+  await db.ins('fin_funcionarios',[{unidade:S.unidade,nome:nfNome.value.trim(),funcao:nfFuncao.value,
+    setor:nfSetor.value,tipo,salario_cents:tipo==='mensalista'?v:0,valor_hora_cents:tipo==='horista'?v:0,
     vt_cents:parseBRL(nfVt.value),ifood_cents:parseBRL(nfIfood.value),plano_saude_cents:parseBRL(nfPlano.value),
-    comissionado:false,ativo:true}]);
-  toast('Funcionário adicionado'); render();
+    comissao_tipo:nfCom.value,comissionado:nfCom.value!=='nenhuma',ativo:true}]);
+  novoFunc=false; toast('Colaborador adicionado'); render();
 }
 async function salvaCfg(){
   let faixas; try{ faixas=JSON.parse(document.getElementById('cfINSS').value) }catch{ return toast('JSON das faixas INSS inválido'); }
