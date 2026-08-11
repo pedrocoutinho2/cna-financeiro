@@ -578,11 +578,14 @@ function calcINSS(brutoCents){
   for(const f of faixas){ if(base>prev){ inss+=(Math.min(base,f.ate)-prev)*f.aliq; prev=f.ate; } }
   return Math.round(inss);
 }
+function comMatCents(){
+  const c=S.cfg.comissao_matricula||{};
+  return (c.valor_cents!=null?+c.valor_cents:(c.valor!=null?+c.valor:5000));
+}
+function comPagCents(){ return +((S.cfg.comissao_pagamento||{}).valor_cents||0); }
 function comissaoDe(f,r,todos,rows){
-  const cfg=S.cfg;
-  const comKey=(cfg.comissao_valor_ativo||'comissao');
-  const vMat=(cfg.comissao_matricula||{})[comKey]||5000;
-  const vPag=((cfg.comissao_pagamento||{}).valor_cents)||0;
+  const vMat=comMatCents();
+  const vPag=comPagCents();
   if(r.comissao_manual_cents!=null && r.comissao_manual_cents!=='') return +r.comissao_manual_cents;
   switch(f.comissao_tipo){
     case 'matricula':  return (r.matriculas||0)*vMat;
@@ -590,7 +593,9 @@ function comissaoDe(f,r,todos,rows){
     case 'coord_comercial': {
       let base=0;
       (todos||[]).filter(x=>x.comissao_tipo==='matricula').forEach(x=>{
-        const rr=(rows||{})[x.id]||{}; base += (rr.matriculas||0)*vMat;
+        const rr=(rows||{})[x.id]||{};
+        base += (rr.comissao_manual_cents!=null&&rr.comissao_manual_cents!=='')
+                ? +rr.comissao_manual_cents : (rr.matriculas||0)*vMat;
       });
       return Math.round(base*0.5);
     }
@@ -824,7 +829,7 @@ function drawFolha(el,fechada){
       <td><b>${esc(f.nome)}</b><div class="hint">${esc(f.funcao||'')}</div></td>
       <td class="num">${producao}</td>
       <td class="num">${fmt(k.salario_base_cents)}</td>
-      <td class="num">${prof?'—':(k.comissao_cents||k.dsr_cents?fmt(k.comissao_cents+k.dsr_cents):'—')}</td>
+      <td class="num">${prof?'—':`<input class="mini money" ${dis} value="${(r.comissao_manual_cents!=null&&r.comissao_manual_cents!=='')?moneyVal(r.comissao_manual_cents):''}" placeholder="${moneyVal(k.comissao_cents)}" title="Vazio usa o cálculo automático" onchange="fComissao(${f.id},this.value)">${k.dsr_cents?`<div class="hint">DSR ${fmt(k.dsr_cents)}</div>`:''}${(r.comissao_manual_cents!=null&&r.comissao_manual_cents!=='')?'<div class="hint">manual</div>':''}`}</td>
       <td class="num">${k.vt_desconto_cents?fmt(k.vt_desconto_cents):'—'}</td>
       <td class="num">${f.ifood_cents?fmt(f.ifood_cents):'—'}</td>
       <td class="num">${f.plano_saude_cents?fmt(f.plano_saude_cents):'—'}</td>
@@ -854,7 +859,7 @@ function drawFolha(el,fechada){
   };
 
   const head=`<thead><tr><th>Funcionário</th><th class="num">Produção</th><th class="num">Base</th>
-    <th class="num">Comissão+DSR</th><th class="num">Desc. VT</th><th class="num">iFood</th><th class="num">Plano</th>
+    <th class="num">Comissão</th><th class="num">Desc. VT</th><th class="num">iFood</th><th class="num">Plano</th>
     <th class="num">Adiantamento</th><th class="num">Líquido</th><th class="num">Custo total</th><th></th></tr></thead>`;
 
   const blocos=SETORES.map(setor=>{
@@ -910,14 +915,16 @@ function painelParametros(){
   return `
   <div class="panel"><h2>Parâmetros de cálculo</h2>
   <div class="grid3">
-    <div class="field"><label>Comissão por matrícula</label>
-      <select id="cfComKey">${['padrao','comissao','geral'].map(k=>`<option value="${k}" ${((cfg.comissao_valor_ativo||'comissao')===k)?'selected':''}>${k} · ${fmt((cfg.comissao_matricula||{})[k]||0)}</option>`).join('')}</select></div>
+    <div class="field"><label>Comissão por matrícula (R$)</label>
+      <input id="cfComMat" class="money" value="${moneyVal(comMatCents())}"></div>
+    <div class="field"><label>Comissão por pagamento (R$)</label>
+      <input id="cfComPag" class="money" value="${moneyVal(comPagCents())}"></div>
     <div class="field"><label>DSR: dias úteis</label><input id="cfDU" type="number" value="${(cfg.dsr||{}).dias_uteis||26}"></div>
     <div class="field"><label>DSR: dias de descanso</label><input id="cfDD" type="number" value="${(cfg.dsr||{}).dias_descanso||5}"></div>
     <div class="field"><label>Alíquota efetiva Simples (%)</label><input id="cfAliq" value="${(((cfg.simples||{}).aliquota_efetiva||0)*100).toFixed(4).replace('.',',')}"></div>
     <div class="field"><label>Desconto de VT (%)</label><input id="cfVT" value="${(((cfg.vt_aliquota!=null?+cfg.vt_aliquota:0.06))*100).toFixed(2).replace('.',',')}"></div>
   </div>
-  <p class="hint" style="margin:8px 0 12px">O vale transporte é descontado sobre salário + comissão, só de quem tem VT cadastrado. O INSS não entra na folha: é recolhido por guia depois. Provisão de férias em 1/9 (férias + terço).</p>
+  <p class="hint" style="margin:8px 0 12px">A comissão por matrícula vale para o Comercial e é a base dos 50% da Coordenação. A comissão por pagamento vale para o Administrativo. Na tabela da folha, digitar um valor na coluna Comissão sobrepõe o cálculo automático daquela pessoa; apagar volta ao automático. O vale transporte é descontado sobre salário + comissão, só de quem tem VT cadastrado. O INSS não entra na folha: é recolhido por guia depois. Provisão de férias em 1/9 (férias + terço).</p>
   <button class="btn" onclick="salvaCfg()">Salvar parâmetros</button></div>`;
 }
 async function funcEdit(id,campo,v){
@@ -980,6 +987,11 @@ async function exportarFolhaPDF(){
 }
 
 function fEdit(fid,campo,valor){ folhaData.rows[fid][campo]=valor; drawFolha(document.getElementById('view'),folhaData.fechada); }
+function fComissao(fid,v){
+  const t=String(v==null?'':v).trim();
+  folhaData.rows[fid].comissao_manual_cents = (t===''||t==='R$ 0,00')?null:parseBRL(t);
+  drawFolha(document.getElementById('view'),folhaData.fechada);
+}
 async function salvarFolha(fechar){
   const c=S.comp;
   const payload=folhaData.funcs.map(f=>{
@@ -1183,14 +1195,18 @@ async function salvaCfg(){
   if(vtAliq<0||vtAliq>0.5) return toast('Percentual de VT fora do razoável');
   const dsr={dias_uteis:+cfDU.value||25,dias_descanso:+cfDD.value||5};
   const simples={...(S.cfg.simples||{}),aliquota_efetiva:(parseFloat(String(cfAliq.value).replace(',','.'))||0)/100};
+  const comMat={valor_cents:parseBRL(cfComMat.value)};
+  const comPag={...(S.cfg.comissao_pagamento||{}),valor_cents:parseBRL(cfComPag.value)};
   const updates=[
-    {chave:'comissao_valor_ativo',valor:cfComKey.value},
+    {chave:'comissao_matricula',valor:comMat},
+    {chave:'comissao_pagamento',valor:comPag},
     {chave:'dsr',valor:dsr},
     {chave:'simples',valor:simples},
     {chave:'vt_aliquota',valor:vtAliq}
   ];
   for(const u of updates){ await db.upd('fin_config','unidade=eq.'+S.unidade+'&chave=eq.'+u.chave,{valor:u.valor,updated_at:new Date().toISOString()}); }
-  S.cfg.comissao_valor_ativo=cfComKey.value; S.cfg.dsr=dsr; S.cfg.simples=simples; S.cfg.vt_aliquota=vtAliq;
+  S.cfg.comissao_matricula=comMat; S.cfg.comissao_pagamento=comPag;
+  S.cfg.dsr=dsr; S.cfg.simples=simples; S.cfg.vt_aliquota=vtAliq;
   toast('Parâmetros salvos'); render();
 }
 
