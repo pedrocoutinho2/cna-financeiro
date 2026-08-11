@@ -1042,8 +1042,8 @@ async function vReceitas(el){
     ${cats.map(cat=>{
       const r=rec.find(x=>x.categoria===cat)||{faturado_cents:0,recebido_cents:0};
       return `<tr><td><b>${esc(cat)}</b></td>
-      <td class="num"><input class="mini" style="width:130px" id="rf_${cat}" value="${(r.faturado_cents/100).toFixed(2).replace('.',',')}"></td>
-      <td class="num"><input class="mini" style="width:130px" id="rr_${cat}" value="${(r.recebido_cents/100).toFixed(2).replace('.',',')}"></td>
+      <td class="num"><input class="mini money" style="width:150px" id="rf_${cat}" placeholder="R$ 0,00" value="${moneyVal(r.faturado_cents)}"></td>
+      <td class="num"><input class="mini money" style="width:150px" id="rr_${cat}" placeholder="R$ 0,00" value="${moneyVal(r.recebido_cents)}"></td>
       <td style="text-align:right"><button class="btn sm sec" onclick="salvaReceita('${cat}')">Salvar</button></td></tr>`;
     }).join('')}
     </tbody></table>
@@ -1138,9 +1138,9 @@ async function vDF(el){
       <div class="field"><label>Nº de alunos</label><input id="dfAlunos" type="number" value="${d.alunos||''}"></div>
       <div class="field"><label>Total de pagamentos</label><input id="dfPag" type="number" value="${d.total_pagamentos||''}"></div>
       <div class="field"><label>Nº de turmas</label><input id="dfTurmas" type="number" value="${d.turmas||''}"></div>
-      <div class="field"><label>Receita de certificações</label><input id="dfCert" value="${((d.receita_cert_cents||0)/100).toFixed(2).replace('.',',')}"></div>
-      <div class="field"><label>Outras receitas</label><input id="dfOutras" value="${((d.outras_receitas_cents||0)/100).toFixed(2).replace('.',',')}"></div>
-      <div class="field"><label>Faturamento mensal <span class="tag">AUTO</span></label><input id="dfFat" value="${(fat/100).toFixed(2).replace('.',',')}"><span class="hint">Sugerido das receitas: ${fmt(fatAuto)}</span></div>
+      <div class="field"><label>Receita de certificações</label><input id="dfCert" class="money" placeholder="R$ 0,00" value="${moneyVal(d.receita_cert_cents||0)}"></div>
+      <div class="field"><label>Outras receitas</label><input id="dfOutras" class="money" placeholder="R$ 0,00" value="${moneyVal(d.outras_receitas_cents||0)}"></div>
+      <div class="field"><label>Faturamento mensal <span class="tag">AUTO</span></label><input id="dfFat" class="money" placeholder="R$ 0,00" value="${moneyVal(fat)}"><span class="hint">Sugerido das receitas: ${fmt(fatAuto)}</span></div>
       <div class="field"><label>Alíquota efetiva Simples <span class="tag">AUTO</span></label><input id="dfAliq" value="${(aliq*100).toFixed(4).replace('.',',')} %"><span class="hint">${esc(simples.faixa||'')} · edite na Config se mudar de faixa</span></div>
     </div>
     <div class="divider"></div>
@@ -1250,6 +1250,9 @@ function gS(label,id,val,opts){
   const o=opts.map(x=>{ const v=Array.isArray(x)?x[0]:x, t=Array.isArray(x)?x[1]:x;
     return `<option value="${esc(String(v))}" ${String(val==null?'':val)===String(v)?'selected':''}>${esc(String(t))}</option>`; }).join('');
   return `<div class="field"><label>${label}</label><select class="selInp" id="${id}">${o}</select></div>`;
+}
+function gFm(label,id,cents){
+  return `<div class="field"><label>${label}</label><input class="txtInp money" id="${id}" placeholder="R$ 0,00" value="${cents?moneyVal(cents):''}"></div>`;
 }
 function gT(label,id,val){
   return `<div class="field" style="grid-column:1/-1"><label>${label}</label><textarea class="txtInp" id="${id}" rows="2">${val==null?'':esc(String(val))}</textarea></div>`;
@@ -1463,7 +1466,7 @@ function histFuncHTML(f,ev){
       ${gS('Tipo','ev_tipo','',EVT_TIPOS)}
       ${gF('Início','ev_ini',todayISO(),'date')}
       ${gF('Fim','ev_fim','','date')}
-      ${gF('Valor (R$)','ev_val','')}
+      ${gFm('Valor','ev_val',null)}
       ${gF('Descrição','ev_desc','')}
     </div>
     <div class="mFoot" style="margin-bottom:14px"><button class="btn sm" onclick="addEvento(${f.id})">Adicionar registro</button></div>
@@ -1782,7 +1785,7 @@ function ctForm(c,pOpts,novo){
       ${gS('Idioma',p+'idioma',c.idioma,[['','—'],['ingles','Inglês'],['espanhol','Espanhol'],['ambos','Ambos']])}
       ${gF('Turmas',p+'turmas',c.turmas||0,'number')}
       ${gF('Alunos',p+'alunos',c.alunos||0,'number')}
-      ${gF('Valor (R$)',p+'valor',c.valor_cents?(c.valor_cents/100).toFixed(2).replace('.',','):'')}
+      ${gFm('Valor',p+'valor',c.valor_cents)}
       ${gS('Periodicidade',p+'per',c.periodicidade||'mensal',PERIODOS)}
       ${gF('Dia do faturamento',p+'dia',c.dia_faturamento,'number','min="1" max="31"')}
       ${gF('Início',p+'ini',c.inicio||todayISO(),'date')}
