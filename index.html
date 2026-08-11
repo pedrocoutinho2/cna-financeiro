@@ -50,9 +50,9 @@ h2{font-size:15px;font-weight:700;color:var(--blue);margin:0 0 10px}
 /* identidade CNA */
 .logoImg{width:150px;display:block;margin-bottom:10px}
 .logoImg.side{width:96px;margin:0;display:block}
-.logoChip{background:#fff;border-radius:9px;padding:9px 12px 7px;display:inline-block;margin-bottom:8px}
-aside{background:var(--red);border-bottom:none}
-aside::after{content:'';display:block;height:6px;background:var(--blue);margin-top:14px}
+.logoChip{background:transparent;border-radius:9px;padding:9px 12px 7px;display:inline-block;margin-bottom:8px}
+aside{background:var(--white);border-bottom:none;border-right:1px solid var(--line);border-top:5px solid var(--red)}
+aside::after{content:'';display:block;height:1px;background:var(--line);margin-top:14px}
 .tableWrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .tableWrap::-webkit-scrollbar{height:9px}
 .tableWrap::-webkit-scrollbar-thumb{background:var(--line);border-radius:5px}
@@ -80,21 +80,21 @@ aside::after{content:'';display:block;height:6px;background:var(--blue);margin-t
 /* ---------- shell ---------- */
 #app{display:none;min-height:100vh}
 .shell{display:flex;min-height:100vh;max-width:100%}
-aside{width:210px;color:#fff;padding:20px 0;display:flex;flex-direction:column;flex-shrink:0}
-aside .brand{padding:0 20px 16px;border-bottom:1px solid var(--onColorLine);margin-bottom:12px}
-aside .brand small{display:block;color:var(--onColor);font-weight:400;font-size:11px;margin-top:2px}
-nav a{display:block;padding:9px 20px;color:var(--onColor);text-decoration:none;font-weight:500;font-size:13.5px;border-left:3px solid transparent;cursor:pointer;transition:background .15s}
-nav a:hover{background:var(--onColorHover)}
-nav a.on{font-weight:700;border-left-color:var(--onColor);background:var(--onColorActive)}
+aside{width:210px;color:var(--ink);padding:20px 0;display:flex;flex-direction:column;flex-shrink:0}
+aside .brand{padding:0 20px 16px;border-bottom:1px solid var(--line);margin-bottom:12px}
+aside .brand small{display:block;color:var(--gray);font-weight:400;font-size:11px;margin-top:2px}
+nav a{display:block;padding:9px 20px;color:var(--ink);text-decoration:none;font-weight:500;font-size:13.5px;border-left:3px solid transparent;cursor:pointer;transition:background .15s}
+nav a:hover{background:var(--surface)}
+nav a.on{font-weight:700;color:var(--red);border-left-color:var(--red);background:var(--pastelRed)}
 .asideBody{display:flex;flex-direction:column;flex:1;min-height:0}
-.unitPick{padding:0 20px 12px;margin-bottom:6px;border-bottom:1px solid var(--onColorLine)}
+.unitPick{padding:0 20px 12px;margin-bottom:6px;border-bottom:1px solid var(--line)}
 .unitPick label{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--onColor);opacity:.75;margin-bottom:5px}
+  text-transform:uppercase;color:var(--gray);margin-bottom:5px}
 .burger{display:none}
 .navOverlay{display:none}
-aside .foot{margin-top:auto;padding:14px 20px;font-size:12px;color:var(--onColor)}
-aside .foot b{color:var(--onColor);display:block}
-aside .foot button{color:var(--onColor);font-size:12px;padding:0;margin-top:6px;text-decoration:underline}
+aside .foot{margin-top:auto;padding:14px 20px;font-size:12px;color:var(--gray)}
+aside .foot b{color:var(--ink);display:block}
+aside .foot button{color:var(--blue);font-size:12px;padding:0;margin-top:6px;text-decoration:underline}
 main{flex:1;min-width:0;padding:22px 26px 60px;max-width:1180px;width:100%;margin-inline:auto}
 .topbar{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
 .topbar h1{margin-right:auto}
@@ -105,7 +105,7 @@ main{flex:1;min-width:0;padding:22px 26px 60px;max-width:1180px;width:100%;margi
 :is(a,button,input,select,textarea,[tabindex]):focus-visible{
   outline:3px solid var(--focus); outline-offset:2px; border-radius:6px;
 }
-aside :is(a,button):focus-visible{outline-color:var(--onDark)}
+aside :is(a,button):focus-visible{outline-color:var(--focus)}
 ::placeholder{color:#6B7280;opacity:1}
 @media(max-width:860px){
   .panel table.cardify{min-width:0}
@@ -142,7 +142,7 @@ aside :is(a,button):focus-visible{outline-color:var(--onDark)}
 }
 
 .navGroup{padding:12px 20px 4px;font-size:10.5px;font-weight:700;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--onColor);opacity:.75}
+  text-transform:uppercase;color:var(--gray)}
 nav a.sub{padding-left:32px;font-size:13px}
 @media(max-width:860px){ nav a.sub{padding-left:34px} }
 
@@ -214,8 +214,8 @@ input.mini,input.mini2{text-align:right}
 
   /* botao hamburguer */
   .burger{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
-    width:44px;height:44px;flex-shrink:0;border-radius:9px;background:var(--onColorHover)}
-  .burger span{display:block;width:21px;height:2.5px;background:var(--onColor);border-radius:2px;
+    width:44px;height:44px;flex-shrink:0;border-radius:var(--r-md);background:var(--surface)}
+  .burger span{display:block;width:21px;height:2.5px;background:var(--ink);border-radius:2px;
     transition:transform .22s ease,opacity .16s ease}
   body.navOpen .burger span:nth-child(1){transform:translateY(7.5px) rotate(45deg)}
   body.navOpen .burger span:nth-child(2){opacity:0}
@@ -234,8 +234,8 @@ input.mini,input.mini2{text-align:right}
   .unitPick{padding:0 20px 14px}
   nav{display:block;overflow:visible;padding:0}
   nav a{border-left:3px solid transparent;border-bottom:none;padding:11px 20px;white-space:normal;font-size:14px}
-  nav a.on{border-left-color:var(--onColor);border-bottom:none;background:var(--onColorActive);font-weight:700}
-  aside .foot{display:block;margin-top:auto;padding:16px 20px 0;border-top:1px solid var(--onColorLine)}
+  nav a.on{color:var(--red);border-left-color:var(--red);border-bottom:none;background:var(--pastelRed);font-weight:700}
+  aside .foot{display:block;margin-top:auto;padding:16px 20px 0;border-top:1px solid var(--line)}
   main{padding:16px 12px 70px;max-width:100%}
   .topbar{gap:10px}
   .topbar h1{width:100%;font-size:17px}
