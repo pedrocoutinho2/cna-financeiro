@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Financeiro · CNA</title>
+<title>Gestão · CNA Taquara</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -64,6 +64,11 @@ aside::after{content:'';display:block;height:1px;background:var(--line);margin-t
 .authCard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:34px 32px;width:100%;max-width:380px;box-shadow:0 8px 30px rgba(25,64,139,.08);border-top:6px solid var(--red)}
 .authCard p.sub{color:var(--gray);margin-bottom:22px;font-size:13px}
 .field{margin-bottom:12px}
+.gGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.gGrid .field{margin:0}
+.gGrid textarea{font:inherit;width:100%;border:1px solid var(--line);border-radius:var(--r-sm);padding:8px 10px;background:#fff;color:var(--ink);resize:vertical}
+.gGrid textarea:focus-visible,.gGrid input:focus-visible,.gGrid select:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+@media(max-width:640px){.gGrid{grid-template-columns:1fr}}
 .field label{display:block;font-size:12px;font-weight:600;color:var(--gray);margin-bottom:4px}
 .authCard .btn{width:100%;margin-top:6px;padding:10px}
 .authSwitch{text-align:center;margin-top:16px;font-size:13px;color:var(--gray)}
@@ -268,7 +273,7 @@ input.mini,input.mini2{text-align:right}
 <div id="auth">
   <div class="authCard">
     <img class="logoImg" alt="CNA idiomas">
-    <p class="sub">Financeiro · Unidades CNA</p>
+    <p class="sub">Gestão · Unidades CNA</p>
     <div class="msg" id="authMsg"></div>
 
     <div id="loginBox">
@@ -300,7 +305,7 @@ input.mini,input.mini2{text-align:right}
   <aside>
     <div class="brand">
       <span class="logoChip"><img class="logoImg side" alt="CNA idiomas"></span>
-      <small id="sideUnit">Financeiro</small>
+      <small id="sideUnit">Gestão</small>
       <button class="burger" id="burger" onclick="toggleNav()" aria-label="Abrir menu" aria-expanded="false" aria-controls="asideBody"><span></span><span></span><span></span></button>
     </div>
     <div class="asideBody" id="asideBody">
@@ -317,6 +322,12 @@ input.mini,input.mini2{text-align:right}
       <a data-v="receitas" onclick="go('receitas')">Receitas</a>
       <a data-v="dre" onclick="go('dre')">DRE</a>
       <a data-v="df" onclick="go('df')">DF · Franquia</a>
+      <div class="navGroup">Equipe</div>
+      <a data-v="equipe" class="sub" data-admin onclick="go('equipe')">Funcionários</a>
+      <a data-v="ponto" class="sub" data-admin onclick="go('ponto')">Folha de ponto</a>
+      <div class="navGroup">Administrativo</div>
+      <a data-v="documentos" class="sub" data-admin onclick="go('documentos')">Documentos</a>
+      <a data-v="contratos" class="sub" data-admin onclick="go('contratos')">Contratos e parceiras</a>
     </nav>
     <div class="foot"><b id="whoName"></b><span id="whoRole"></span><br><button onclick="logout()">Sair</button></div>
     </div>
@@ -449,7 +460,7 @@ async function loadUnidade(id){
   cfgRows.forEach(r=>S.cfg[r.chave]=r.valor);
   const u=UNIDADES.find(x=>x.id===id);
   document.getElementById('unitSel').innerHTML=UNIDADES.map(x=>`<option value="${x.id}" ${x.id===id?'selected':''}>${x.nome}</option>`).join('');
-  document.getElementById('sideUnit').textContent='Financeiro · '+u.nome.replace('CNA ','');
+  document.getElementById('sideUnit').textContent='Gestão · '+u.nome.replace('CNA ','');
   unitBox.style.display='none';
   document.getElementById('auth').style.display='none';
   document.getElementById('app').style.display='block';
@@ -466,10 +477,13 @@ window.addEventListener('resize',()=>{ if(window.innerWidth>860) closeNav(); });
 function logout(){ closeNav(); S={token:null,refresh:null,uid:null,role:null,nome:null,unidade:null,comp:curComp(),view:'resumo',cfg:{}}; document.getElementById('app').style.display='none'; document.getElementById('auth').style.display='flex'; showLogin(); }
 
 /* ================= ROUTER ================= */
-const TITLES={resumo:'Resumo do mês',fixas:'Contas a pagar · Despesas fixas',variaveis:'Contas a pagar · Despesas variáveis',folha:'Folha de pagamento',receitas:'Receitas',dre:'DRE',df:'DF · Relatório de franquia'};
+const TITLES={resumo:'Resumo do mês',fixas:'Contas a pagar · Despesas fixas',variaveis:'Contas a pagar · Despesas variáveis',folha:'Folha de pagamento',receitas:'Receitas',dre:'DRE',df:'DF · Relatório de franquia',equipe:'Equipe · Funcionários',ponto:'Folha de ponto',documentos:'Documentos',contratos:'Contratos e empresas parceiras'};
+const VIEWS_ADMIN=['folha','equipe','ponto','documentos','contratos'];
+const VIEWS_SEM_MES=['equipe','documentos','contratos'];
 function go(v){
-  if(v==='folha'&&S.role!=='admin') return;
+  if(VIEWS_ADMIN.includes(v)&&S.role!=='admin') return;
   S.view=v; closeNav();
+  const mp=document.querySelector('.monthPick'); if(mp) mp.style.display=VIEWS_SEM_MES.includes(v)?'none':'';
   document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on',a.dataset.v===v));
   document.getElementById('viewTitle').textContent=TITLES[v];
   render();
@@ -479,7 +493,7 @@ function render(){
   document.getElementById('monthLabel').textContent=compLabel(S.comp);
   const el=document.getElementById('view');
   el.innerHTML='<div class="empty">Carregando…</div>';
-  ({resumo:vResumo,fixas:el2=>vContas(el2,'fixa'),variaveis:el2=>vContas(el2,'variavel'),folha:vFolha,receitas:vReceitas,dre:vDRE,df:vDF})[S.view](el).catch(e=>{ el.innerHTML=`<div class="panel"><b style="color:var(--redDark)">Erro:</b> ${esc(e.message)}</div>`; });
+  ({resumo:vResumo,fixas:el2=>vContas(el2,'fixa'),variaveis:el2=>vContas(el2,'variavel'),folha:vFolha,receitas:vReceitas,dre:vDRE,df:vDF,equipe:vEquipe,ponto:vPonto,documentos:vDocumentos,contratos:vContratos})[S.view](el).catch(e=>{ el.innerHTML=`<div class="panel"><b style="color:var(--redDark)">Erro:</b> ${esc(e.message)}</div>`; });
 }
 
 /* ================= CÁLCULOS DA FOLHA ================= */
@@ -1059,6 +1073,564 @@ async function salvaCfg(){
 }
 
 document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&document.getElementById('auth').style.display!=='none'){ if(loginBox.style.display!=='none') doLogin(); }});
+
+/* ================= GESTÃO: EQUIPE · DOCUMENTOS · CONTRATOS · PONTO ================= */
+
+/* --- helpers de formulário --- */
+const gv  = id => { const e=document.getElementById(id); return e?String(e.value).trim():''; };
+const gvn = id => gv(id)||null;
+const gvi = id => { const v=gv(id); return v===''?null:parseInt(v,10); };
+const gvf = id => { const v=gv(id).replace(',','.'); return v===''?0:(parseFloat(v)||0); };
+const gvb = id => { const e=document.getElementById(id); return e?!!e.checked:false; };
+function gF(label,id,val,type,extra){
+  return `<div class="field"><label>${label}</label><input class="txtInp" id="${id}" type="${type||'text'}" value="${val==null?'':esc(String(val))}" ${extra||''}></div>`;
+}
+function gS(label,id,val,opts){
+  const o=opts.map(x=>{ const v=Array.isArray(x)?x[0]:x, t=Array.isArray(x)?x[1]:x;
+    return `<option value="${esc(String(v))}" ${String(val==null?'':val)===String(v)?'selected':''}>${esc(String(t))}</option>`; }).join('');
+  return `<div class="field"><label>${label}</label><select class="selInp" id="${id}">${o}</select></div>`;
+}
+function gT(label,id,val){
+  return `<div class="field" style="grid-column:1/-1"><label>${label}</label><textarea class="txtInp" id="${id}" rows="2">${val==null?'':esc(String(val))}</textarea></div>`;
+}
+function sitBadge(s){
+  const map={ok:['pago','Em dia'],sem_validade:['cat','Sem validade'],vencendo:['pend','Vence em breve'],
+              vencido:['late','Vencido'],faltando:['late','Faltando'],vigente:['pago','Vigente'],
+              negociacao:['cat','Em negociação'],suspenso:['pend','Suspenso'],
+              encerrado:['cat','Encerrado'],cancelado:['late','Cancelado']};
+  const m=map[s]||['cat',s||'—'];
+  return `<span class="badge ${m[0]}">${esc(m[1])}</span>`;
+}
+
+/* --- Supabase Storage --- */
+const BUCKET='gestao-docs';
+async function stUpload(path,file){
+  const res=await fetch(`${SUPA}/storage/v1/object/${BUCKET}/${path}`,{
+    method:'POST',
+    headers:{apikey:ANON,Authorization:'Bearer '+S.token,'x-upsert':'true',
+             'Content-Type':file.type||'application/octet-stream'},
+    body:file});
+  if(!res.ok){ let e; try{e=await res.json()}catch{e={}}; throw new Error(e.message||'Falha ao enviar o arquivo'); }
+}
+async function stDelete(path){
+  try{ await api(`/storage/v1/object/${BUCKET}/${path}`,{method:'DELETE'}); }catch(e){}
+}
+async function abrirArquivo(path){
+  try{
+    const r=await api(`/storage/v1/object/sign/${BUCKET}/${path}`,{method:'POST',body:{expiresIn:3600}});
+    window.open(SUPA+'/storage/v1'+r.signedURL,'_blank');
+  }catch(e){ toast('Não consegui abrir: '+e.message); }
+}
+function slugArq(n){
+  return String(n).normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+         .replace(/[^a-zA-Z0-9.\-_]/g,'-').replace(/-+/g,'-').toLowerCase().slice(-70);
+}
+
+/* ================= EQUIPE ================= */
+let equipeSel=null;
+const REGIMES=[['clt','CLT'],['estagio','Estágio'],['autonomo','Autônomo'],['pj','PJ'],['socio','Sócio']];
+const EVT_TIPOS=[['admissao','Admissão'],['efetivacao','Efetivação'],['alteracao_salarial','Alteração salarial'],
+  ['promocao','Promoção'],['mudanca_funcao','Mudança de função'],['ferias','Férias'],
+  ['afastamento','Afastamento'],['atestado','Atestado'],['advertencia','Advertência'],
+  ['suspensao','Suspensão'],['desligamento','Desligamento'],['outro','Outro']];
+
+function toggleFicha(id){ equipeSel = (equipeSel===id?null:id); render(); }
+
+async function vEquipe(el){
+  const [funcs,fichas,pend]=await Promise.all([
+    db.get('fin_funcionarios',`unidade=eq.${S.unidade}&select=*&order=nome.asc`),
+    db.get('fin_func_ficha','select=*'),
+    db.get('v_fin_doc_pendencias',`unidade=eq.${S.unidade}&select=funcionario_id,situacao`)
+  ]);
+  const fmap={}; fichas.forEach(f=>fmap[f.funcionario_id]=f);
+  const pmap={}; pend.forEach(p=>{ if(p.situacao!=='ok') pmap[p.funcionario_id]=(pmap[p.funcionario_id]||0)+1; });
+  const ativos=funcs.filter(f=>f.ativo);
+  const semFicha=ativos.filter(f=>!fmap[f.id]).length;
+  const comPend=ativos.filter(f=>pmap[f.id]).length;
+  if(equipeSel && !funcs.some(f=>f.id===equipeSel)) equipeSel=null;
+  let eventos=[];
+  if(equipeSel) eventos=await db.get('fin_func_eventos',`funcionario_id=eq.${equipeSel}&select=*&order=data_inicio.desc`);
+
+  el.innerHTML=`
+  <div class="cards">
+    <div class="card"><small>Funcionários ativos</small><div class="v blue">${ativos.length}</div></div>
+    <div class="card"><small>Sem ficha preenchida</small><div class="v ${semFicha?'red':'ok'}">${semFicha}</div><div class="d">dados pessoais e contratuais</div></div>
+    <div class="card"><small>Com documento pendente</small><div class="v ${comPend?'red':'ok'}">${comPend}</div><div class="d">ver aba Documentos</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panelHead"><h2>Equipe · ${esc(UNIDADES.find(u=>u.id===S.unidade).nome)}</h2></div>
+    <table><thead><tr><th>Nome</th><th>Setor</th><th>Função</th><th>Regime</th><th>Admissão</th><th>Documentos</th><th></th></tr></thead><tbody>
+    ${funcs.map(f=>{ const fi=fmap[f.id]||{}; const np=pmap[f.id]||0;
+      return `<tr class="${f.ativo?'':'paid'}">
+        <td><b>${esc(f.nome)}</b>${f.ativo?'':'<span class="tag">inativo</span>'}</td>
+        <td>${esc(f.setor||'—')}</td>
+        <td>${esc(f.funcao||'—')}</td>
+        <td>${esc((REGIMES.find(r=>r[0]===(fi.regime||'clt'))||['','—'])[1])}</td>
+        <td>${fi.admissao?dBR(fi.admissao):'<span class="hint">a preencher</span>'}</td>
+        <td>${np?`<span class="badge late">${np} pendente${np>1?'s':''}</span>`:'<span class="badge pago">Em dia</span>'}</td>
+        <td class="acoes"><button class="btn sm sec" onclick="toggleFicha(${f.id})">${equipeSel===f.id?'Fechar':'Ficha'}</button></td>
+      </tr>`; }).join('')}
+    </tbody></table>
+    <p class="hint" style="margin-top:10px">O cadastro de salário, comissão e benefícios continua na Folha de pagamento. Aqui ficam os dados pessoais, contratuais e o histórico.</p>
+  </div>
+  ${equipeSel?fichaHTML(funcs.find(f=>f.id===equipeSel),fmap[equipeSel]||{},eventos):''}`;
+}
+
+function fichaHTML(f,fi,eventos){
+  return `
+  <div class="panel">
+    <div class="panelHead"><h2>Ficha · ${esc(f.nome)}</h2>
+      <button class="btn sm" onclick="salvarFicha(${f.id})">Salvar ficha</button></div>
+
+    <h3 style="font-size:13px;color:var(--gray);margin:4px 0 10px">Identificação</h3>
+    <div class="gGrid">
+      ${gF('CPF','fk_cpf',fi.cpf)}
+      ${gF('RG','fk_rg',fi.rg)}
+      ${gF('Órgão emissor','fk_rgem',fi.rg_emissor)}
+      ${gF('PIS / PASEP','fk_pis',fi.pis_pasep)}
+      ${gF('CTPS número','fk_ctpsn',fi.ctps_numero)}
+      ${gF('CTPS série','fk_ctpss',fi.ctps_serie)}
+      ${gF('Nascimento','fk_nasc',fi.data_nascimento,'date')}
+      ${gS('Estado civil','fk_ec',fi.estado_civil,['','Solteiro(a)','Casado(a)','União estável','Divorciado(a)','Viúvo(a)'])}
+      ${gF('Nome da mãe','fk_mae',fi.nome_mae)}
+    </div>
+
+    <h3 style="font-size:13px;color:var(--gray);margin:16px 0 10px">Contato</h3>
+    <div class="gGrid">
+      ${gF('E-mail','fk_email',fi.email,'email')}
+      ${gF('Telefone','fk_tel',fi.telefone)}
+      ${gF('Contato de emergência','fk_emerg',fi.contato_emergencia)}
+    </div>
+
+    <h3 style="font-size:13px;color:var(--gray);margin:16px 0 10px">Endereço</h3>
+    <div class="gGrid">
+      ${gF('CEP','fk_cep',fi.cep)}
+      ${gF('Logradouro','fk_log',fi.logradouro)}
+      ${gF('Número','fk_num',fi.numero)}
+      ${gF('Complemento','fk_comp',fi.complemento)}
+      ${gF('Bairro','fk_bai',fi.bairro)}
+      ${gF('Cidade','fk_cid',fi.cidade)}
+      ${gF('UF','fk_uf',fi.uf,'text','maxlength="2"')}
+    </div>
+
+    <h3 style="font-size:13px;color:var(--gray);margin:16px 0 10px">Pagamento</h3>
+    <div class="gGrid">
+      ${gF('Banco','fk_banco',fi.banco)}
+      ${gF('Agência','fk_ag',fi.agencia)}
+      ${gF('Conta','fk_conta',fi.conta)}
+      ${gF('Chave PIX','fk_pix',fi.chave_pix)}
+    </div>
+
+    <h3 style="font-size:13px;color:var(--gray);margin:16px 0 10px">Contrato</h3>
+    <div class="gGrid">
+      ${gF('Matrícula','fk_mat',fi.matricula)}
+      ${gF('Cargo na CTPS','fk_cargo',fi.cargo_ctps)}
+      ${gF('CBO','fk_cbo',fi.cbo)}
+      ${gS('Regime','fk_reg',fi.regime||'clt',REGIMES)}
+      ${gF('Admissão','fk_adm',fi.admissao,'date')}
+      ${gF('Fim da experiência','fk_exp',fi.fim_experiencia,'date')}
+      ${gF('Jornada semanal (h)','fk_jor',fi.jornada_semanal_horas==null?44:fi.jornada_semanal_horas,'number','step="0.5"')}
+      ${gF('Demissão','fk_dem',fi.demissao,'date')}
+      ${gF('Motivo do desligamento','fk_motivo',fi.motivo_desligamento)}
+      ${gT('Observações','fk_obs',fi.obs)}
+    </div>
+
+    <div class="divider"></div>
+    <h3 style="font-size:13px;color:var(--gray);margin:16px 0 10px">Histórico</h3>
+    <div class="formRow">
+      ${gS('Tipo','ev_tipo','',EVT_TIPOS)}
+      ${gF('Início','ev_ini',todayISO(),'date')}
+      ${gF('Fim','ev_fim','','date')}
+      ${gF('Valor (R$)','ev_val','')}
+      ${gF('Descrição','ev_desc','')}
+      <button class="btn sm" onclick="addEvento(${f.id})">Adicionar</button>
+    </div>
+    ${eventos.length?`<table><thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th class="num">Valor</th><th></th></tr></thead><tbody>
+      ${eventos.map(e=>`<tr>
+        <td>${dBR(e.data_inicio)}${e.data_fim?' a '+dBR(e.data_fim):''}</td>
+        <td>${esc((EVT_TIPOS.find(t=>t[0]===e.tipo)||['',e.tipo])[1])}</td>
+        <td>${esc(e.descricao||'—')}</td>
+        <td class="num">${e.valor_cents?fmt(e.valor_cents):'—'}</td>
+        <td class="acoes"><button class="btn sm ghost" onclick="delEvento(${e.id})">Excluir</button></td>
+      </tr>`).join('')}</tbody></table>`
+    :'<div class="empty">Nenhum registro no histórico ainda.</div>'}
+  </div>`;
+}
+
+async function salvarFicha(id){
+  const body={funcionario_id:id,
+    cpf:gvn('fk_cpf'), rg:gvn('fk_rg'), rg_emissor:gvn('fk_rgem'), pis_pasep:gvn('fk_pis'),
+    ctps_numero:gvn('fk_ctpsn'), ctps_serie:gvn('fk_ctpss'), data_nascimento:gvn('fk_nasc'),
+    estado_civil:gvn('fk_ec'), nome_mae:gvn('fk_mae'),
+    email:gvn('fk_email'), telefone:gvn('fk_tel'), contato_emergencia:gvn('fk_emerg'),
+    cep:gvn('fk_cep'), logradouro:gvn('fk_log'), numero:gvn('fk_num'), complemento:gvn('fk_comp'),
+    bairro:gvn('fk_bai'), cidade:gvn('fk_cid'), uf:(gvn('fk_uf')||'').toUpperCase()||null,
+    banco:gvn('fk_banco'), agencia:gvn('fk_ag'), conta:gvn('fk_conta'), chave_pix:gvn('fk_pix'),
+    matricula:gvn('fk_mat'), cargo_ctps:gvn('fk_cargo'), cbo:gvn('fk_cbo'), regime:gv('fk_reg')||'clt',
+    admissao:gvn('fk_adm'), fim_experiencia:gvn('fk_exp'),
+    jornada_semanal_horas:gvf('fk_jor')||44,
+    demissao:gvn('fk_dem'), motivo_desligamento:gvn('fk_motivo'), obs:gvn('fk_obs'),
+    updated_at:new Date().toISOString()};
+  try{ await db.upsert('fin_func_ficha',[body],'funcionario_id'); toast('Ficha salva'); render(); }
+  catch(e){ toast(e.message); }
+}
+async function addEvento(fid){
+  const d=gv('ev_ini'); if(!d) return toast('Informe a data de início');
+  const v=gv('ev_val');
+  try{
+    await db.ins('fin_func_eventos',[{funcionario_id:fid,tipo:gv('ev_tipo')||'outro',
+      data_inicio:d,data_fim:gvn('ev_fim'),descricao:gvn('ev_desc'),
+      valor_cents:v?parseBRL(v):null}]);
+    toast('Registro adicionado'); render();
+  }catch(e){ toast(e.message); }
+}
+async function delEvento(id){
+  if(!confirm('Excluir este registro do histórico?')) return;
+  await db.del('fin_func_eventos',`id=eq.${id}`); toast('Excluído'); render();
+}
+
+/* ================= DOCUMENTOS ================= */
+let docEscopo='funcionario';
+function setDocEscopo(e){ docEscopo=e; render(); }
+
+async function vDocumentos(el){
+  const [docs,tipos,funcs,pend,parc,cts]=await Promise.all([
+    db.get('v_fin_documentos',`unidade=eq.${S.unidade}&select=*&order=created_at.desc`),
+    db.get('fin_documento_tipos','ativo=eq.true&select=*&order=ordem.asc'),
+    db.get('fin_funcionarios',`unidade=eq.${S.unidade}&ativo=eq.true&select=id,nome&order=nome.asc`),
+    db.get('v_fin_doc_pendencias',`unidade=eq.${S.unidade}&select=*&order=funcionario_nome.asc`),
+    db.get('fin_parceiros',`unidade=eq.${S.unidade}&select=id,nome&order=nome.asc`),
+    db.get('v_fin_contratos',`unidade=eq.${S.unidade}&select=id,codigo,parceiro_nome&order=parceiro_nome.asc`)
+  ]);
+  const venc=docs.filter(d=>d.situacao==='vencido').length;
+  const veno=docs.filter(d=>d.situacao==='vencendo').length;
+  const falt=pend.filter(p=>p.situacao!=='ok');
+  const lista=docs.filter(d=>d.escopo===docEscopo);
+  const tipoOpts=tipos.filter(t=>t.escopo===docEscopo).map(t=>[t.codigo,t.nome]);
+  const escopos=[['funcionario','Funcionário'],['unidade','Unidade'],['contrato','Contrato'],['parceiro','Parceira'],['fornecedor','Fornecedor']];
+
+  el.innerHTML=`
+  <div class="cards">
+    <div class="card"><small>Documentos arquivados</small><div class="v blue">${docs.length}</div></div>
+    <div class="card"><small>Vencendo em 30 dias</small><div class="v ${veno?'red':'ok'}">${veno}</div></div>
+    <div class="card"><small>Vencidos</small><div class="v ${venc?'red':'ok'}">${venc}</div></div>
+    <div class="card"><small>Obrigatórios faltando</small><div class="v ${falt.length?'red':'ok'}">${falt.length}</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panelHead"><h2>Anexar documento</h2></div>
+    <div class="gGrid">
+      ${gS('Vínculo','dc_escopo',docEscopo,escopos)}
+      <div class="field" id="dcAlvoBox"><label>Referente a</label>
+        <select class="selInp" id="dc_alvo">
+          ${docEscopo==='funcionario'?funcs.map(f=>`<option value="${f.id}">${esc(f.nome)}</option>`).join('')
+           :docEscopo==='contrato'?cts.map(c=>`<option value="${c.id}">${esc(c.parceiro_nome)}${c.codigo?' · '+esc(c.codigo):''}</option>`).join('')
+           :(docEscopo==='parceiro'||docEscopo==='fornecedor')?parc.map(p=>`<option value="${p.id}">${esc(p.nome)}</option>`).join('')
+           :'<option value="">CNA '+esc(S.unidade)+'</option>'}
+        </select></div>
+      ${gS('Tipo','dc_tipo','',tipoOpts.length?tipoOpts:[['','sem tipos cadastrados']])}
+      ${gF('Número / identificação','dc_num','')}
+      ${gF('Emissão','dc_emissao','','date')}
+      ${gF('Validade','dc_validade','','date')}
+      <div class="field"><label>Arquivo (até 25 MB)</label><input class="txtInp" id="dc_file" type="file"></div>
+      ${gT('Observação','dc_obs','')}
+    </div>
+    <button class="btn" id="dcBtn" onclick="docUpload()" style="margin-top:6px">Enviar documento</button>
+    <p class="hint" style="margin-top:8px">Arquivos ficam em bucket privado. Só administrador abre, e o link expira em 1 hora.</p>
+  </div>
+
+  <div class="panel">
+    <div class="panelHead"><h2>Arquivo · ${esc((escopos.find(e=>e[0]===docEscopo)||[])[1]||'')}</h2>
+      ${escopos.map(e=>`<button class="pill ${docEscopo===e[0]?'on':''}" onclick="setDocEscopo('${e[0]}')">${esc(e[1])}</button>`).join('')}</div>
+    ${lista.length?`<table><thead><tr><th>Documento</th><th>Referente a</th><th>Emissão</th><th>Validade</th><th>Situação</th><th></th></tr></thead><tbody>
+      ${lista.map(d=>`<tr>
+        <td><b>${esc(d.tipo_nome)}</b>${d.numero?'<span class="tag">'+esc(d.numero)+'</span>':''}</td>
+        <td>${esc(d.funcionario_nome||d.titulo||'CNA '+S.unidade)}</td>
+        <td>${d.emissao?dBR(d.emissao):'—'}</td>
+        <td>${d.validade?dBR(d.validade):'—'}</td>
+        <td>${sitBadge(d.situacao)}${d.dias_para_vencer!=null&&d.situacao==='vencendo'?`<span class="hint"> ${d.dias_para_vencer}d</span>`:''}</td>
+        <td class="acoes">
+          ${d.arquivo_path?`<button class="btn sm sec" onclick="abrirArquivo('${esc(d.arquivo_path)}')">Abrir</button>`:''}
+          <button class="btn sm ghost" onclick="delDoc(${d.id},'${esc(d.arquivo_path||'')}')">Excluir</button></td>
+      </tr>`).join('')}</tbody></table>`
+    :'<div class="empty">Nenhum documento arquivado neste vínculo.</div>'}
+  </div>
+
+  <div class="panel">
+    <div class="panelHead"><h2>Pendências obrigatórias</h2></div>
+    ${falt.length?`<table><thead><tr><th>Funcionário</th><th>Documento</th><th>Situação</th></tr></thead><tbody>
+      ${falt.map(p=>`<tr><td><b>${esc(p.funcionario_nome)}</b></td><td>${esc(p.tipo_nome)}</td><td>${sitBadge(p.situacao)}</td></tr>`).join('')}
+      </tbody></table>`:'<div class="empty">Nenhuma pendência. Documentação da equipe completa.</div>'}
+  </div>`;
+  const es=document.getElementById('dc_escopo');
+  if(es) es.onchange=()=>setDocEscopo(es.value);
+}
+
+async function docUpload(){
+  const inp=document.getElementById('dc_file');
+  const tipo=gv('dc_tipo');
+  if(!tipo) return toast('Escolha o tipo de documento');
+  const alvo=gv('dc_alvo');
+  const btn=document.getElementById('dcBtn'); btn.disabled=true; btn.textContent='Enviando…';
+  try{
+    let path=null,nome=null,mime=null,tam=null;
+    const file=inp&&inp.files&&inp.files[0];
+    if(file){
+      if(file.size>25*1024*1024) throw new Error('Arquivo acima de 25 MB');
+      path=`${docEscopo}/${alvo||'unidade'}/${Date.now()}-${slugArq(file.name)}`;
+      await stUpload(path,file);
+      nome=file.name; mime=file.type||null; tam=file.size;
+    }
+    const row={unidade:S.unidade,escopo:docEscopo,tipo,
+      funcionario_id:docEscopo==='funcionario'?parseInt(alvo,10):null,
+      contrato_id:docEscopo==='contrato'?parseInt(alvo,10):null,
+      parceiro_id:(docEscopo==='parceiro'||docEscopo==='fornecedor')?parseInt(alvo,10):null,
+      numero:gvn('dc_num'),emissao:gvn('dc_emissao'),validade:gvn('dc_validade'),
+      arquivo_path:path,arquivo_nome:nome,mime,tamanho_bytes:tam,obs:gvn('dc_obs'),
+      updated_at:new Date().toISOString()};
+    await db.ins('fin_documentos',[row]);
+    toast('Documento arquivado'); render();
+  }catch(e){ toast(e.message); btn.disabled=false; btn.textContent='Enviar documento'; }
+}
+async function delDoc(id,path){
+  if(!confirm('Excluir este documento e o arquivo?')) return;
+  if(path) await stDelete(path);
+  await db.del('fin_documentos',`id=eq.${id}`);
+  toast('Documento excluído'); render();
+}
+
+/* ================= CONTRATOS E PARCEIRAS ================= */
+let ctSel=null, ctNovo=false, pcSel=null, pcNovo=false;
+const CT_TIPOS=[['cna_empresa','CNA na Empresa'],['cna_escola','CNA na Escola'],['convenio','Convênio'],
+                ['locacao','Locação'],['fornecedor','Fornecedor'],['outro','Outro']];
+const PC_TIPOS=[['empresa','Empresa'],['escola','Escola'],['convenio','Convênio'],['fornecedor','Fornecedor'],['outro','Outro']];
+const PERIODOS=[['mensal','Mensal'],['bimestral','Bimestral'],['semestral','Semestral'],['anual','Anual'],['unico','Pagamento único']];
+const CT_STATUS=[['negociacao','Em negociação'],['vigente','Vigente'],['suspenso','Suspenso'],['encerrado','Encerrado'],['cancelado','Cancelado']];
+
+function toggleCt(id){ ctSel=(ctSel===id?null:id); ctNovo=false; render(); }
+function novoCt(){ ctNovo=!ctNovo; ctSel=null; render(); }
+function togglePc(id){ pcSel=(pcSel===id?null:id); pcNovo=false; render(); }
+function novoPc(){ pcNovo=!pcNovo; pcSel=null; render(); }
+
+async function vContratos(el){
+  const [cts,parc]=await Promise.all([
+    db.get('v_fin_contratos',`unidade=eq.${S.unidade}&select=*&order=fim.asc.nullslast`),
+    db.get('fin_parceiros',`unidade=eq.${S.unidade}&select=*&order=nome.asc`)
+  ]);
+  const vig=cts.filter(c=>c.situacao==='vigente'||c.situacao==='vencendo');
+  const mrr=vig.reduce((a,c)=>a+(c.valor_mensal_cents||0),0);
+  const alunos=vig.reduce((a,c)=>a+(c.alunos||0),0);
+  const venc=cts.filter(c=>c.situacao==='vencendo').length;
+  const pOpts=parc.map(p=>[p.id,p.nome]);
+
+  el.innerHTML=`
+  <div class="cards">
+    <div class="card"><small>Contratos vigentes</small><div class="v blue">${vig.length}</div></div>
+    <div class="card"><small>Receita recorrente</small><div class="v ok">${fmt(mrr)}</div><div class="d">por mês, mensalizado</div></div>
+    <div class="card"><small>Alunos atendidos</small><div class="v">${alunos}</div></div>
+    <div class="card"><small>Vencendo em 60 dias</small><div class="v ${venc?'red':'ok'}">${venc}</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panelHead"><h2>Contratos</h2>
+      <button class="btn sm" onclick="novoCt()" ${parc.length?'':'disabled'}>${ctNovo?'Cancelar':'Novo contrato'}</button></div>
+    ${!parc.length?'<p class="hint">Cadastre uma parceira antes de criar contrato.</p>':''}
+    ${ctNovo?ctForm({},pOpts,true):''}
+    ${cts.length?`<table><thead><tr><th>Parceira</th><th>Tipo</th><th>Vigência</th><th class="num">Valor/mês</th><th>Situação</th><th></th></tr></thead><tbody>
+      ${cts.map(c=>`<tr>
+        <td><b>${esc(c.parceiro_nome)}</b>${c.codigo?'<span class="tag">'+esc(c.codigo)+'</span>':''}</td>
+        <td>${esc((CT_TIPOS.find(t=>t[0]===c.tipo)||['',c.tipo])[1])}</td>
+        <td>${dBR(c.inicio)} a ${c.fim?dBR(c.fim):'sem termo'}</td>
+        <td class="num">${fmt(c.valor_mensal_cents)}</td>
+        <td>${sitBadge(c.situacao)}${c.situacao==='vencendo'?`<span class="hint"> ${c.dias_para_vencer}d</span>`:''}</td>
+        <td class="acoes"><button class="btn sm sec" onclick="toggleCt(${c.id})">${ctSel===c.id?'Fechar':'Editar'}</button></td>
+      </tr>`).join('')}</tbody></table>`
+    :'<div class="empty">Nenhum contrato cadastrado.</div>'}
+    ${ctSel?ctForm(cts.find(c=>c.id===ctSel)||{},pOpts,false):''}
+  </div>
+
+  <div class="panel">
+    <div class="panelHead"><h2>Empresas parceiras</h2>
+      <button class="btn sm sec" onclick="novoPc()">${pcNovo?'Cancelar':'Nova parceira'}</button></div>
+    ${pcNovo?pcForm({},true):''}
+    ${parc.length?`<table><thead><tr><th>Nome</th><th>Tipo</th><th>CNPJ</th><th>Contato</th><th>Contratos</th><th></th></tr></thead><tbody>
+      ${parc.map(p=>{ const n=cts.filter(c=>c.parceiro_id===p.id).length; return `<tr class="${p.ativo?'':'paid'}">
+        <td><b>${esc(p.nome)}</b></td>
+        <td>${esc((PC_TIPOS.find(t=>t[0]===p.tipo)||['',p.tipo])[1])}</td>
+        <td>${esc(p.cnpj||'—')}</td>
+        <td>${esc(p.contato_nome||'—')}${p.contato_telefone?'<span class="hint"> '+esc(p.contato_telefone)+'</span>':''}</td>
+        <td>${n}</td>
+        <td class="acoes"><button class="btn sm sec" onclick="togglePc(${p.id})">${pcSel===p.id?'Fechar':'Editar'}</button></td>
+      </tr>`; }).join('')}</tbody></table>`
+    :'<div class="empty">Nenhuma parceira cadastrada.</div>'}
+    ${pcSel?pcForm(parc.find(p=>p.id===pcSel)||{},false):''}
+  </div>`;
+}
+
+function ctForm(c,pOpts,novo){
+  const p='ct_';
+  return `<div class="panel" style="background:var(--surface)">
+    <div class="panelHead"><h2 style="font-size:15px">${novo?'Novo contrato':'Editar contrato'}</h2></div>
+    <div class="gGrid">
+      ${gS('Parceira',p+'parceiro',c.parceiro_id,pOpts)}
+      ${gF('Código interno',p+'codigo',c.codigo)}
+      ${gS('Tipo',p+'tipo',c.tipo||'cna_empresa',CT_TIPOS)}
+      ${gS('Modalidade',p+'mod',c.modalidade,[['','—'],['presencial','Presencial na empresa'],['online','Online ao vivo'],['hibrido','Híbrido']])}
+      ${gS('Idioma',p+'idioma',c.idioma,[['','—'],['ingles','Inglês'],['espanhol','Espanhol'],['ambos','Ambos']])}
+      ${gF('Turmas',p+'turmas',c.turmas||0,'number')}
+      ${gF('Alunos',p+'alunos',c.alunos||0,'number')}
+      ${gF('Valor (R$)',p+'valor',c.valor_cents?(c.valor_cents/100).toFixed(2).replace('.',','):'')}
+      ${gS('Periodicidade',p+'per',c.periodicidade||'mensal',PERIODOS)}
+      ${gF('Dia do faturamento',p+'dia',c.dia_faturamento,'number','min="1" max="31"')}
+      ${gF('Início',p+'ini',c.inicio||todayISO(),'date')}
+      ${gF('Fim',p+'fim',c.fim,'date')}
+      ${gF('Aviso prévio (dias)',p+'aviso',c.aviso_previo_dias==null?30:c.aviso_previo_dias,'number')}
+      ${gF('Índice de reajuste',p+'idx',c.reajuste_indice)}
+      ${gF('Mês do reajuste',p+'rmes',c.reajuste_mes,'number','min="1" max="12"')}
+      ${gS('Status',p+'status',c.status||'vigente',CT_STATUS)}
+      ${gF('Responsável',p+'resp',c.responsavel)}
+      <div class="field"><label>Renovação automática</label>
+        <label class="hint"><input type="checkbox" id="${p}auto" ${c.renovacao_automatica?'checked':''}> renova sozinho no fim</label></div>
+      ${gT('Objeto do contrato',p+'objeto',c.objeto)}
+      ${gT('Observações',p+'obs',c.obs)}
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button class="btn" onclick="salvarCt(${novo?'null':c.id})">Salvar contrato</button>
+      ${novo?'':`<button class="btn sm ghost" onclick="delCt(${c.id})">Excluir</button>`}
+    </div>
+  </div>`;
+}
+async function salvarCt(id){
+  const p='ct_';
+  const body={unidade:S.unidade,parceiro_id:gvi(p+'parceiro'),codigo:gvn(p+'codigo'),
+    tipo:gv(p+'tipo'),objeto:gvn(p+'objeto'),modalidade:gvn(p+'mod'),idioma:gvn(p+'idioma'),
+    turmas:gvi(p+'turmas')||0,alunos:gvi(p+'alunos')||0,
+    valor_cents:parseBRL(gv(p+'valor')),periodicidade:gv(p+'per'),dia_faturamento:gvi(p+'dia'),
+    inicio:gv(p+'ini'),fim:gvn(p+'fim'),renovacao_automatica:gvb(p+'auto'),
+    aviso_previo_dias:gvi(p+'aviso'),reajuste_indice:gvn(p+'idx'),reajuste_mes:gvi(p+'rmes'),
+    status:gv(p+'status'),responsavel:gvn(p+'resp'),obs:gvn(p+'obs'),
+    updated_at:new Date().toISOString()};
+  if(!body.parceiro_id) return toast('Escolha a parceira');
+  if(!body.inicio) return toast('Informe a data de início');
+  if(body.fim && body.fim<body.inicio) return toast('Fim não pode ser antes do início');
+  try{
+    if(id) await db.upd('fin_contratos',`id=eq.${id}`,body);
+    else   await db.ins('fin_contratos',[body]);
+    ctNovo=false; ctSel=null; toast('Contrato salvo'); render();
+  }catch(e){ toast(e.message); }
+}
+async function delCt(id){
+  if(!confirm('Excluir este contrato? Os documentos anexados a ele também saem.')) return;
+  await db.del('fin_contratos',`id=eq.${id}`); ctSel=null; toast('Contrato excluído'); render();
+}
+
+function pcForm(p,novo){
+  const q='pc_';
+  return `<div class="panel" style="background:var(--surface)">
+    <div class="panelHead"><h2 style="font-size:15px">${novo?'Nova parceira':'Editar parceira'}</h2></div>
+    <div class="gGrid">
+      ${gF('Nome',q+'nome',p.nome)}
+      ${gS('Tipo',q+'tipo',p.tipo||'empresa',PC_TIPOS)}
+      ${gF('Razão social',q+'razao',p.razao_social)}
+      ${gF('CNPJ',q+'cnpj',p.cnpj)}
+      ${gF('Contato',q+'cnome',p.contato_nome)}
+      ${gF('Cargo do contato',q+'ccargo',p.contato_cargo)}
+      ${gF('E-mail',q+'cemail',p.contato_email,'email')}
+      ${gF('Telefone',q+'ctel',p.contato_telefone)}
+      ${gF('Endereço',q+'end',p.endereco)}
+      ${gF('ID no CRM (empresa)',q+'crm',p.crm_empresa_id,'number')}
+      ${gT('Observações',q+'obs',p.obs)}
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button class="btn" onclick="salvarPc(${novo?'null':p.id})">Salvar parceira</button>
+      ${novo?'':`<button class="btn sm ghost" onclick="delPc(${p.id})">Excluir</button>`}
+    </div>
+  </div>`;
+}
+async function salvarPc(id){
+  const q='pc_';
+  const body={unidade:S.unidade,nome:gv(q+'nome'),tipo:gv(q+'tipo'),razao_social:gvn(q+'razao'),
+    cnpj:gvn(q+'cnpj'),contato_nome:gvn(q+'cnome'),contato_cargo:gvn(q+'ccargo'),
+    contato_email:gvn(q+'cemail'),contato_telefone:gvn(q+'ctel'),endereco:gvn(q+'end'),
+    crm_empresa_id:gvi(q+'crm'),obs:gvn(q+'obs'),updated_at:new Date().toISOString()};
+  if(!body.nome) return toast('Informe o nome da parceira');
+  try{
+    if(id) await db.upd('fin_parceiros',`id=eq.${id}`,body);
+    else   await db.ins('fin_parceiros',[body]);
+    pcNovo=false; pcSel=null; toast('Parceira salva'); render();
+  }catch(e){ toast(e.message); }
+}
+async function delPc(id){
+  if(!confirm('Excluir esta parceira? Contratos ligados a ela também saem.')) return;
+  await db.del('fin_parceiros',`id=eq.${id}`); pcSel=null; toast('Parceira excluída'); render();
+}
+
+/* ================= FOLHA DE PONTO ================= */
+async function vPonto(el){
+  const c=S.comp;
+  const [funcs,esp]=await Promise.all([
+    db.get('fin_funcionarios',`unidade=eq.${S.unidade}&ativo=eq.true&setor=neq.Professores&select=*&order=nome.asc`),
+    db.get('fin_ponto_espelho',`unidade=eq.${S.unidade}&competencia=eq.${c}&select=*`)
+  ]);
+  const emap={}; esp.forEach(e=>emap[e.funcionario_id]=e);
+  const fechado=esp.length>0 && esp.every(e=>e.fechado);
+  const totH=esp.reduce((a,e)=>a+Number(e.horas_trabalhadas||0),0);
+  const totE=esp.reduce((a,e)=>a+Number(e.horas_extras||0),0);
+  const totF=esp.reduce((a,e)=>a+Number(e.faltas_dias||0),0);
+  const ro=fechado?'disabled':'';
+
+  el.innerHTML=`
+  <div class="cards">
+    <div class="card"><small>Equipe com ponto</small><div class="v blue">${funcs.length}</div><div class="d">administrativo, comercial e coordenação</div></div>
+    <div class="card"><small>Horas no mês</small><div class="v">${totH.toFixed(1).replace('.',',')}</div></div>
+    <div class="card"><small>Horas extras</small><div class="v ${totE?'blue':''}">${totE.toFixed(1).replace('.',',')}</div></div>
+    <div class="card"><small>Faltas</small><div class="v ${totF?'red':'ok'}">${totF.toFixed(0)}</div><div class="d">dias</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panelHead"><h2>Espelho de ${compLabel(c)}</h2>
+      ${fechado?'<span class="badge pago">Fechado</span>':''}
+      <button class="btn sm sec" disabled title="Disponível quando o REP-A entrar em produção">Importar do REP-A</button>
+      ${fechado?`<button class="btn sm sec" onclick="reabrirEspelho()">Reabrir</button>`
+               :`<button class="btn sm sec" onclick="salvarEspelho(false)">Salvar</button>
+                 <button class="btn sm" onclick="salvarEspelho(true)">Salvar e fechar</button>`}</div>
+    <table><thead><tr><th>Funcionário</th><th class="num">Dias prev.</th><th class="num">Dias trab.</th><th class="num">Horas</th><th class="num">Extras</th><th class="num">Faltas</th><th class="num">Atrasos (min)</th><th class="num">Banco (h)</th></tr></thead><tbody>
+    ${funcs.map(f=>{ const e=emap[f.id]||{};
+      return `<tr>
+        <td><b>${esc(f.nome)}</b><span class="tag">${esc(f.setor||'')}</span></td>
+        <td class="num"><input class="mini2" id="pt_dp_${f.id}" value="${e.dias_previstos!=null?e.dias_previstos:22}" ${ro}></td>
+        <td class="num"><input class="mini2" id="pt_dt_${f.id}" value="${e.dias_trabalhados!=null?e.dias_trabalhados:''}" ${ro}></td>
+        <td class="num"><input class="mini2" id="pt_h_${f.id}" value="${e.horas_trabalhadas!=null?e.horas_trabalhadas:''}" ${ro}></td>
+        <td class="num"><input class="mini2" id="pt_he_${f.id}" value="${e.horas_extras!=null?e.horas_extras:''}" ${ro}></td>
+        <td class="num"><input class="mini2" id="pt_fa_${f.id}" value="${e.faltas_dias!=null?e.faltas_dias:''}" ${ro}></td>
+        <td class="num"><input class="mini2" id="pt_at_${f.id}" value="${e.atrasos_minutos!=null?e.atrasos_minutos:''}" ${ro}></td>
+        <td class="num"><input class="mini2" id="pt_bh_${f.id}" value="${e.saldo_banco_horas!=null?e.saldo_banco_horas:''}" ${ro}></td>
+      </tr>`; }).join('')}
+    </tbody></table>
+    <p class="hint" style="margin-top:10px">Professores não entram aqui. As horas deles continuam sendo lançadas direto na Folha de pagamento.</p>
+    <p class="hint">O registro legal de ponto fica no REP-A e não é alterado por esta tela. Aqui fica a consolidação do mês usada para conferir a folha. Fechar o espelho congela a competência.</p>
+  </div>`;
+}
+async function salvarEspelho(fechar){
+  const funcs=await db.get('fin_funcionarios',`unidade=eq.${S.unidade}&ativo=eq.true&setor=neq.Professores&select=id`);
+  const num=id=>{ const v=gv(id); return v===''?0:(parseFloat(v.replace(',','.'))||0); };
+  const rows=funcs.map(f=>({unidade:S.unidade,competencia:S.comp,funcionario_id:f.id,
+    dias_previstos:num('pt_dp_'+f.id),dias_trabalhados:num('pt_dt_'+f.id),
+    horas_trabalhadas:num('pt_h_'+f.id),horas_extras:num('pt_he_'+f.id),
+    faltas_dias:num('pt_fa_'+f.id),atrasos_minutos:Math.round(num('pt_at_'+f.id)),
+    saldo_banco_horas:num('pt_bh_'+f.id),origem:'manual',fechado:!!fechar,
+    importado_em:new Date().toISOString()}));
+  try{
+    await db.upsert('fin_ponto_espelho',rows,'unidade,competencia,funcionario_id');
+    toast(fechar?'Espelho fechado':'Espelho salvo'); render();
+  }catch(e){ toast(e.message); }
+}
+async function reabrirEspelho(){
+  if(!confirm('Reabrir o espelho desta competência?')) return;
+  await db.upd('fin_ponto_espelho',`unidade=eq.${S.unidade}&competencia=eq.${S.comp}`,{fechado:false});
+  toast('Espelho reaberto'); render();
+}
 
 // rotula celulas para o layout de cartao no mobile
 function cardifyTables(){
