@@ -65,6 +65,46 @@ aside::after{content:'';display:block;height:1px;background:var(--line);margin-t
 .authCard p.sub{color:var(--gray);margin-bottom:22px;font-size:13px}
 .field{margin-bottom:12px}
 .gGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.navSec{border-bottom:1px solid var(--line)}
+.navSec:last-child{border-bottom:none}
+button.navGroup{display:flex;align-items:center;width:100%;gap:8px;background:none;border:none;cursor:pointer;
+  text-align:left;padding:13px 20px;font-size:11px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--gray);font-family:inherit}
+button.navGroup:hover{color:var(--ink);background:var(--surface)}
+button.navGroup .chev{margin-left:auto;border:solid var(--gray);border-width:0 2px 2px 0;
+  padding:3px;transform:rotate(45deg);transition:transform .18s}
+.navSec.open>button.navGroup{color:var(--red)}
+.navSec.open>button.navGroup .chev{transform:rotate(-135deg);border-color:var(--red)}
+.navSec.hasOn>button.navGroup{color:var(--red)}
+.navItems{display:none;padding-bottom:6px}
+.navSec.open .navItems{display:block}
+.navItems a{padding-left:28px}
+.lnk{color:var(--blue);font-weight:600;cursor:pointer;text-decoration:none}
+.lnk:hover{text-decoration:underline}
+.modal{position:fixed;inset:0;z-index:80;display:none;align-items:flex-start;justify-content:center;
+  padding:26px 16px;overflow-y:auto;background:rgba(0,0,0,.45);-webkit-overflow-scrolling:touch}
+body.modalOpen .modal{display:flex}
+body.modalOpen{overflow:hidden}
+.modalCard{background:#fff;border-radius:14px;width:min(880px,100%);margin:auto 0;
+  border-top:4px solid var(--red);box-shadow:0 18px 50px rgba(0,0,0,.28);overflow:hidden}
+.modalHead{position:sticky;top:0;background:#fff;display:flex;align-items:center;gap:10px;
+  padding:15px 20px;border-bottom:1px solid var(--line);z-index:2}
+.modalHead h2{margin:0;margin-right:auto;font-size:17px;font-family:var(--display);min-width:0;overflow-wrap:anywhere}
+.modalClose{font-size:26px;line-height:1;color:var(--gray);background:none;border:none;cursor:pointer;padding:0 6px}
+.modalClose:hover{color:var(--redDark)}
+.modalBody{padding:18px 20px 24px}
+.modalBody .panel{margin-bottom:14px}
+.modalBody table{min-width:0}
+.mTabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.mSec{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--gray);margin:20px 0 10px;padding-top:12px;border-top:1px solid var(--line)}
+.mFoot{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:720px){
+  .modal{padding:0}
+  .modalCard{border-radius:0;width:100%;min-height:100dvh;margin:0}
+  .modalBody{padding:16px 14px 28px}
+  .mTabs .pill{flex:1;text-align:center}
+}
 .gGrid .field{margin:0}
 .gGrid textarea{font:inherit;width:100%;border:1px solid var(--line);border-radius:var(--r-sm);padding:8px 10px;background:#fff;color:var(--ink);resize:vertical}
 .gGrid textarea:focus-visible,.gGrid input:focus-visible,.gGrid select:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
@@ -314,20 +354,32 @@ input.mini,input.mini2{text-align:right}
       <select id="unitSel" class="unitSel" onchange="switchUnidade(this.value)" aria-label="Trocar de unidade"></select>
     </div>
     <nav id="nav">
-      <a data-v="resumo" class="on" onclick="go('resumo')">Resumo</a>
-      <div class="navGroup">Contas a pagar</div>
-      <a data-v="fixas" class="sub" onclick="go('fixas')">Despesas fixas</a>
-      <a data-v="variaveis" class="sub" onclick="go('variaveis')">Despesas variáveis</a>
-      <a data-v="folha" data-admin onclick="go('folha')">Folha de pagamento</a>
-      <a data-v="receitas" onclick="go('receitas')">Receitas</a>
-      <a data-v="dre" onclick="go('dre')">DRE</a>
-      <a data-v="df" onclick="go('df')">DF · Franquia</a>
-      <div class="navGroup">Equipe</div>
-      <a data-v="equipe" class="sub" data-admin onclick="go('equipe')">Funcionários</a>
-      <a data-v="ponto" class="sub" data-admin onclick="go('ponto')">Folha de ponto</a>
-      <div class="navGroup">Administrativo</div>
-      <a data-v="documentos" class="sub" data-admin onclick="go('documentos')">Documentos</a>
-      <a data-v="contratos" class="sub" data-admin onclick="go('contratos')">Contratos e parceiras</a>
+      <div class="navSec" id="sec_financeiro">
+        <button class="navGroup" type="button" onclick="toggleSec('financeiro')" aria-label="Financeiro">Financeiro<span class="chev"></span></button>
+        <div class="navItems">
+          <a data-v="resumo" onclick="go('resumo')">Resumo do mês</a>
+          <a data-v="fixas" onclick="go('fixas')">Despesas fixas</a>
+          <a data-v="variaveis" onclick="go('variaveis')">Despesas variáveis</a>
+          <a data-v="receitas" onclick="go('receitas')">Receitas</a>
+          <a data-v="folha" data-admin onclick="go('folha')">Folha de pagamento</a>
+          <a data-v="dre" onclick="go('dre')">DRE</a>
+          <a data-v="df" onclick="go('df')">DF · Franquia</a>
+        </div>
+      </div>
+      <div class="navSec" id="sec_equipe" data-admin>
+        <button class="navGroup" type="button" onclick="toggleSec('equipe')" aria-label="Equipe">Equipe<span class="chev"></span></button>
+        <div class="navItems">
+          <a data-v="equipe" onclick="go('equipe')">Funcionários</a>
+          <a data-v="ponto" onclick="go('ponto')">Folha de ponto</a>
+        </div>
+      </div>
+      <div class="navSec" id="sec_admin" data-admin>
+        <button class="navGroup" type="button" onclick="toggleSec('admin')" aria-label="Administrativo">Administrativo<span class="chev"></span></button>
+        <div class="navItems">
+          <a data-v="documentos" onclick="go('documentos')">Documentos</a>
+          <a data-v="contratos" onclick="go('contratos')">Contratos e parceiras</a>
+        </div>
+      </div>
     </nav>
     <div class="foot"><b id="whoName"></b><span id="whoRole"></span><br><button onclick="logout()">Sair</button></div>
     </div>
@@ -345,6 +397,13 @@ input.mini,input.mini2{text-align:right}
     <div id="view"></div>
   </main>
 </div>
+</div>
+<div class="modal" id="modal" onclick="if(event.target===this)fecharModal()">
+  <div class="modalCard">
+    <div class="modalHead"><h2 id="modalTitle"></h2>
+      <button class="modalClose" onclick="fecharModal()" aria-label="Fechar">&times;</button></div>
+    <div class="modalBody" id="modalBody"></div>
+  </div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -482,7 +541,7 @@ const VIEWS_ADMIN=['folha','equipe','ponto','documentos','contratos'];
 const VIEWS_SEM_MES=['equipe','documentos','contratos'];
 function go(v){
   if(VIEWS_ADMIN.includes(v)&&S.role!=='admin') return;
-  S.view=v; closeNav();
+  S.view=v; closeNav(); abrirSec(SEC_OF[v]);
   const mp=document.querySelector('.monthPick'); if(mp) mp.style.display=VIEWS_SEM_MES.includes(v)?'none':'';
   document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on',a.dataset.v===v));
   document.getElementById('viewTitle').textContent=TITLES[v];
@@ -1076,6 +1135,29 @@ document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&document.getElement
 
 /* ================= GESTÃO: EQUIPE · DOCUMENTOS · CONTRATOS · PONTO ================= */
 
+/* --- navegação por seções --- */
+const SEC_OF={resumo:'financeiro',fixas:'financeiro',variaveis:'financeiro',receitas:'financeiro',
+  folha:'financeiro',dre:'financeiro',df:'financeiro',equipe:'equipe',ponto:'equipe',
+  documentos:'admin',contratos:'admin'};
+function toggleSec(id){ const el=document.getElementById('sec_'+id); if(el) el.classList.toggle('open'); }
+function abrirSec(id){ document.querySelectorAll('.navSec').forEach(s=>s.classList.toggle('open',s.id==='sec_'+id)); }
+
+/* --- modal --- */
+let modalCtx=null;
+function openModal(title,html){
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalBody').innerHTML=html;
+  document.body.classList.add('modalOpen');
+  const m=document.getElementById('modal'); if(m) m.scrollTop=0;
+}
+function fecharModal(){ document.body.classList.remove('modalOpen'); modalCtx=null; }
+function refreshModal(){
+  if(!modalCtx) return;
+  if(modalCtx.kind==='func') abrirFuncionario(modalCtx.id);
+  if(modalCtx.kind==='contrato') abrirDocsContrato(modalCtx.id);
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&document.body.classList.contains('modalOpen')) fecharModal(); });
+
 /* --- helpers de formulário --- */
 const gv  = id => { const e=document.getElementById(id); return e?String(e.value).trim():''; };
 const gvn = id => gv(id)||null;
@@ -1127,14 +1209,11 @@ function slugArq(n){
 }
 
 /* ================= EQUIPE ================= */
-let equipeSel=null;
 const REGIMES=[['clt','CLT'],['estagio','Estágio'],['autonomo','Autônomo'],['pj','PJ'],['socio','Sócio']];
 const EVT_TIPOS=[['admissao','Admissão'],['efetivacao','Efetivação'],['alteracao_salarial','Alteração salarial'],
   ['promocao','Promoção'],['mudanca_funcao','Mudança de função'],['ferias','Férias'],
   ['afastamento','Afastamento'],['atestado','Atestado'],['advertencia','Advertência'],
   ['suspensao','Suspensão'],['desligamento','Desligamento'],['outro','Outro']];
-
-function toggleFicha(id){ equipeSel = (equipeSel===id?null:id); render(); }
 
 async function vEquipe(el){
   const [funcs,fichas,pend]=await Promise.all([
@@ -1147,15 +1226,12 @@ async function vEquipe(el){
   const ativos=funcs.filter(f=>f.ativo);
   const semFicha=ativos.filter(f=>!fmap[f.id]).length;
   const comPend=ativos.filter(f=>pmap[f.id]).length;
-  if(equipeSel && !funcs.some(f=>f.id===equipeSel)) equipeSel=null;
-  let eventos=[];
-  if(equipeSel) eventos=await db.get('fin_func_eventos',`funcionario_id=eq.${equipeSel}&select=*&order=data_inicio.desc`);
 
   el.innerHTML=`
   <div class="cards">
     <div class="card"><small>Funcionários ativos</small><div class="v blue">${ativos.length}</div></div>
     <div class="card"><small>Sem ficha preenchida</small><div class="v ${semFicha?'red':'ok'}">${semFicha}</div><div class="d">dados pessoais e contratuais</div></div>
-    <div class="card"><small>Com documento pendente</small><div class="v ${comPend?'red':'ok'}">${comPend}</div><div class="d">ver aba Documentos</div></div>
+    <div class="card"><small>Com documento pendente</small><div class="v ${comPend?'red':'ok'}">${comPend}</div></div>
   </div>
 
   <div class="panel">
@@ -1169,21 +1245,53 @@ async function vEquipe(el){
         <td>${esc((REGIMES.find(r=>r[0]===(fi.regime||'clt'))||['','—'])[1])}</td>
         <td>${fi.admissao?dBR(fi.admissao):'<span class="hint">a preencher</span>'}</td>
         <td>${np?`<span class="badge late">${np} pendente${np>1?'s':''}</span>`:'<span class="badge pago">Em dia</span>'}</td>
-        <td class="acoes"><button class="btn sm sec" onclick="toggleFicha(${f.id})">${equipeSel===f.id?'Fechar':'Ficha'}</button></td>
+        <td class="acoes"><button class="btn sm sec" onclick="abrirFuncionario(${f.id})">Abrir</button></td>
       </tr>`; }).join('')}
     </tbody></table>
-    <p class="hint" style="margin-top:10px">O cadastro de salário, comissão e benefícios continua na Folha de pagamento. Aqui ficam os dados pessoais, contratuais e o histórico.</p>
-  </div>
-  ${equipeSel?fichaHTML(funcs.find(f=>f.id===equipeSel),fmap[equipeSel]||{},eventos):''}`;
+    <p class="hint" style="margin-top:10px">Salário, comissão e benefícios continuam na Folha de pagamento. Aqui ficam os dados pessoais, os documentos e o histórico.</p>
+  </div>`;
 }
 
-function fichaHTML(f,fi,eventos){
-  return `
-  <div class="panel">
-    <div class="panelHead"><h2>Ficha · ${esc(f.nome)}</h2>
-      <button class="btn sm" onclick="salvarFicha(${f.id})">Salvar ficha</button></div>
+let funcTab='ficha';
+function setFuncTab(t){
+  funcTab=t;
+  ['ficha','docs','hist'].forEach(k=>{
+    const el=document.getElementById('mt_'+k); if(el) el.style.display=(k===t?'':'none');
+    const b=document.getElementById('tb_'+k); if(b) b.classList.toggle('on',k===t);
+  });
+}
 
-    <h3 style="font-size:13px;color:var(--gray);margin:4px 0 10px">Identificação</h3>
+async function abrirFuncionario(id){
+  modalCtx={kind:'func',id};
+  openModal('Carregando…','<div class="empty">Carregando…</div>');
+  try{
+    const [fa,fia,ev,docs,tipos]=await Promise.all([
+      db.get('fin_funcionarios',`id=eq.${id}&select=*`),
+      db.get('fin_func_ficha',`funcionario_id=eq.${id}&select=*`),
+      db.get('fin_func_eventos',`funcionario_id=eq.${id}&select=*&order=data_inicio.desc`),
+      db.get('v_fin_documentos',`funcionario_id=eq.${id}&select=*&order=created_at.desc`),
+      db.get('fin_documento_tipos','ativo=eq.true&escopo=eq.funcionario&select=*&order=ordem.asc')
+    ]);
+    if(!fa.length){ fecharModal(); return toast('Funcionário não encontrado'); }
+    const f=fa[0], fi=fia[0]||{};
+    const html=`
+    <div class="mTabs">
+      <button class="pill" id="tb_ficha" onclick="setFuncTab('ficha')">Ficha</button>
+      <button class="pill" id="tb_docs" onclick="setFuncTab('docs')">Documentos${docs.length?' ('+docs.length+')':''}</button>
+      <button class="pill" id="tb_hist" onclick="setFuncTab('hist')">Histórico${ev.length?' ('+ev.length+')':''}</button>
+    </div>
+    <div id="mt_ficha">${fichaHTML(f,fi)}</div>
+    <div id="mt_docs" style="display:none">${docsFuncHTML(f,docs,tipos)}</div>
+    <div id="mt_hist" style="display:none">${histFuncHTML(f,ev)}</div>`;
+    openModal(f.nome+(f.ativo?'':' · inativo'),html);
+    setFuncTab(funcTab);
+  }catch(e){ toast(e.message); fecharModal(); }
+}
+
+function fichaHTML(f,fi){
+  return `
+    <p class="hint" style="margin-bottom:12px">${esc(f.setor||'')}${f.funcao?' · '+esc(f.funcao):''} · ${f.tipo==='horista'?'Horista':'Mensalista'}</p>
+    <h3 class="mSec">Identificação</h3>
     <div class="gGrid">
       ${gF('CPF','fk_cpf',fi.cpf)}
       ${gF('RG','fk_rg',fi.rg)}
@@ -1195,15 +1303,13 @@ function fichaHTML(f,fi,eventos){
       ${gS('Estado civil','fk_ec',fi.estado_civil,['','Solteiro(a)','Casado(a)','União estável','Divorciado(a)','Viúvo(a)'])}
       ${gF('Nome da mãe','fk_mae',fi.nome_mae)}
     </div>
-
-    <h3 style="font-size:13px;color:var(--gray);margin:16px 0 10px">Contato</h3>
+    <h3 class="mSec">Contato</h3>
     <div class="gGrid">
       ${gF('E-mail','fk_email',fi.email,'email')}
       ${gF('Telefone','fk_tel',fi.telefone)}
       ${gF('Contato de emergência','fk_emerg',fi.contato_emergencia)}
     </div>
-
-    <h3 style="font-size:13px;color:var(--gray);margin:16px 0 10px">Endereço</h3>
+    <h3 class="mSec">Endereço</h3>
     <div class="gGrid">
       ${gF('CEP','fk_cep',fi.cep)}
       ${gF('Logradouro','fk_log',fi.logradouro)}
@@ -1213,16 +1319,14 @@ function fichaHTML(f,fi,eventos){
       ${gF('Cidade','fk_cid',fi.cidade)}
       ${gF('UF','fk_uf',fi.uf,'text','maxlength="2"')}
     </div>
-
-    <h3 style="font-size:13px;color:var(--gray);margin:16px 0 10px">Pagamento</h3>
+    <h3 class="mSec">Pagamento</h3>
     <div class="gGrid">
       ${gF('Banco','fk_banco',fi.banco)}
       ${gF('Agência','fk_ag',fi.agencia)}
       ${gF('Conta','fk_conta',fi.conta)}
       ${gF('Chave PIX','fk_pix',fi.chave_pix)}
     </div>
-
-    <h3 style="font-size:13px;color:var(--gray);margin:16px 0 10px">Contrato</h3>
+    <h3 class="mSec">Contrato</h3>
     <div class="gGrid">
       ${gF('Matrícula','fk_mat',fi.matricula)}
       ${gF('Cargo na CTPS','fk_cargo',fi.cargo_ctps)}
@@ -1235,27 +1339,64 @@ function fichaHTML(f,fi,eventos){
       ${gF('Motivo do desligamento','fk_motivo',fi.motivo_desligamento)}
       ${gT('Observações','fk_obs',fi.obs)}
     </div>
+    <div class="mFoot"><button class="btn" onclick="salvarFicha(${f.id})">Salvar ficha</button></div>`;
+}
 
-    <div class="divider"></div>
-    <h3 style="font-size:13px;color:var(--gray);margin:16px 0 10px">Histórico</h3>
-    <div class="formRow">
+function docsFuncHTML(f,docs,tipos){
+  const ultimo={}; docs.forEach(d=>{ if(!ultimo[d.tipo]) ultimo[d.tipo]=d; });
+  const falt=tipos.filter(t=>t.obrigatorio).filter(t=>{
+    const d=ultimo[t.codigo];
+    return !d || (d.validade && d.situacao==='vencido');
+  });
+  return `
+    ${falt.length?`<div class="panel" style="background:var(--dangerBg);border-color:var(--dangerLine)">
+      <b style="color:var(--redDark);font-size:13px">Faltando ou vencido</b>
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+        ${falt.map(t=>`<span class="badge late">${esc(t.nome)}</span>`).join('')}</div></div>`
+     :'<p class="hint" style="margin-bottom:12px">Documentação obrigatória completa.</p>'}
+
+    ${docs.length?`<table><thead><tr><th>Documento</th><th>Emissão</th><th>Validade</th><th>Situação</th><th></th></tr></thead><tbody>
+      ${docs.map(d=>`<tr>
+        <td><b>${esc(d.tipo_nome)}</b>${d.numero?'<span class="tag">'+esc(d.numero)+'</span>':''}</td>
+        <td>${d.emissao?dBR(d.emissao):'—'}</td>
+        <td>${d.validade?dBR(d.validade):'—'}</td>
+        <td>${sitBadge(d.situacao)}</td>
+        <td class="acoes">
+          ${d.arquivo_path?`<button class="btn sm sec" onclick="abrirArquivo('${esc(d.arquivo_path)}')">Abrir</button>`:''}
+          <button class="btn sm ghost" onclick="delDoc(${d.id},'${esc(d.arquivo_path||'')}')">Excluir</button></td>
+      </tr>`).join('')}</tbody></table>`
+    :'<div class="empty">Nenhum documento anexado.</div>'}
+
+    <h3 class="mSec">Anexar documento</h3>
+    <div class="gGrid">
+      ${gS('Tipo','mdc_tipo','',tipos.map(t=>[t.codigo,t.nome]))}
+      ${gF('Número / identificação','mdc_num','')}
+      ${gF('Emissão','mdc_emissao','','date')}
+      ${gF('Validade','mdc_validade','','date')}
+      <div class="field" style="grid-column:1/-1"><label>Arquivo (até 25 MB)</label><input class="txtInp" id="mdc_file" type="file"></div>
+    </div>
+    <div class="mFoot"><button class="btn" id="mdcBtn" onclick="docUploadFunc(${f.id})">Enviar documento</button></div>`;
+}
+
+function histFuncHTML(f,ev){
+  return `
+    <div class="gGrid">
       ${gS('Tipo','ev_tipo','',EVT_TIPOS)}
       ${gF('Início','ev_ini',todayISO(),'date')}
       ${gF('Fim','ev_fim','','date')}
       ${gF('Valor (R$)','ev_val','')}
       ${gF('Descrição','ev_desc','')}
-      <button class="btn sm" onclick="addEvento(${f.id})">Adicionar</button>
     </div>
-    ${eventos.length?`<table><thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th class="num">Valor</th><th></th></tr></thead><tbody>
-      ${eventos.map(e=>`<tr>
+    <div class="mFoot" style="margin-bottom:14px"><button class="btn sm" onclick="addEvento(${f.id})">Adicionar registro</button></div>
+    ${ev.length?`<table><thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th class="num">Valor</th><th></th></tr></thead><tbody>
+      ${ev.map(e=>`<tr>
         <td>${dBR(e.data_inicio)}${e.data_fim?' a '+dBR(e.data_fim):''}</td>
         <td>${esc((EVT_TIPOS.find(t=>t[0]===e.tipo)||['',e.tipo])[1])}</td>
         <td>${esc(e.descricao||'—')}</td>
         <td class="num">${e.valor_cents?fmt(e.valor_cents):'—'}</td>
         <td class="acoes"><button class="btn sm ghost" onclick="delEvento(${e.id})">Excluir</button></td>
       </tr>`).join('')}</tbody></table>`
-    :'<div class="empty">Nenhum registro no histórico ainda.</div>'}
-  </div>`;
+    :'<div class="empty">Nenhum registro no histórico ainda.</div>'}`;
 }
 
 async function salvarFicha(id){
@@ -1272,22 +1413,39 @@ async function salvarFicha(id){
     jornada_semanal_horas:gvf('fk_jor')||44,
     demissao:gvn('fk_dem'), motivo_desligamento:gvn('fk_motivo'), obs:gvn('fk_obs'),
     updated_at:new Date().toISOString()};
-  try{ await db.upsert('fin_func_ficha',[body],'funcionario_id'); toast('Ficha salva'); render(); }
+  try{ await db.upsert('fin_func_ficha',[body],'funcionario_id'); toast('Ficha salva'); render(); refreshModal(); }
   catch(e){ toast(e.message); }
+}
+async function docUploadFunc(fid){
+  const tipo=gv('mdc_tipo'); if(!tipo) return toast('Escolha o tipo de documento');
+  const btn=document.getElementById('mdcBtn'); btn.disabled=true; btn.textContent='Enviando…';
+  try{
+    const inp=document.getElementById('mdc_file');
+    const file=inp&&inp.files&&inp.files[0];
+    let path=null,nome=null,mime=null,tam=null;
+    if(file){
+      if(file.size>25*1024*1024) throw new Error('Arquivo acima de 25 MB');
+      path=`funcionario/${fid}/${Date.now()}-${slugArq(file.name)}`;
+      await stUpload(path,file); nome=file.name; mime=file.type||null; tam=file.size;
+    }
+    await db.ins('fin_documentos',[{unidade:S.unidade,escopo:'funcionario',funcionario_id:fid,tipo,
+      numero:gvn('mdc_num'),emissao:gvn('mdc_emissao'),validade:gvn('mdc_validade'),
+      arquivo_path:path,arquivo_nome:nome,mime,tamanho_bytes:tam,updated_at:new Date().toISOString()}]);
+    toast('Documento anexado'); funcTab='docs'; render(); refreshModal();
+  }catch(e){ toast(e.message); btn.disabled=false; btn.textContent='Enviar documento'; }
 }
 async function addEvento(fid){
   const d=gv('ev_ini'); if(!d) return toast('Informe a data de início');
   const v=gv('ev_val');
   try{
     await db.ins('fin_func_eventos',[{funcionario_id:fid,tipo:gv('ev_tipo')||'outro',
-      data_inicio:d,data_fim:gvn('ev_fim'),descricao:gvn('ev_desc'),
-      valor_cents:v?parseBRL(v):null}]);
-    toast('Registro adicionado'); render();
+      data_inicio:d,data_fim:gvn('ev_fim'),descricao:gvn('ev_desc'),valor_cents:v?parseBRL(v):null}]);
+    toast('Registro adicionado'); funcTab='hist'; refreshModal();
   }catch(e){ toast(e.message); }
 }
 async function delEvento(id){
   if(!confirm('Excluir este registro do histórico?')) return;
-  await db.del('fin_func_eventos',`id=eq.${id}`); toast('Excluído'); render();
+  await db.del('fin_func_eventos',`id=eq.${id}`); toast('Excluído'); funcTab='hist'; refreshModal();
 }
 
 /* ================= DOCUMENTOS ================= */
@@ -1309,6 +1467,8 @@ async function vDocumentos(el){
   const lista=docs.filter(d=>d.escopo===docEscopo);
   const tipoOpts=tipos.filter(t=>t.escopo===docEscopo).map(t=>[t.codigo,t.nome]);
   const escopos=[['funcionario','Funcionário'],['unidade','Unidade'],['contrato','Contrato'],['parceiro','Parceira'],['fornecedor','Fornecedor']];
+  const ctMap={}; cts.forEach(c=>ctMap[c.id]=c);
+  const pcMap={}; parc.forEach(p=>pcMap[p.id]=p);
 
   el.innerHTML=`
   <div class="cards">
@@ -1322,7 +1482,7 @@ async function vDocumentos(el){
     <div class="panelHead"><h2>Anexar documento</h2></div>
     <div class="gGrid">
       ${gS('Vínculo','dc_escopo',docEscopo,escopos)}
-      <div class="field" id="dcAlvoBox"><label>Referente a</label>
+      <div class="field"><label>Referente a</label>
         <select class="selInp" id="dc_alvo">
           ${docEscopo==='funcionario'?funcs.map(f=>`<option value="${f.id}">${esc(f.nome)}</option>`).join('')
            :docEscopo==='contrato'?cts.map(c=>`<option value="${c.id}">${esc(c.parceiro_nome)}${c.codigo?' · '+esc(c.codigo):''}</option>`).join('')
@@ -1344,23 +1504,29 @@ async function vDocumentos(el){
     <div class="panelHead"><h2>Arquivo · ${esc((escopos.find(e=>e[0]===docEscopo)||[])[1]||'')}</h2>
       ${escopos.map(e=>`<button class="pill ${docEscopo===e[0]?'on':''}" onclick="setDocEscopo('${e[0]}')">${esc(e[1])}</button>`).join('')}</div>
     ${lista.length?`<table><thead><tr><th>Documento</th><th>Referente a</th><th>Emissão</th><th>Validade</th><th>Situação</th><th></th></tr></thead><tbody>
-      ${lista.map(d=>`<tr>
+      ${lista.map(d=>{
+        let ref='CNA '+S.unidade, link='';
+        if(d.funcionario_id){ ref=d.funcionario_nome||'—'; link=`onclick="abrirFuncionario(${d.funcionario_id})"`; }
+        else if(d.contrato_id){ const c=ctMap[d.contrato_id]; ref=c?(c.parceiro_nome+(c.codigo?' · '+c.codigo:'')):'Contrato'; link=`onclick="abrirDocsContrato(${d.contrato_id})"`; }
+        else if(d.parceiro_id){ const p=pcMap[d.parceiro_id]; ref=p?p.nome:'Parceira'; }
+        return `<tr>
         <td><b>${esc(d.tipo_nome)}</b>${d.numero?'<span class="tag">'+esc(d.numero)+'</span>':''}</td>
-        <td>${esc(d.funcionario_nome||d.titulo||'CNA '+S.unidade)}</td>
+        <td>${link?`<a class="lnk" ${link}>${esc(ref)}</a>`:esc(ref)}</td>
         <td>${d.emissao?dBR(d.emissao):'—'}</td>
         <td>${d.validade?dBR(d.validade):'—'}</td>
         <td>${sitBadge(d.situacao)}${d.dias_para_vencer!=null&&d.situacao==='vencendo'?`<span class="hint"> ${d.dias_para_vencer}d</span>`:''}</td>
         <td class="acoes">
           ${d.arquivo_path?`<button class="btn sm sec" onclick="abrirArquivo('${esc(d.arquivo_path)}')">Abrir</button>`:''}
           <button class="btn sm ghost" onclick="delDoc(${d.id},'${esc(d.arquivo_path||'')}')">Excluir</button></td>
-      </tr>`).join('')}</tbody></table>`
+      </tr>`; }).join('')}</tbody></table>`
     :'<div class="empty">Nenhum documento arquivado neste vínculo.</div>'}
   </div>
 
   <div class="panel">
     <div class="panelHead"><h2>Pendências obrigatórias</h2></div>
-    ${falt.length?`<table><thead><tr><th>Funcionário</th><th>Documento</th><th>Situação</th></tr></thead><tbody>
-      ${falt.map(p=>`<tr><td><b>${esc(p.funcionario_nome)}</b></td><td>${esc(p.tipo_nome)}</td><td>${sitBadge(p.situacao)}</td></tr>`).join('')}
+    ${falt.length?`<table><thead><tr><th>Funcionário</th><th>Documento</th><th>Situação</th><th></th></tr></thead><tbody>
+      ${falt.map(p=>`<tr><td><b>${esc(p.funcionario_nome)}</b></td><td>${esc(p.tipo_nome)}</td><td>${sitBadge(p.situacao)}</td>
+        <td class="acoes"><button class="btn sm sec" onclick="funcTab='docs';abrirFuncionario(${p.funcionario_id})">Resolver</button></td></tr>`).join('')}
       </tbody></table>`:'<div class="empty">Nenhuma pendência. Documentação da equipe completa.</div>'}
   </div>`;
   const es=document.getElementById('dc_escopo');
@@ -1382,14 +1548,13 @@ async function docUpload(){
       await stUpload(path,file);
       nome=file.name; mime=file.type||null; tam=file.size;
     }
-    const row={unidade:S.unidade,escopo:docEscopo,tipo,
+    await db.ins('fin_documentos',[{unidade:S.unidade,escopo:docEscopo,tipo,
       funcionario_id:docEscopo==='funcionario'?parseInt(alvo,10):null,
       contrato_id:docEscopo==='contrato'?parseInt(alvo,10):null,
       parceiro_id:(docEscopo==='parceiro'||docEscopo==='fornecedor')?parseInt(alvo,10):null,
       numero:gvn('dc_num'),emissao:gvn('dc_emissao'),validade:gvn('dc_validade'),
       arquivo_path:path,arquivo_nome:nome,mime,tamanho_bytes:tam,obs:gvn('dc_obs'),
-      updated_at:new Date().toISOString()};
-    await db.ins('fin_documentos',[row]);
+      updated_at:new Date().toISOString()}]);
     toast('Documento arquivado'); render();
   }catch(e){ toast(e.message); btn.disabled=false; btn.textContent='Enviar documento'; }
 }
@@ -1397,7 +1562,7 @@ async function delDoc(id,path){
   if(!confirm('Excluir este documento e o arquivo?')) return;
   if(path) await stDelete(path);
   await db.del('fin_documentos',`id=eq.${id}`);
-  toast('Documento excluído'); render();
+  toast('Documento excluído'); render(); refreshModal();
 }
 
 /* ================= CONTRATOS E PARCEIRAS ================= */
@@ -1413,11 +1578,67 @@ function novoCt(){ ctNovo=!ctNovo; ctSel=null; render(); }
 function togglePc(id){ pcSel=(pcSel===id?null:id); pcNovo=false; render(); }
 function novoPc(){ pcNovo=!pcNovo; pcSel=null; render(); }
 
+async function abrirDocsContrato(id){
+  modalCtx={kind:'contrato',id};
+  openModal('Carregando…','<div class="empty">Carregando…</div>');
+  try{
+    const [ca,docs,tipos]=await Promise.all([
+      db.get('v_fin_contratos',`id=eq.${id}&select=*`),
+      db.get('v_fin_documentos',`contrato_id=eq.${id}&select=*&order=created_at.desc`),
+      db.get('fin_documento_tipos','ativo=eq.true&escopo=eq.contrato&select=*&order=ordem.asc')
+    ]);
+    if(!ca.length){ fecharModal(); return toast('Contrato não encontrado'); }
+    const c=ca[0];
+    openModal(c.parceiro_nome+(c.codigo?' · '+c.codigo:''),`
+      <p class="hint" style="margin-bottom:12px">${esc((CT_TIPOS.find(t=>t[0]===c.tipo)||['',c.tipo])[1])} · ${dBR(c.inicio)} a ${c.fim?dBR(c.fim):'sem termo'} · ${fmt(c.valor_mensal_cents)}/mês ${sitBadge(c.situacao)}</p>
+      ${docs.length?`<table><thead><tr><th>Documento</th><th>Emissão</th><th>Validade</th><th>Situação</th><th></th></tr></thead><tbody>
+        ${docs.map(d=>`<tr>
+          <td><b>${esc(d.tipo_nome)}</b>${d.numero?'<span class="tag">'+esc(d.numero)+'</span>':''}</td>
+          <td>${d.emissao?dBR(d.emissao):'—'}</td>
+          <td>${d.validade?dBR(d.validade):'—'}</td>
+          <td>${sitBadge(d.situacao)}</td>
+          <td class="acoes">
+            ${d.arquivo_path?`<button class="btn sm sec" onclick="abrirArquivo('${esc(d.arquivo_path)}')">Abrir</button>`:''}
+            <button class="btn sm ghost" onclick="delDoc(${d.id},'${esc(d.arquivo_path||'')}')">Excluir</button></td>
+        </tr>`).join('')}</tbody></table>`
+      :'<div class="empty">Nenhum documento anexado a este contrato.</div>'}
+      <h3 class="mSec">Anexar documento</h3>
+      <div class="gGrid">
+        ${gS('Tipo','cdc_tipo','',tipos.map(t=>[t.codigo,t.nome]))}
+        ${gF('Número','cdc_num','')}
+        ${gF('Emissão','cdc_emissao','','date')}
+        ${gF('Validade','cdc_validade','','date')}
+        <div class="field" style="grid-column:1/-1"><label>Arquivo (até 25 MB)</label><input class="txtInp" id="cdc_file" type="file"></div>
+      </div>
+      <div class="mFoot"><button class="btn" id="cdcBtn" onclick="docUploadCt(${id})">Enviar documento</button></div>`);
+  }catch(e){ toast(e.message); fecharModal(); }
+}
+async function docUploadCt(cid){
+  const tipo=gv('cdc_tipo'); if(!tipo) return toast('Escolha o tipo de documento');
+  const btn=document.getElementById('cdcBtn'); btn.disabled=true; btn.textContent='Enviando…';
+  try{
+    const inp=document.getElementById('cdc_file');
+    const file=inp&&inp.files&&inp.files[0];
+    let path=null,nome=null,mime=null,tam=null;
+    if(file){
+      if(file.size>25*1024*1024) throw new Error('Arquivo acima de 25 MB');
+      path=`contrato/${cid}/${Date.now()}-${slugArq(file.name)}`;
+      await stUpload(path,file); nome=file.name; mime=file.type||null; tam=file.size;
+    }
+    await db.ins('fin_documentos',[{unidade:S.unidade,escopo:'contrato',contrato_id:cid,tipo,
+      numero:gvn('cdc_num'),emissao:gvn('cdc_emissao'),validade:gvn('cdc_validade'),
+      arquivo_path:path,arquivo_nome:nome,mime,tamanho_bytes:tam,updated_at:new Date().toISOString()}]);
+    toast('Documento anexado'); refreshModal();
+  }catch(e){ toast(e.message); btn.disabled=false; btn.textContent='Enviar documento'; }
+}
+
 async function vContratos(el){
-  const [cts,parc]=await Promise.all([
+  const [cts,parc,docs]=await Promise.all([
     db.get('v_fin_contratos',`unidade=eq.${S.unidade}&select=*&order=fim.asc.nullslast`),
-    db.get('fin_parceiros',`unidade=eq.${S.unidade}&select=*&order=nome.asc`)
+    db.get('fin_parceiros',`unidade=eq.${S.unidade}&select=*&order=nome.asc`),
+    db.get('fin_documentos',`unidade=eq.${S.unidade}&escopo=eq.contrato&select=contrato_id`)
   ]);
+  const dc={}; docs.forEach(d=>dc[d.contrato_id]=(dc[d.contrato_id]||0)+1);
   const vig=cts.filter(c=>c.situacao==='vigente'||c.situacao==='vencendo');
   const mrr=vig.reduce((a,c)=>a+(c.valor_mensal_cents||0),0);
   const alunos=vig.reduce((a,c)=>a+(c.alunos||0),0);
@@ -1444,7 +1665,9 @@ async function vContratos(el){
         <td>${dBR(c.inicio)} a ${c.fim?dBR(c.fim):'sem termo'}</td>
         <td class="num">${fmt(c.valor_mensal_cents)}</td>
         <td>${sitBadge(c.situacao)}${c.situacao==='vencendo'?`<span class="hint"> ${c.dias_para_vencer}d</span>`:''}</td>
-        <td class="acoes"><button class="btn sm sec" onclick="toggleCt(${c.id})">${ctSel===c.id?'Fechar':'Editar'}</button></td>
+        <td class="acoes">
+          <button class="btn sm sec" onclick="abrirDocsContrato(${c.id})">Docs${dc[c.id]?' ('+dc[c.id]+')':''}</button>
+          <button class="btn sm sec" onclick="toggleCt(${c.id})">${ctSel===c.id?'Fechar':'Editar'}</button></td>
       </tr>`).join('')}</tbody></table>`
     :'<div class="empty">Nenhum contrato cadastrado.</div>'}
     ${ctSel?ctForm(cts.find(c=>c.id===ctSel)||{},pOpts,false):''}
@@ -1598,7 +1821,7 @@ async function vPonto(el){
     <table><thead><tr><th>Funcionário</th><th class="num">Dias prev.</th><th class="num">Dias trab.</th><th class="num">Horas</th><th class="num">Extras</th><th class="num">Faltas</th><th class="num">Atrasos (min)</th><th class="num">Banco (h)</th></tr></thead><tbody>
     ${funcs.map(f=>{ const e=emap[f.id]||{};
       return `<tr>
-        <td><b>${esc(f.nome)}</b><span class="tag">${esc(f.setor||'')}</span></td>
+        <td><a class="lnk" onclick="abrirFuncionario(${f.id})"><b>${esc(f.nome)}</b></a><span class="tag">${esc(f.setor||'')}</span></td>
         <td class="num"><input class="mini2" id="pt_dp_${f.id}" value="${e.dias_previstos!=null?e.dias_previstos:22}" ${ro}></td>
         <td class="num"><input class="mini2" id="pt_dt_${f.id}" value="${e.dias_trabalhados!=null?e.dias_trabalhados:''}" ${ro}></td>
         <td class="num"><input class="mini2" id="pt_h_${f.id}" value="${e.horas_trabalhadas!=null?e.horas_trabalhadas:''}" ${ro}></td>
