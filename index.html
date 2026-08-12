@@ -318,6 +318,49 @@ input.mini,input.mini2{text-align:right}
   nav a{min-height:44px;display:flex;align-items:center}
   input,select{padding:9px 10px}
 }
+
+/* ---------- perfil no topo (chip + menu) ---------- */
+.topbar h1{margin-right:auto}
+.topbar .monthPick{order:2}
+.topbar .userChip{order:3}
+.userChip{position:relative;flex-shrink:0}
+.userBtn{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);
+  border-radius:var(--r-pill);padding:4px 12px 4px 4px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.userBtn:hover{border-color:var(--blue);box-shadow:var(--shadow-1)}
+.avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  background:var(--pastelBlue);color:var(--blue);font-family:var(--display);font-weight:700;font-size:13px;
+  overflow:hidden;line-height:1;text-transform:uppercase;border:1px solid var(--line)}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.avatar.lg{width:52px;height:52px;font-size:19px}
+.avatar.xl{width:82px;height:82px;font-size:28px}
+.userTxt{display:flex;flex-direction:column;align-items:flex-start;line-height:1.15;min-width:0}
+.userTxt b{font-size:13px;font-weight:600;color:var(--ink);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.userTxt small{font-size:11px;color:var(--gray)}
+.userCaret{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;
+  border-top:5px solid var(--gray);flex-shrink:0;margin-left:2px}
+.userPop{position:absolute;right:0;top:calc(100% + 8px);z-index:60;width:250px;background:#fff;
+  border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-3);
+  padding:6px;display:none;border-top:3px solid var(--red)}
+.userPop.open{display:block}
+.userPopHead{display:flex;align-items:center;gap:11px;padding:11px 10px 12px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.userPopHead b{display:block;font-size:13.5px;color:var(--ink);overflow-wrap:anywhere}
+.userPopHead small{display:block;font-size:11.5px;color:var(--gray);overflow-wrap:anywhere}
+.userPop button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;padding:9px 10px;
+  border-radius:var(--r-sm);font-size:13.5px;color:var(--ink);font-weight:500}
+.userPop button:hover{background:var(--surface)}
+.userPop button.danger{color:var(--redDark)}
+.userPop button.danger:hover{background:var(--pastelRed)}
+.userPop .sep{height:1px;background:var(--line);margin:5px 8px}
+.avatarPick{display:flex;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+.avatarPick .acts{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:860px){
+  .topbar h1{width:auto;flex:1 1 auto;order:1;min-width:0}
+  .topbar .userChip{order:2}
+  .topbar .monthPick{order:3;width:100%}
+  .userBtn{padding:3px}
+  .userTxt,.userCaret{display:none}
+  .userPop{width:min(272px,calc(100vw - 32px))}
+}
 </style>
 </head>
 <body>
@@ -391,16 +434,33 @@ input.mini,input.mini2{text-align:right}
         <div class="navItems">
           <a data-v="documentos" onclick="go('documentos')">Documentos</a>
           <a data-v="contratos" onclick="go('contratos')">Contratos e parceiras</a>
+          <a data-v="acessos" onclick="go('acessos')">Acessos ao sistema</a>
         </div>
       </div>
     </nav>
-    <div class="foot"><b id="whoName"></b><span id="whoRole"></span><br><button onclick="logout()">Sair</button></div>
     </div>
   </aside>
   <main>
       <div id="printHead"><img src="" id="printLogo" alt=""><h1 id="printTitle"></h1></div>
     <div class="topbar">
       <h1 id="viewTitle">Resumo</h1>
+      <div class="userChip">
+        <button class="userBtn" id="userBtn" onclick="toggleUserMenu(event)" aria-haspopup="true" aria-expanded="false" aria-label="Menu do perfil">
+          <span class="avatar" id="avatarTop"></span>
+          <span class="userTxt"><b id="topName"></b><small id="topRole"></small></span>
+          <span class="userCaret"></span>
+        </button>
+        <div class="userPop" id="userPop">
+          <div class="userPopHead">
+            <span class="avatar lg" id="avatarPop"></span>
+            <div><b id="popName"></b><small id="popEmail"></small></div>
+          </div>
+          <button onclick="abrirPerfil()">Editar perfil</button>
+          <button id="popAcessos" onclick="fecharUserMenu();go('acessos')">Gerenciar acessos</button>
+          <div class="sep"></div>
+          <button class="danger" onclick="logout()">Sair</button>
+        </div>
+      </div>
       <div class="monthPick">
         <button onclick="shiftMonth(-1)" aria-label="Mês anterior">‹</button>
         <b id="monthLabel"></b>
@@ -428,7 +488,7 @@ const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const LOGO = 'data:image/png;base64,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';
 
 const UNIDADES=[{id:'taquara',nome:'CNA Taquara',sub:'Estrada da Soca, 129'},{id:'queimados',nome:'CNA Queimados',sub:'Unidade Queimados'}];
-let S = { token:null, refresh:null, uid:null, role:null, nome:null, unidade:null, comp: curComp(), view:'resumo', cfg:{} };
+let S = { token:null, refresh:null, uid:null, role:null, nome:null, email:null, avatar:null, telefone:null, unidade:null, comp: curComp(), view:'resumo', cfg:{} };
 
 document.querySelectorAll('.logoImg').forEach(i=>i.src=LOGO);
 
@@ -512,13 +572,12 @@ async function doInvite(){
   }catch(e){ authMsg(e.message); }
 }
 async function afterLogin(){
-  const perfil = await db.get('fin_usuarios','id=eq.'+S.uid+'&select=nome,role,aprovado,email');
+  const perfil = await db.get('fin_usuarios','id=eq.'+S.uid+'&select=nome,role,aprovado,email,avatar,telefone');
   const p = perfil[0];
   if(!p || !p.aprovado){ showInvite(); return; }
-  S.role=p.role; S.nome=p.nome||p.email;
-  document.getElementById('whoName').textContent=S.nome;
-  document.getElementById('whoRole').textContent=S.role==='admin'?'Administrador':'Operacional';
-  if(S.role!=='admin') document.querySelectorAll('[data-admin]').forEach(el=>el.style.display='none');
+  S.role=p.role; S.nome=p.nome||p.email; S.email=p.email; S.avatar=p.avatar||null; S.telefone=p.telefone||null;
+  document.querySelectorAll('[data-admin]').forEach(el=>{ el.style.display = (S.role==='admin'?'':'none'); });
+  pintarPerfil();
   showUnitPicker();
 }
 function showUnitPicker(){
@@ -547,12 +606,12 @@ function closeNav(){ document.body.classList.remove('navOpen'); const b=document
 function toggleNav(){ document.body.classList.contains('navOpen')?closeNav():openNav(); }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeNav(); });
 window.addEventListener('resize',()=>{ if(window.innerWidth>860) closeNav(); });
-function logout(){ closeNav(); S={token:null,refresh:null,uid:null,role:null,nome:null,unidade:null,comp:curComp(),view:'resumo',cfg:{}}; document.getElementById('app').style.display='none'; document.getElementById('auth').style.display='flex'; showLogin(); }
+function logout(){ closeNav(); fecharUserMenu(); S={token:null,refresh:null,uid:null,role:null,nome:null,email:null,avatar:null,telefone:null,unidade:null,comp:curComp(),view:'resumo',cfg:{}}; document.getElementById('app').style.display='none'; document.getElementById('auth').style.display='flex'; showLogin(); }
 
 /* ================= ROUTER ================= */
-const TITLES={resumo:'Resumo do mês',fixas:'Contas a pagar · Despesas fixas',variaveis:'Contas a pagar · Despesas variáveis',folha:'Folha de pagamento',receitas:'Receitas',dre:'DRE',df:'DF · Relatório de franquia',equipe:'Equipe · Funcionários',ponto:'Folha de ponto',documentos:'Documentos',contratos:'Contratos e empresas parceiras'};
-const VIEWS_ADMIN=['folha','equipe','ponto','documentos','contratos'];
-const VIEWS_SEM_MES=['equipe','documentos','contratos'];
+const TITLES={resumo:'Resumo do mês',fixas:'Contas a pagar · Despesas fixas',variaveis:'Contas a pagar · Despesas variáveis',folha:'Folha de pagamento',receitas:'Receitas',dre:'DRE',df:'DF · Relatório de franquia',equipe:'Equipe · Funcionários',ponto:'Folha de ponto',documentos:'Documentos',contratos:'Contratos e empresas parceiras',acessos:'Acessos ao sistema'};
+const VIEWS_ADMIN=['folha','equipe','ponto','documentos','contratos','acessos'];
+const VIEWS_SEM_MES=['equipe','documentos','contratos','acessos'];
 function go(v){
   if(VIEWS_ADMIN.includes(v)&&S.role!=='admin') return;
   S.view=v; closeNav(); abrirSec(SEC_OF[v]);
@@ -566,7 +625,7 @@ function render(){
   document.getElementById('monthLabel').textContent=compLabel(S.comp);
   const el=document.getElementById('view');
   el.innerHTML='<div class="empty">Carregando…</div>';
-  ({resumo:vResumo,fixas:el2=>vContas(el2,'fixa'),variaveis:el2=>vContas(el2,'variavel'),folha:vFolha,receitas:vReceitas,dre:vDRE,df:vDF,equipe:vEquipe,ponto:vPonto,documentos:vDocumentos,contratos:vContratos})[S.view](el).catch(e=>{ el.innerHTML=`<div class="panel"><b style="color:var(--redDark)">Erro:</b> ${esc(e.message)}</div>`; });
+  ({resumo:vResumo,fixas:el2=>vContas(el2,'fixa'),variaveis:el2=>vContas(el2,'variavel'),folha:vFolha,receitas:vReceitas,dre:vDRE,df:vDF,equipe:vEquipe,ponto:vPonto,documentos:vDocumentos,contratos:vContratos,acessos:vAcessos})[S.view](el).catch(e=>{ el.innerHTML=`<div class="panel"><b style="color:var(--redDark)">Erro:</b> ${esc(e.message)}</div>`; });
 }
 
 /* ================= CÁLCULOS DA FOLHA ================= */
@@ -1217,7 +1276,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&document.getElement
 /* --- navegação por seções --- */
 const SEC_OF={resumo:'financeiro',fixas:'financeiro',variaveis:'financeiro',receitas:'financeiro',
   folha:'financeiro',dre:'financeiro',df:'financeiro',equipe:'equipe',ponto:'equipe',
-  documentos:'admin',contratos:'admin'};
+  documentos:'admin',contratos:'admin',acessos:'admin'};
 function toggleSec(id){ const el=document.getElementById('sec_'+id); if(el) el.classList.toggle('open'); }
 function abrirSec(id){ document.querySelectorAll('.navSec').forEach(s=>s.classList.toggle('open',s.id==='sec_'+id)); }
 
@@ -1958,6 +2017,263 @@ function cardifyTables(){
 new MutationObserver(()=>cardifyTables())
   .observe(document.body,{childList:true,subtree:true});
 document.addEventListener('DOMContentLoaded',cardifyTables);
+
+/* ================= PERFIL E ACESSOS ================= */
+
+function iniciais(nome,email){
+  const base=(nome||'').trim()||(email||'').split('@')[0]||'?';
+  const p=base.split(/[\s._-]+/).filter(Boolean);
+  return ((p[0]||'?')[0]+(p.length>1?p[p.length-1][0]:'')).toUpperCase();
+}
+function pintaAvatar(el,avatar,nome,email){
+  if(!el) return;
+  el.innerHTML = avatar ? `<img src="${esc(avatar)}" alt="">` : esc(iniciais(nome,email));
+}
+function pintarPerfil(){
+  const rot = S.role==='admin'?'Administrador':'Operacional';
+  const nm  = S.nome||S.email||'';
+  const set=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
+  set('topName',nm); set('topRole',rot); set('popName',nm); set('popEmail',S.email||'');
+  pintaAvatar(document.getElementById('avatarTop'),S.avatar,nm,S.email);
+  pintaAvatar(document.getElementById('avatarPop'),S.avatar,nm,S.email);
+  const pa=document.getElementById('popAcessos'); if(pa) pa.style.display=(S.role==='admin'?'':'none');
+}
+function toggleUserMenu(ev){
+  if(ev) ev.stopPropagation();
+  const p=document.getElementById('userPop'), b=document.getElementById('userBtn');
+  if(!p) return;
+  const abrir=!p.classList.contains('open');
+  p.classList.toggle('open',abrir);
+  if(b) b.setAttribute('aria-expanded',abrir?'true':'false');
+}
+function fecharUserMenu(){
+  const p=document.getElementById('userPop'), b=document.getElementById('userBtn');
+  if(p) p.classList.remove('open');
+  if(b) b.setAttribute('aria-expanded','false');
+}
+document.addEventListener('click',e=>{ if(!e.target.closest('.userChip')) fecharUserMenu(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') fecharUserMenu(); });
+
+/* --- editar o proprio perfil --- */
+let perfilAvatar=null;
+
+function abrirPerfil(){
+  fecharUserMenu(); closeNav();
+  perfilAvatar=S.avatar||null;
+  openModal('Meu perfil',`
+    <div class="panel">
+      <h2>Dados</h2>
+      <div class="avatarPick">
+        <span class="avatar xl" id="pfAvatar"></span>
+        <div class="acts">
+          <button class="btn sm sec" onclick="document.getElementById('pfFile').click()">Trocar foto</button>
+          <button class="btn sm ghost" onclick="removerFotoPerfil()">Remover</button>
+          <input type="file" id="pfFile" accept="image/*" style="display:none" onchange="lerFotoPerfil(this)">
+          <p class="hint" style="flex:0 0 100%;margin-top:2px">JPG ou PNG. A imagem é reduzida automaticamente.</p>
+        </div>
+      </div>
+      <div class="gGrid">
+        <div class="field"><label for="pfNome">Nome</label><input id="pfNome" value="${esc(S.nome||'')}"></div>
+        <div class="field"><label for="pfTel">Telefone</label><input id="pfTel" value="${esc(S.telefone||'')}"></div>
+        <div class="field"><label for="pfMail">E-mail de acesso</label><input id="pfMail" value="${esc(S.email||'')}" disabled></div>
+      </div>
+      <button class="btn" onclick="salvarPerfil()">Salvar perfil</button>
+    </div>
+    <div class="panel">
+      <h2>Trocar minha senha</h2>
+      <div class="gGrid">
+        <div class="field"><label for="pfS0">Senha atual</label><input id="pfS0" type="password" autocomplete="current-password"></div>
+        <div class="field"><label for="pfS1">Nova senha</label><input id="pfS1" type="password" autocomplete="new-password"></div>
+        <div class="field"><label for="pfS2">Repetir nova senha</label><input id="pfS2" type="password" autocomplete="new-password"></div>
+      </div>
+      <p class="hint" style="margin-bottom:10px">Mínimo de 8 caracteres.</p>
+      <button class="btn sec" onclick="trocarMinhaSenha()">Trocar senha</button>
+    </div>`);
+  pintaAvatar(document.getElementById('pfAvatar'),perfilAvatar,S.nome,S.email);
+}
+
+function redimensionar(file,lado){
+  return new Promise((res,rej)=>{
+    const fr=new FileReader();
+    fr.onerror=()=>rej(new Error('Não consegui ler o arquivo'));
+    fr.onload=()=>{
+      const img=new Image();
+      img.onerror=()=>rej(new Error('Arquivo de imagem inválido'));
+      img.onload=()=>{
+        const c=document.createElement('canvas'); c.width=lado; c.height=lado;
+        const ctx=c.getContext('2d');
+        const m=Math.min(img.width,img.height);
+        ctx.drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,lado,lado);
+        res(c.toDataURL('image/jpeg',0.82));
+      };
+      img.src=fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+async function lerFotoPerfil(inp){
+  const f=inp.files&&inp.files[0]; if(!f) return;
+  try{
+    perfilAvatar=await redimensionar(f,192);
+    pintaAvatar(document.getElementById('pfAvatar'),perfilAvatar,S.nome,S.email);
+  }catch(e){ toast(e.message); }
+  inp.value='';
+}
+function removerFotoPerfil(){
+  perfilAvatar='';
+  pintaAvatar(document.getElementById('pfAvatar'),null,gv('pfNome')||S.nome,S.email);
+}
+async function salvarPerfil(){
+  const nome=gv('pfNome');
+  if(!nome) return toast('Informe o nome');
+  try{
+    const r=await db.rpc('fin_perfil_salvar',{p_nome:nome,p_telefone:gv('pfTel'),p_avatar:perfilAvatar});
+    if(!r.ok) return toast(r.erro);
+    S.nome=nome; S.telefone=gv('pfTel')||null;
+    S.avatar = (perfilAvatar==='' ? null : (perfilAvatar||S.avatar));
+    pintarPerfil(); fecharModal(); toast('Perfil atualizado');
+  }catch(e){ toast(e.message); }
+}
+async function trocarMinhaSenha(){
+  const a=gv('pfS0'), n1=gv('pfS1'), n2=gv('pfS2');
+  if(!a||!n1) return toast('Preencha a senha atual e a nova');
+  if(n1!==n2) return toast('A nova senha e a repetição não conferem');
+  if(n1.length<8) return toast('A nova senha precisa de pelo menos 8 caracteres');
+  try{
+    const r=await db.rpc('fin_perfil_trocar_senha',{p_atual:a,p_nova:n1});
+    if(!r.ok) return toast(r.erro);
+    ['pfS0','pfS1','pfS2'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+    toast('Senha alterada');
+  }catch(e){ toast(e.message); }
+}
+
+/* --- tela de acessos (admin) --- */
+const ROLES=[['admin','Administrador'],['operacional','Operacional']];
+const roleLabel=r=>(ROLES.find(x=>x[0]===r)||['','—'])[1];
+
+async function vAcessos(el){
+  const us=await db.rpc('fin_usuarios_listar',{});
+  const admins=us.filter(u=>u.role==='admin'&&u.aprovado).length;
+  const pend=us.filter(u=>!u.aprovado).length;
+  el.innerHTML=`
+  <div class="cards">
+    <div class="card"><small>Acessos cadastrados</small><div class="v blue">${us.length}</div></div>
+    <div class="card"><small>Administradores</small><div class="v">${admins}</div><div class="d">acesso total ao sistema</div></div>
+    <div class="card"><small>Aguardando liberação</small><div class="v ${pend?'red':'ok'}">${pend}</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panelHead">
+      <h2>Acessos ao sistema</h2>
+      <button class="btn sm" onclick="abrirAcesso(null)">+ Novo acesso</button>
+    </div>
+    <table><thead><tr><th>Pessoa</th><th>E-mail</th><th>Perfil</th><th>Situação</th><th>Último acesso</th><th></th></tr></thead><tbody>
+    ${us.map(u=>`<tr class="${u.aprovado?'':'paid'}">
+      <td><span style="display:flex;align-items:center;gap:9px">
+        <span class="avatar">${u.avatar?`<img src="${esc(u.avatar)}" alt="">`:esc(iniciais(u.nome,u.email))}</span>
+        <b>${esc(u.nome||'sem nome')}</b>${u.eu?'<span class="tag">você</span>':''}</span></td>
+      <td>${esc(u.email)}</td>
+      <td>${u.role==='admin'?'<span class="badge late">Administrador</span>':'<span class="badge cat">Operacional</span>'}</td>
+      <td>${u.aprovado?'<span class="badge pago">Liberado</span>':'<span class="badge pend">Bloqueado</span>'}</td>
+      <td>${u.ultimo_acesso?esc(new Date(u.ultimo_acesso).toLocaleDateString('pt-BR')):'<span class="hint">nunca entrou</span>'}</td>
+      <td class="acoes"><button class="btn sm sec" onclick="abrirAcesso('${u.id}')">Abrir</button></td>
+    </tr>`).join('')}
+    </tbody></table>
+    <p class="hint" style="margin-top:10px">Administrador vê tudo, inclusive folha de pagamento, equipe e esta tela. Operacional não vê folha nem dados da equipe. Bloquear preserva o histórico e impede a entrada.</p>
+  </div>`;
+  acessosCache=us;
+}
+
+let acessosCache=[];
+
+function abrirAcesso(id){
+  const u = id ? acessosCache.find(x=>x.id===id) : null;
+  const novo = !u;
+  openModal(novo?'Novo acesso':('Acesso · '+(u.nome||u.email)),`
+    <div class="panel">
+      <h2>Dados do acesso</h2>
+      <div class="gGrid">
+        <div class="field"><label for="acNome">Nome</label><input id="acNome" value="${esc(u?(u.nome||''):'')}"></div>
+        <div class="field"><label for="acMail">E-mail</label>
+          <input id="acMail" type="email" value="${esc(u?u.email:'')}" ${novo?'':'disabled'}></div>
+        <div class="field"><label for="acRole">Perfil</label><select id="acRole">
+          ${ROLES.map(r=>`<option value="${r[0]}" ${u&&u.role===r[0]?'selected':''}>${r[1]}</option>`).join('')}
+        </select></div>
+        <div class="field"><label for="acAprov">Situação</label><select id="acAprov">
+          <option value="1" ${!u||u.aprovado?'selected':''}>Liberado</option>
+          <option value="0" ${u&&!u.aprovado?'selected':''}>Bloqueado</option>
+        </select></div>
+        ${novo?`<div class="field"><label for="acTel">Telefone</label><input id="acTel"></div>`:
+                `<div class="field"><label for="acTel">Telefone</label><input id="acTel" value="${esc(u.telefone||'')}"></div>`}
+      </div>
+      ${novo?`
+      <div class="gGrid">
+        <div class="field"><label for="acS1">Senha inicial</label><input id="acS1" type="password" autocomplete="new-password"></div>
+        <div class="field"><label for="acS2">Repetir senha</label><input id="acS2" type="password" autocomplete="new-password"></div>
+      </div>
+      <p class="hint" style="margin-bottom:10px">Mínimo de 8 caracteres. Passe a senha à pessoa e peça para ela trocar no menu do perfil.</p>`:''}
+      <button class="btn" onclick="salvarAcesso(${novo?'null':`'${u.id}'`})">${novo?'Criar acesso':'Salvar alterações'}</button>
+    </div>
+    ${novo?'':`
+    <div class="panel">
+      <h2>Redefinir senha</h2>
+      <div class="gGrid">
+        <div class="field"><label for="acN1">Nova senha</label><input id="acN1" type="password" autocomplete="new-password"></div>
+        <div class="field"><label for="acN2">Repetir nova senha</label><input id="acN2" type="password" autocomplete="new-password"></div>
+      </div>
+      <p class="hint" style="margin-bottom:10px">A pessoa passa a entrar com a senha nova imediatamente.</p>
+      <button class="btn sec" onclick="redefinirSenhaAcesso('${u.id}')">Redefinir senha</button>
+    </div>
+    <div class="panel">
+      <h2>Excluir acesso</h2>
+      <p class="hint" style="margin-bottom:10px">Remove a conta em definitivo. Para tirar o acesso sem apagar nada, marque a situação como <b>Bloqueado</b>.</p>
+      <button class="btn sec" style="color:var(--redDark)" onclick="excluirAcesso('${u.id}','${esc(u.nome||u.email)}')" ${u.eu?'disabled':''}>Excluir acesso</button>
+    </div>`}`);
+}
+
+async function salvarAcesso(id){
+  const nome=gv('acNome'), role=gv('acRole'), aprov=gv('acAprov')==='1', tel=gv('acTel');
+  try{
+    let r;
+    if(!id){
+      const mail=gv('acMail'), s1=gv('acS1'), s2=gv('acS2');
+      if(!mail) return toast('Informe o e-mail');
+      if(s1!==s2) return toast('As senhas não conferem');
+      if(s1.length<8) return toast('A senha precisa de pelo menos 8 caracteres');
+      r=await db.rpc('fin_usuario_criar',{p_email:mail,p_nome:nome,p_role:role,p_senha:s1,p_aprovado:aprov});
+      if(!r.ok) return toast(r.erro);
+      if(tel) await db.rpc('fin_usuario_atualizar',{p_id:r.id,p_nome:nome,p_role:role,p_aprovado:aprov,p_telefone:tel});
+      toast('Acesso criado');
+    }else{
+      r=await db.rpc('fin_usuario_atualizar',{p_id:id,p_nome:nome,p_role:role,p_aprovado:aprov,p_telefone:tel});
+      if(!r.ok) return toast(r.erro);
+      if(id===S.uid){ S.nome=nome; S.role=role; S.telefone=tel||null; pintarPerfil(); }
+      toast('Acesso atualizado');
+    }
+    fecharModal(); render();
+  }catch(e){ toast(e.message); }
+}
+
+async function redefinirSenhaAcesso(id){
+  const n1=gv('acN1'), n2=gv('acN2');
+  if(n1!==n2) return toast('As senhas não conferem');
+  if(n1.length<8) return toast('A senha precisa de pelo menos 8 caracteres');
+  try{
+    const r=await db.rpc('fin_usuario_senha',{p_id:id,p_senha:n1});
+    if(!r.ok) return toast(r.erro);
+    ['acN1','acN2'].forEach(k=>{ const e=document.getElementById(k); if(e) e.value=''; });
+    toast('Senha redefinida');
+  }catch(e){ toast(e.message); }
+}
+
+async function excluirAcesso(id,nome){
+  if(!confirm('Excluir em definitivo o acesso de '+nome+'?')) return;
+  try{
+    const r=await db.rpc('fin_usuario_excluir',{p_id:id});
+    if(!r.ok) return toast(r.erro);
+    fecharModal(); render(); toast('Acesso excluído');
+  }catch(e){ toast(e.message); }
+}
 </script>
 </body>
 </html>
