@@ -17,16 +17,18 @@ financeiro é um dos módulos.
 
 ## Arquitetura
 
-Monólito de arquivo único. `index.html` com ~2.280 linhas, **um único bloco
-`<script>`**, HTML + CSS + JS vanilla inline. Sem build.
+Monólito de arquivo único. `index.html` com HTML + CSS + JS vanilla inline,
+sem build. **Dois blocos `<script>`**: o primeiro é o administrativo clássico
+(vanilla, sem imports); o segundo é `type="module"` e carrega a gestão do ponto
+eletrônico. São mundos separados de propósito, ver a seção do ponto abaixo.
 
 Arquivos:
 
 | Arquivo | O que é |
 |---|---|
 | `index.html` | Aplicação administrativa completa |
-| `rep.html` | Tela de registro de ponto |
-| `rep-entrar.html` | Entrada do registro de ponto |
+| `rep.html` | Legado. Versão avulsa da gestão do ponto, já portada para o `index.html`. Sem link no menu. Mantida só como rollback |
+| `rep-entrar.html` | Legado. Login da versão avulsa |
 | `CNAME` | `adm.cnataquara.com.br` |
 
 Acesso a dados via REST direto, sem `supabase-js`:
@@ -47,15 +49,43 @@ RPCs de usuário: `fin_usuarios_listar`, `fin_usuario_criar`,
 
 Storage: bucket `gestao-docs`, acesso por signed URL com expiração de 3600s.
 
-## Atenção: `rep.html` não fala com este banco
+## Atenção: o ponto eletrônico não fala com este banco
 
-`rep.html` e `rep-entrar.html` moram neste repo mas apontam para o Supabase do
-ponto eletrônico (`snipevyvfxaotjhnabmx`), não para `thelqaxsnuynevizhcla`.
+O menu tem a seção **Ponto eletrônico** com sete telas (equipe e biometria,
+espelho, banco de horas, pendências, relatórios, terminais, configurações).
+Elas moram no `index.html` mas apontam para o Supabase do ponto
+(`snipevyvfxaotjhnabmx`, schema `ponto`), não para `thelqaxsnuynevizhcla`.
 
-Não assuma que tudo neste repo é `fin_*`. Antes de mexer nessas duas telas,
-confira qual banco a página está usando. O ponto eletrônico é
+Não assuma que tudo neste repo é `fin_*`. O ponto eletrônico é
 **arquiteturalmente isolado** por razão fiscal e legal, e essa separação de
 banco é proposital. Ver `cnataquara-ponto`.
+
+Como a convivência funciona:
+
+- **HTML**: tudo dentro de `<div id="pontoWrap">`, irmão de `#view` dentro do
+  `<main>`. O roteador mostra um ou outro, nunca os dois.
+- **CSS**: o `cna.css` do repo `cnataquara-ponto` mais os estilos próprios das
+  telas foram escopados sob `#pontoWrap` no bloco `<style id="pontoCSS">`.
+  Oito classes colidiam com o administrativo (`.btn`, `.tag`, `.ok`, `.n`,
+  `.num`, `.neg`, `.danger`) e o escopo resolve. Se atualizar o `cna.css` lá,
+  reescope antes de trazer: nenhum seletor pode sair de `#pontoWrap`, com a
+  única exceção de `body.dialogo-aberto`.
+- **JS**: bloco `<script type="module">` no fim do body. O escopo de módulo
+  isola tudo; a única superfície pública é `window.PONTO = { abrir, sair }`.
+  O código usa delegação de evento, nunca `onclick` inline, e depende disso
+  para funcionar dentro do módulo.
+- **Views**: prefixo `rep_` (`rep_equipe`, `rep_espelho`, ...). O `render()`
+  desvia para `window.PONTO.abrir(view.slice(4))` em vez de escrever no `#view`.
+- **Sessão**: projetos Supabase diferentes significam usuários diferentes. O
+  `doLogin()` do adm espelha as credenciais no projeto do ponto em segundo
+  plano e deixa o resultado em `window.__PONTO_SESSAO`. Se a senha for outra,
+  a própria tela pede uma vez (painel `p-repauth`). Falha no espelho nunca
+  trava o login do adm.
+
+A tela **Fechamento para a folha** (`view` `ponto`, tabela `fin_ponto_espelho`)
+continua no banco financeiro e continua sendo digitada à mão. É a consolidação
+que alimenta a folha, não o registro legal. Ligar o "Importar do REP-A" agora é
+viável: os dois lados estão na mesma página.
 
 ## Regras de folha
 
