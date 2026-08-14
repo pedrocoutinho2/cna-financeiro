@@ -399,6 +399,10 @@ aside .brand{padding:0 20px 16px;border-bottom:1px solid var(--line);margin-bott
 aside .brand small{display:block;color:var(--gray);font-weight:400;font-size:11px;margin-top:2px}
 nav a{display:block;padding:9px 20px;color:var(--ink);text-decoration:none;font-weight:500;font-size:13.5px;border-left:3px solid transparent;cursor:pointer;transition:background .15s}
 nav a:hover{background:var(--surface)}
+nav a.ext{color:var(--gray);font-size:13px}
+nav a.ext::after{content:'\2197';margin-left:6px;font-size:11px;opacity:.7}
+nav a.ext:hover{color:var(--ink)}
+.navItems .sepNav{margin:8px 20px 6px;border-top:1px solid var(--line);padding-top:8px;font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 nav a.on{font-weight:700;color:var(--red);border-left-color:var(--red);background:var(--pastelRed)}
 .asideBody{display:flex;flex-direction:column;flex:1;min-height:0}
 .unitPick{padding:0 20px 12px;margin-bottom:6px;border-bottom:1px solid var(--line)}
@@ -708,6 +712,9 @@ input.mini,input.mini2{text-align:right}
           <a data-v="rep_terminais" onclick="go('rep_terminais')">Terminais</a>
           <a data-v="rep_config" onclick="go('rep_config')">Configurações do ponto</a>
           <a data-v="ponto" onclick="go('ponto')">Fechamento para a folha</a>
+          <div class="sepNav">Para a equipe</div>
+          <a class="ext" href="https://ponto.cnataquara.com.br/" target="_blank" rel="noopener">Bater ponto (terminal)</a>
+          <a class="ext" href="https://ponto.cnataquara.com.br/pessoal.html" target="_blank" rel="noopener">Consultar o próprio ponto</a>
         </div>
       </div>
       <div class="navSec" id="sec_admin" data-admin>
